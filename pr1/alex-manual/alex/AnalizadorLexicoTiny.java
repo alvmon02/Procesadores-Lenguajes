@@ -218,6 +218,16 @@ public class AnalizadorLexicoTiny {
             transita(Estado.REC_0EXP);
           else if (hayDigitoPos())
             transita(Estado.REC_EXP);
+          else if (haySigno())
+            transita(Estado.EXP_SIG);
+          else
+            error();
+          break;
+        case EXP_SIG:
+          if (hayCero())
+            transita(Estado.REC_0EXP);
+          else if (hayDigitoPos())
+            transita(Estado.REC_EXP);
           else
             error();
           break;
@@ -308,6 +318,10 @@ public class AnalizadorLexicoTiny {
 
   private boolean hayResta() {
     return sigCar == '-';
+  }
+
+  private boolean haySigno() {
+    return haySuma() || hayResta();
   }
 
   private boolean hayMul() {
