@@ -18,7 +18,7 @@ public enum ClaseLexica {
     PCOMA(";"),
     MAS("+"),
     MENOS("-"),
-    POR("*"),
+    MUL("*"),
     DIV("/"),
     INIEVAL("@"),
     FINDECLAR("&&"),
