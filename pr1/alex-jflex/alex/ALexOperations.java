@@ -119,7 +119,7 @@ public class ALexOperations {
       return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.P_AND);
    }
 
-   public UnidadLexica unidadP_or() {
+   public UnidadLexica unidadP_Or() {
       return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.P_OR);
    }
 
