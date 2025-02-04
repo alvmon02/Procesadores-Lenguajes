@@ -224,6 +224,14 @@ public class ALexOperations {
       return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.EOF);
    }
 
+   public UnidadLexica unidadCad() {
+      return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.CAD);
+   }
+
+   public UnidadLexica unidadAmpersand() {
+      return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.AMPERSAND);
+   }
+   
    public void error() {
       throw new ECaracterInesperado(
             "***" + alex.fila() + "," + alex.columna() + ": Caracter inexperado: " + alex.lexema());
