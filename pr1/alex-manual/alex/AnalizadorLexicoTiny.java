@@ -293,7 +293,7 @@ public class AnalizadorLexicoTiny {
 
   private boolean hayLetra() {
     return sigCar >= 'a' && sigCar <= 'z' ||
-        sigCar >= 'A' && sigCar <= 'Z';
+        sigCar >= 'A' && sigCar <= 'Z' || sigCar == '_';
   }
 
   private boolean hayExponente() {
@@ -365,7 +365,7 @@ public class AnalizadorLexicoTiny {
   }
 
   private boolean hayPyComa() {
-    return sigCar == ',';
+    return sigCar == ';';
   }
 
   private boolean hayPunto() {
