@@ -57,7 +57,7 @@ call = call
 identificador = {letra}({letra}|{digito})*
 numeroEntero = [\+\-]?{parteEntera}
 numeroReal = {numeroEntero} ({parte_exponencial} | \.{parteDecimal} | \.{parteDecimal}{parte_exponencial})
-cadena = "([^"])*" 
+cadena = \" ([^\"])* \"
 operadorSuma = \+
 operadorResta = \-
 operadorMultiplicacion = \*
@@ -80,7 +80,7 @@ porcentaje = %
 inicioEvaluacion = \@
 finDeclaracion = \&\&
 ampersand = \&
-exponente = ^
+exponente = \^
 %%
 {separador}               {}
 {comentario}              {}
@@ -125,8 +125,8 @@ exponente = ^
 
 {identificador}           {return ops.unidadId();}
 {numeroEntero}            {return ops.unidadEnt();}
-{numeroReal}              {return ops.unidadReal();}
 {cadena}                  {return ops.unidadCad();}
+{numeroReal}              {return ops.unidadReal();}
 {operadorSuma}            {return ops.unidadSuma();}
 {operadorResta}           {return ops.unidadResta();}
 {operadorMultiplicacion}  {return ops.unidadMul();}
