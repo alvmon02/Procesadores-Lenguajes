@@ -26,10 +26,10 @@ package alex;
 letra  = ([A-Z]|[a-z]|_)
 digitoPositivo = [1-9]
 digito = ({digitoPositivo}|0)
-parteEntera = ({digitoPositivo}{digito}*|0)
+signo = [\+,\-]
+parteEntera = {signo}?({digitoPositivo}{digito}*|0)
 parteDecimal = ({digito}*{digitoPositivo}|0)
 parteExponencial = ([eE]{parteEntera})
-signo = [\+\-]
 
 /* Cadenas ignorables */
 separador = [ \t\r\b\n]
@@ -37,8 +37,8 @@ comentario = ##[^\n]*
 
 /* Clases lexicas */
 identificador = {letra}({letra}|{digito})*
-numeroEntero = {signo}?{parteEntera}
-numeroReal = {signo}?{parteEntera}({parteExponencial}|\.{parteDecimal}|\.{parteDecimal}{parteExponencial})
+numeroEntero = {parteEntera}
+numeroReal = {parteEntera}({parteExponencial}|\.{parteDecimal}|\.{parteDecimal}{parteExponencial})
 string = \"([^\"])*\"
 parentesisApertura = \(
 parentesisCierre = \)
@@ -91,6 +91,28 @@ p_call = [cC][aA][lL][lL]
 %%
 {separador}               {}
 {comentario}              {}
+{p_int}                   {return ops.unidadP_Int();}
+{p_real}                  {return ops.unidadP_Real();}
+{p_bool}                  {return ops.unidadP_Bool();}
+{p_and}                   {return ops.unidadP_And();}
+{p_or}                    {return ops.unidadP_Or();}
+{p_not}                   {return ops.unidadP_Not();}
+{p_true}                  {return ops.unidadP_True();}
+{p_false}                 {return ops.unidadP_False();}
+{p_string}                {return ops.unidadP_String();}
+{p_null}                  {return ops.unidadP_Null();}
+{p_proc}                  {return ops.unidadP_Proc();}
+{p_if}                    {return ops.unidadP_If();}
+{p_else}                  {return ops.unidadP_Else();}
+{p_while}                 {return ops.unidadP_While();}
+{p_struct}                {return ops.unidadP_Struct();}
+{p_new}                   {return ops.unidadP_New();}
+{p_delete}                {return ops.unidadP_Delete();}
+{p_read}                  {return ops.unidadP_Read();}
+{p_write}                 {return ops.unidadP_Write();}
+{p_nl}                    {return ops.unidadP_Nl();}
+{p_type}                  {return ops.unidadP_Type();}
+{p_call}                  {return ops.unidadP_Call();}
 {identificador}           {return ops.unidadId();}
 {numeroEntero}            {return ops.unidadEnt();}
 {numeroReal}              {return ops.unidadReal();}
@@ -120,26 +142,4 @@ p_call = [cC][aA][lL][lL]
 {corcheteCierre}          {return ops.unidadCorcheteCierre();}
 {punto}                   {return ops.unidadPunto();}
 {exponente}               {return ops.unidadExponente();}
-{p_int}                   {return ops.unidadP_Int();}
-{p_real}                  {return ops.unidadP_Real();}
-{p_bool}                  {return ops.unidadP_Bool();}
-{p_and}                   {return ops.unidadP_And();}
-{p_or}                    {return ops.unidadP_Or();}
-{p_not}                   {return ops.unidadP_Not();}
-{p_true}                  {return ops.unidadP_True();}
-{p_false}                 {return ops.unidadP_False();}
-{p_string}                {return ops.unidadP_String();}
-{p_null}                  {return ops.unidadP_Null();}
-{p_proc}                  {return ops.unidadP_Proc();}
-{p_if}                    {return ops.unidadP_If();}
-{p_else}                  {return ops.unidadP_Else();}
-{p_while}                 {return ops.unidadP_While();}
-{p_struct}                {return ops.unidadP_Struct();}
-{p_new}                   {return ops.unidadP_New();}
-{p_delete}                {return ops.unidadP_Delete();}
-{p_read}                  {return ops.unidadP_Read();}
-{p_write}                 {return ops.unidadP_Write();}
-{p_nl}                    {return ops.unidadP_Nl();}
-{p_type}                  {return ops.unidadP_Type();}
-{p_call}                  {return ops.unidadP_Call();}
 [^]                       {ops.error();}  
