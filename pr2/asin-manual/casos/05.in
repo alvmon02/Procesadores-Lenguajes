@@ -1,0 +1,7 @@
+## Error or no asocia 
+{
+## bien
+@  x or (y or z);
+## error
+@ x or y or z
+}  

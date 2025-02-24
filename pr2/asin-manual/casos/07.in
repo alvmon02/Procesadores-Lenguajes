@@ -1,0 +1,7 @@
+## Asociatividad and binario (a derechas) or binario (no asocia)
+{
+## bien
+@ x and y and z or k;
+## mal
+@ x or y and z and k
+}

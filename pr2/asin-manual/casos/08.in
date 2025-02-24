@@ -1,0 +1,5 @@
+## Lista declaraciones mal modelizada
+{
+; int x; int y
+&&
+}

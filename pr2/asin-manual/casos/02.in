@@ -1,0 +1,4 @@
+## Programa con instrucciones, sin declaraciones 
+{
+@ x = 5 + 1
+}  
