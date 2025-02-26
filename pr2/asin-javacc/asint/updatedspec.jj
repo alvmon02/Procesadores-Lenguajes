@@ -1,0 +1,161 @@
+options  {
+  STATIC=false;
+  DEBUG_PARSER=true;
+}  
+PARSER_BEGIN(ConstructorASTsEval)
+package c_ast_descendente;
+import asint.ClaseSemanticaEval;
+import asint.SintaxisAbstractaEval.Exp;
+import asint.SintaxisAbstractaEval.Decs;
+import asint.SintaxisAbstractaEval.LDecs;
+import asint.SintaxisAbstractaEval.Dec;
+import asint.SintaxisAbstractaEval.Prog;
+import c_ast_ascendente.UnidadLexica.StringLocalizado;
+
+public class ConstructorASTsEval {
+   private ClaseSemanticaEval sem = new ClaseSemanticaEval();   
+}
+PARSER_END(ConstructorASTsEval)
+
+  TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
+  TOKEN:{<#digitoPositivo:["1"-"9"]>}
+  TOKEN:{<#digito:<digitoPositivo>|"0">} 
+  TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
+  TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
+  TOKEN:{<#parteExponencial: ("e"|"E") <parteEntera>>}  // nuevo
+  SKIP:{<["\t"," ","\r","\b","\n"]>}  
+  SKIP:{<"#"(~["\n"])*>}  
+  TOKEN: {<donde:"donde">}
+  TOKEN: {<evalua:"evalua">}
+  TOKEN: {<int:"int"|"INT">}
+  TOKEN: {<real:"real"|"REAL">}
+  TOKEN: {<bool:"bool"|"BOOL">}
+  TOKEN: {<and:"and"|"AND">}
+  TOKEN: {<or:"or"|"OR">}
+  TOKEN: {<not:"not"|"NOT">}
+  TOKEN: {<string:"string"|"STRING">}
+  TOKEN: {<null:"null"|"NULL">}
+  TOKEN: {<true:"true"|"TRUE">}
+  TOKEN: {<false:"false"|"FALSE">}
+  TOKEN: {<proc:"proc"|"PROC">}
+  TOKEN: {<if:"if"|"IF">}
+  TOKEN: {<else:"else"|"ELSE">}
+  TOKEN: {<while:"while"|"WHILE">}
+  TOKEN: {<struct:"struct"|"STRUCT">}
+  TOKEN: {<new:"new"|"NEW">}
+  TOKEN: {<delete:"delete"|"DELETE">}
+  TOKEN: {<read:"read"|"READ">}
+  TOKEN: {<write:"write"|"WRITE">}
+  TOKEN: {<nl:"nl"|"NL">}
+  TOKEN: {<type:"type"|"TYPE">}
+  TOKEN: {<call:"call"|"CALL">}
+  TOKEN:{<iden:<letra>(<letra>|<digito>)*>}
+  TOKEN:{<lit_ent:(["+","-"])?<parteEntera>>}
+  TOKEN:{<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>} // nuevo
+  TOKEN:{<cadena: "\"" (~["\""])* "\"">} //nuevo
+  
+  Prog analiza()   : 
+      {Prog prog;} 
+      {
+         prog = programa() <EOF> 
+            {return prog;} 
+      }
+  Prog programa()  : 
+     {Bloq bloq} 
+     {
+         bloq = bloque() 
+           {return bloq;}
+     }
+  Bloq bloque()   :
+      {Declar_opt declar_opt; Instr_opt instrs_opt;}
+      {
+        "{" declar_opt = declaraciones_opt() instrs_opt = expresiones_opt() "}"
+          {return sem.bloque(declar_opt, instrs_opt);}
+      }
+
+  Declar_opt declaraciones_opt()    :
+      {LDecs declaraciones;}
+      {
+        declaraciones = lista_declaraciones()
+          {return sem.si_decs(declaraciones);}
+          |
+          {return sem.no_decs();}
+      }
+
+  LDecs lista_declaraciones() : 
+        {LDecs decs; Dec dec;} 
+        {
+            dec = declaracion() decs = rlista_decs(sem.una_dec(dec)) 
+            {return decs;}
+        }
+  LDecs rlista_decs(LDecs decsh) : 
+      {LDecs decs; Dec dec;} 
+      {
+        "," dec = declaracion() decs = rlista_decs(sem.muchas_decs(decsh,dec))  
+          {return decs;}
+        | 
+          {return decsh;}
+      }
+  Dec declaracion() : 
+    {Dec dec;} 
+    {
+      dec = declaracion_tipo() {return dec;}
+      |
+      dec = declaracion_proc() {return dec;}
+      |
+      dec = declaracion_variable() {return dec;}
+    }
+
+  Dec declaracion_tipo() : 
+    {Token t1; Token t2; Tipo_0 tipo;} 
+    {
+      t1 = <type>
+      tipo = tipo_0()
+      t2 = <iden>
+      {return sem.declaracion_tipo(tipo, t2.image);}
+    }
+
+  Dec declaracion_variable()  :
+    {Tipo_0 tipo; Token t;}
+    {
+      tipo = tipo_0
+      t = <iden>
+      {return sem.declaracion_variable(tipo, t.image);}
+    }
+
+
+  Dec declaracion_proc() :
+    {Token t1; Token t2; Parametros_formales params; Bloq bloq;}
+    {
+      t1 = <proc>
+      t2 = <iden>
+      params = parametros_formales()
+      bloq = bloque()
+      {return sem.declaracion_proc(t2.image, params, bloq);}
+    }
+
+    Parametros_formales parametros_formales() :
+      {LDecs params;}
+      {
+        "(" params = lista_parametros_formales() ")" 
+        {return sem.si_param(params);}
+        |
+        {return sem.no_param();}
+      }
+
+    Lparams lista_parametros_formales() :
+      {Lparams params; Param param;}
+      {
+        param = parametro() params = rlista_parametros(sem.un_param(param))
+        {return params;}
+      }
+
+    Lparams rlista_parametros(Lparams paramsh) : 
+       {Lparams params; Param param;} 
+       {
+         "," param = parametro() params = rlista_parametros(sem.muchos_params(params,param))  
+           {return params;}
+         | 
+           {return paramsh;}
+       }
+    
