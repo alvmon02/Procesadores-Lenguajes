@@ -4,7 +4,7 @@ import alex.UnidadLexica;
 import java.io.IOException;
 import java.io.Reader;
 
-public class AnalizadorSintacticoEvalDJ extends AnalizadorSintacticoEval {
+public class AnalizadorSintacticoEvalDJ extends AnalizadorSintacticoTiny {
        public AnalizadorSintacticoEvalDJ(Reader input) throws IOException {
           super(input); 
        }

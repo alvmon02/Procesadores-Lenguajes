@@ -2,6 +2,9 @@ package alex;
 
 import java.io.FileInputStream;
 import java.io.Reader;
+
+import errors.GestionErroresTiny;
+
 import java.io.InputStreamReader;
 import java.io.IOException;
 
@@ -20,6 +23,8 @@ public class AnalizadorLexicoTiny {
   private int columnaInicio;
   private int filaActual;
   private int columnaActual;
+  private GestionErroresTiny errores;
+
   private static String NL = System.getProperty("line.separator");
 
   private static enum Estado {
@@ -30,8 +35,9 @@ public class AnalizadorLexicoTiny {
 
   private Estado estado;
 
-  public AnalizadorLexicoTiny(Reader input) throws IOException {
+  public AnalizadorLexicoTiny(Reader input, GestionErroresTiny errores) throws IOException {
     this.input = input;
+    this.errores = errores;
     lex = new StringBuffer();
     sigCar = input.read();
     filaActual = 1;
@@ -504,17 +510,12 @@ public class AnalizadorLexicoTiny {
   }
 
   private void error() {
-    int curCar = sigCar;
-    try {
-      sigCar();
-    } catch (IOException e) {
-    }
-    throw new ECaracterInesperado("(" + filaActual + ',' + columnaActual + "):Caracter inexperado:" + (char) curCar);
+    errores.errorLexico(filaActual, columnaActual, (char) sigCar);
   }
 
   public static void main(String arg[]) throws IOException {
     Reader input = new InputStreamReader(new FileInputStream("input.txt"));
-    AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
+    AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input, new GestionErroresTiny());
     UnidadLexica unidad;
     do {
       unidad = al.sigToken();
