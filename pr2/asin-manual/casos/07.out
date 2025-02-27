@@ -1,0 +1,15 @@
+{
+@ 
+x 
+<and>
+y
+<and>
+z
+<or>
+k
+;
+@
+x 
+<or> 
+y 
+ERROR_SINTACTICO

@@ -1,0 +1,8 @@
+## Lista instrucciones mal modelizada
+{
+int x
+&&
+; 
+@ 5;
+@ 6
+}
