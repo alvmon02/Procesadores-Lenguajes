@@ -2,29 +2,23 @@ options  {
   STATIC=false;
   DEBUG_PARSER=true;
 }  
-PARSER_BEGIN(ConstructorASTsEval)
-package c_ast_descendente;
-import asint.ClaseSemanticaEval;
-import asint.SintaxisAbstractaEval.Exp;
-import asint.SintaxisAbstractaEval.Decs;
-import asint.SintaxisAbstractaEval.LDecs;
-import asint.SintaxisAbstractaEval.Dec;
-import asint.SintaxisAbstractaEval.Prog;
-import c_ast_ascendente.UnidadLexica.StringLocalizado;
+PARSER_BEGIN(AnalizadorSintacticoTiny)
+package asint;
 
-public class ConstructorASTsEval {
-   private ClaseSemanticaEval sem = new ClaseSemanticaEval();   
+public class AnalizadorSintacticoTiny {
+    protected void newToken(Token t) {}
 }
-PARSER_END(ConstructorASTsEval)
+PARSER_END(AnalizadorSintacticoTiny)
 
   TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
   TOKEN:{<#digitoPositivo:["1"-"9"]>}
   TOKEN:{<#digito:<digitoPositivo>|"0">} 
   TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
   TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
-  TOKEN:{<#parteExponencial: ("e"|"E") <parteEntera>>}  // nuevo
+  TOKEN:{<#parteExponencial: ("e"|"E") <parteEntera>>}
   SKIP:{<["\t"," ","\r","\b","\n"]>}  
-  SKIP:{<"#"(~["\n"])*>}  
+  SKIP:{<"##"(~["\n"])*>}  
+
   TOKEN: {<donde:"donde">}
   TOKEN: {<evalua:"evalua">}
   TOKEN: {<int:"int"|"INT">}
@@ -49,113 +43,101 @@ PARSER_END(ConstructorASTsEval)
   TOKEN: {<nl:"nl"|"NL">}
   TOKEN: {<type:"type"|"TYPE">}
   TOKEN: {<call:"call"|"CALL">}
+
   TOKEN:{<iden:<letra>(<letra>|<digito>)*>}
   TOKEN:{<lit_ent:(["+","-"])?<parteEntera>>}
-  TOKEN:{<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>} // nuevo
-  TOKEN:{<cadena: "\"" (~["\""])* "\"">} //nuevo
+  TOKEN:{<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>}
+  TOKEN:{<cadena: "\"" (~["\""])* "\"">}
+
+  void analiza()   : {} {programa() <EOF> }
+  void programa()  : {} {bloque()}
+  void bloque(): {} { "{" declar_opt() instr_opt() "}" }
+
+  void declar_opt() : {} {lista_declaraciones() "&&" | {}}
+  void lista_declaraciones() : {} {declaracion() rlista_decs()}
+  void rlista_decs() : {} {";" declaracion() rlista_decs() | {}}
+  void declaracion(): {} {declaracion_variable() | declaracion_tipo() | declaracion_proc()}
+
+  void declaracion_variable(): {} {tipo_0 <iden>}
+  void declaracion_tipo(): {} {<type> tipo_0 <iden>}
+  void declaracion_proc(): {} {<proc> <iden> param_formales() bloque()}
+
+  void param_formales(): {} {lista_params() | {}}
+  void lista_params(): {} {parametro() rlista_param()}
+  void rlista_param(): {} {"," parametro() rlista_param() | {}}
+  void parametro(): {} {tipo_0() ref_op() <iden>}
+  void ref_op(): {} {"&" | {}}
+  void tipo_0() : {} {array() | tipo_1()}
+  void tipo_1() : {} {puntero() | tipo_2()}
+  void tipo_2() : {} {<iden> | tipo_basico() | struct()}
+  void tipo_basico(): {} {<int> | <real> | <bool> | <string>}
+  void array(): {} {tipo_0() "[" <lit_ent> "]"}
+  void struct(): {} { campos_struct() }
+  void campos_struct(): {} {lista_campos_struct | {}}
+  void lista_campos_struct(): {campo_struct() rlista_campo_struct()}
+  void rlista_campo_struct(): {} {"," campo_struct() rlista_campo_struct() | {}}
+  void campo_struct(): {} {tipo_0() <iden>}
+  void puntero(): {} {"^" tipo_1()}
+
+  void instr_opt() : {} {lista_instrucciones() | {}}
+  void lista_instrucciones() : {} {instruccion() rlista_instrs()}
+  void rlista_instrs() : {} {";" instruccion() rlista_instrs() | {}}
+  void instruccion() : {} {instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_proc() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_new() | instruccion_delete() | instruccion_call() | instruccion_compuesta()}
+  void instruccion_eval(): {} {"@" expresion()}
+  void instruccion_if(): {} {<if> expresion() bloque() instruccion_else_opt()}
+  void instruccion_else_opt(): {} {instruccion_else() | {}}
+  void instruccion_else(): {} {<else> bloque()}
+  void instruccion_while(): {} {<while> expresion() bloque()}
+  void instruccion_read(): {} {<read> expresion()}
+  void instruccion_write(): {} {<write> expresion()}
+  void instruccion_nl(): {} {"\n"}
+  void instruccion_new(): {} {<new> expresion()}
+  void instruccion_delete(): {} {<delete> expresion()}
+  void instruccion_call(): {} {<call> <iden> "(" params_reales() ")"}
+  void params_reales(): {} {lista_params_reales() | {}}
+  void lista_params_reales(): {} {param_real() rlista_params_reales()}
+  void rlista_params_reales(): {} {"," param_real() rlista_params_reales() | {}}
+  void param_real(): {} {<iden>}
+  void instruccion_compuesta(): {} {bloque()}
+
+
+  void e0(): {} {e1() e0'()}
+  void e0'(): {} {"=" e0() | {}}
+  void e1(): {} {e2() e1'()}
+  void e1'(): {} {op1() e2() e1'() | {}}
+  void e2(): {} {e3() e2'()}
+  void e2'(): {} {"+" e3() e2'() | "-" e3() | {}}
+  void e3(): {} {e4() e3'()}
+  void e3'(): {} {<and> e3() | <or> e4() | {}}
+  void e4(): {} {e5() e4'()}
+  void e4'(): {} {op4() e5() e4'() | {}}
+  void e5(): {} {op5() e5() | e6()}
+  void e6(): {} {e7() e6'()}
+  void e6'(): {} {op6() e6'() | {}}
+  void e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <null>}
+  void booleano(): {} {<true> | <false>}
+  void e8(): { "(" e0() ")" }
+  void op1(): {} {"==" | "<" | ">" | ">=" | "<="}
+  void op4(): {} {"*" | "/" | "%"}
+  void op5(): {} {"-" | <not>}
+  void op6(): {} { "[" expresion() "]" | "." <iden> | "^"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
-  Prog analiza()   : 
-      {Prog prog;} 
-      {
-         prog = programa() <EOF> 
-            {return prog;} 
-      }
-  Prog programa()  : 
-     {Bloq bloq} 
-     {
-         bloq = bloque() 
-           {return bloq;}
-     }
-  Bloq bloque()   :
-      {Declar_opt declar_opt; Instr_opt instrs_opt;}
-      {
-        "{" declar_opt = declaraciones_opt() instrs_opt = expresiones_opt() "}"
-          {return sem.bloque(declar_opt, instrs_opt);}
-      }
-
-  Declar_opt declaraciones_opt()    :
-      {LDecs declaraciones;}
-      {
-        declaraciones = lista_declaraciones()
-          {return sem.si_decs(declaraciones);}
-          |
-          {return sem.no_decs();}
-      }
-
-  LDecs lista_declaraciones() : 
-        {LDecs decs; Dec dec;} 
-        {
-            dec = declaracion() decs = rlista_decs(sem.una_dec(dec)) 
-            {return decs;}
-        }
-  LDecs rlista_decs(LDecs decsh) : 
-      {LDecs decs; Dec dec;} 
-      {
-        "," dec = declaracion() decs = rlista_decs(sem.muchas_decs(decsh,dec))  
-          {return decs;}
-        | 
-          {return decsh;}
-      }
-  Dec declaracion() : 
-    {Dec dec;} 
-    {
-      dec = declaracion_tipo() {return dec;}
-      |
-      dec = declaracion_proc() {return dec;}
-      |
-      dec = declaracion_variable() {return dec;}
-    }
-
-  Dec declaracion_tipo() : 
-    {Token t1; Token t2; Tipo_0 tipo;} 
-    {
-      t1 = <type>
-      tipo = tipo_0()
-      t2 = <iden>
-      {return sem.declaracion_tipo(tipo, t2.image);}
-    }
-
-  Dec declaracion_variable()  :
-    {Tipo_0 tipo; Token t;}
-    {
-      tipo = tipo_0
-      t = <iden>
-      {return sem.declaracion_variable(tipo, t.image);}
-    }
-
-
-  Dec declaracion_proc() :
-    {Token t1; Token t2; Parametros_formales params; Bloq bloq;}
-    {
-      t1 = <proc>
-      t2 = <iden>
-      params = parametros_formales()
-      bloq = bloque()
-      {return sem.declaracion_proc(t2.image, params, bloq);}
-    }
-
-    Parametros_formales parametros_formales() :
-      {LDecs params;}
-      {
-        "(" params = lista_parametros_formales() ")" 
-        {return sem.si_param(params);}
-        |
-        {return sem.no_param();}
-      }
-
-    Lparams lista_parametros_formales() :
-      {Lparams params; Param param;}
-      {
-        param = parametro() params = rlista_parametros(sem.un_param(param))
-        {return params;}
-      }
-
-    Lparams rlista_parametros(Lparams paramsh) : 
-       {Lparams params; Param param;} 
-       {
-         "," param = parametro() params = rlista_parametros(sem.muchos_params(params,param))  
-           {return params;}
-         | 
-           {return paramsh;}
-       }
-    
