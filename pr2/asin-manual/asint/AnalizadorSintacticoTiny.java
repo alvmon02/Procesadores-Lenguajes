@@ -144,11 +144,13 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E0() {
+        // System.out.println("Pasando por E0");
         E1();
         RE0();
     }
 
     private void RE0() {
+        // System.out.println("Pasando por RE0");
         switch (anticipo.clase()) {
             case IGUAL:
                 empareja(ClaseLexica.IGUAL);
@@ -162,11 +164,13 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E1() {
+        // System.out.println("Pasando por E1");
         E2();
         RE1();
     }
 
     private void RE1() {
+        // System.out.println("Pasando por RE1");
         switch (anticipo.clase()) {
             case LT:
             case LEQ:
@@ -186,6 +190,7 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void OP1() {
+        // System.out.println("Pasando por OP1");
         switch (anticipo.clase()) {
             case LT:
                 empareja(ClaseLexica.LT);
@@ -213,12 +218,14 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E2() {
+        // System.out.println("Pasando por E2");
         E3();
         FE2(); // E2' Factorizado
         RE2(); // E2'' Recursivo
     }
 
     private void FE2() {
+        // System.out.println("Pasando por FE2");
         switch (anticipo.clase()) {
             case MENOS:
                 empareja(ClaseLexica.MENOS);
@@ -231,6 +238,7 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void RE2() {
+        // System.out.println("Pasando por RE2");
         switch (anticipo.clase()) {
             case MAS:
                 empareja(ClaseLexica.MAS);
@@ -244,11 +252,13 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E3() {
+        // System.out.println("Pasando por E3");
         E4();
         RE3();
     }
 
     private void RE3() {
+        // System.out.println("Pasando por RE3");
         switch (anticipo.clase()) {
             case P_AND:
                 empareja(ClaseLexica.P_AND);
@@ -267,11 +277,13 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E4() {
+        // System.out.println("Pasando por E4");
         E5();
         RE4();
     }
 
     private void RE4() {
+        // System.out.println("Pasando por RE4");
         switch (anticipo.clase()) {
             case MUL:
             case DIV:
@@ -286,6 +298,7 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void OP4() {
+        // System.out.println("Pasando por OP4");
         switch (anticipo.clase()) {
             case MUL:
                 empareja(ClaseLexica.MUL);
@@ -300,6 +313,7 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E5() {
+        // System.out.println("Pasando por E5");
         switch (anticipo.clase()) {
             case MENOS:
             case P_NOT:
@@ -322,6 +336,7 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void OP5() {
+        // System.out.println("Pasando por OP5");
         switch (anticipo.clase()) {
             case MENOS:
                 empareja(ClaseLexica.MENOS);
@@ -336,6 +351,7 @@ public class AnalizadorSintacticoTiny {
     }
 
     private void E6() {
+        // System.out.println("Pasando por E6");
         switch (anticipo.clase()) {
             case IDEN:
                 empareja(ClaseLexica.IDEN);
@@ -356,6 +372,7 @@ public class AnalizadorSintacticoTiny {
                 empareja(ClaseLexica.PAP);
                 E0();
                 empareja(ClaseLexica.PCIERRE);
+                break;
             default:
                 esperados(ClaseLexica.PAP, ClaseLexica.ENT, ClaseLexica.P_FALSE,
                         ClaseLexica.P_TRUE, ClaseLexica.REAL, ClaseLexica.IDEN);
@@ -371,6 +388,7 @@ public class AnalizadorSintacticoTiny {
 
     private void empareja(ClaseLexica claseEsperada) {
         if (anticipo.clase() == claseEsperada) {
+            // System.out.printf("Consumiendo %s\n", claseEsperada.getImage());
             traza_emparejamiento(anticipo);
             sigToken();
         } else {
