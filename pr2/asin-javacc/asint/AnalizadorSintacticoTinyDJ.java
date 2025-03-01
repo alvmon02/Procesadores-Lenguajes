@@ -1,4 +1,3 @@
-package asint;
 
 import java.io.Reader;
 

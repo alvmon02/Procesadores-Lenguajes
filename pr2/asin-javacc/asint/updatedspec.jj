@@ -21,30 +21,30 @@ PARSER_END(AnalizadorSintacticoTiny)
 
   TOKEN: {<donde:"donde">}
   TOKEN: {<evalua:"evalua">}
-  TOKEN: {<int:"int"|"INT">}
-  TOKEN: {<real:"real"|"REAL">}
-  TOKEN: {<bool:"bool"|"BOOL">}
+  TOKEN: {<t_int:"int"|"INT">}
+  TOKEN: {<t_real:"real"|"REAL">}
+  TOKEN: {<t_bool:"bool"|"BOOL">}
   TOKEN: {<and:"and"|"AND">}
   TOKEN: {<or:"or"|"OR">}
   TOKEN: {<not:"not"|"NOT">}
-  TOKEN: {<string:"string"|"STRING">}
-  TOKEN: {<null:"null"|"NULL">}
-  TOKEN: {<true:"true"|"TRUE">}
-  TOKEN: {<false:"false"|"FALSE">}
+  TOKEN: {<t_string:"string"|"STRING">}
+  TOKEN: {<nulo:"null"|"NULL">}
+  TOKEN: {<t_true:"true"|"TRUE">}
+  TOKEN: {<t_false:"false"|"FALSE">}
   TOKEN: {<proc:"proc"|"PROC">}
-  TOKEN: {<if:"if"|"IF">}
-  TOKEN: {<else:"else"|"ELSE">}
-  TOKEN: {<while:"while"|"WHILE">}
+  TOKEN: {<t_if:"if"|"IF">}
+  TOKEN: {<t_else:"else"|"ELSE">}
+  TOKEN: {<t_while:"while"|"WHILE">}
   TOKEN: {<struct:"struct"|"STRUCT">}
-  TOKEN: {<new:"new"|"NEW">}
+  TOKEN: {<t_new:"new"|"NEW">}
   TOKEN: {<delete:"delete"|"DELETE">}
-  TOKEN: {<read:"read"|"READ">}
+  TOKEN: {<read:"read"|"RfEAD">}
   TOKEN: {<write:"write"|"WRITE">}
   TOKEN: {<nl:"nl"|"NL">}
   TOKEN: {<type:"type"|"TYPE">}
   TOKEN: {<call:"call"|"CALL">}
 
-  TOKEN:{<iden:<letra>(<letra>|<digito>)*>}
+  TOKEN:{<iden:<letra>(<letra>|<digito>|"_")*>}
   TOKEN:{<lit_ent:(["+","-"])?<parteEntera>>}
   TOKEN:{<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>}
   TOKEN:{<cadena: "\"" (~["\""])* "\"">}
@@ -58,23 +58,23 @@ PARSER_END(AnalizadorSintacticoTiny)
   void rlista_decs() : {} {";" declaracion() rlista_decs() | {}}
   void declaracion(): {} {declaracion_variable() | declaracion_tipo() | declaracion_proc()}
 
-  void declaracion_variable(): {} {tipo_0 <iden>}
-  void declaracion_tipo(): {} {<type> tipo_0 <iden>}
-  void declaracion_proc(): {} {<proc> <iden> param_formales() bloque()}
+  void declaracion_variable(): {} {tipo_0() <iden>}
+  void declaracion_tipo(): {} {<type> tipo_0() <iden>}
+  void declaracion_proc(): {} {<proc> <iden> "(" param_formales() ")" bloque()}
 
   void param_formales(): {} {lista_params() | {}}
   void lista_params(): {} {parametro() rlista_param()}
   void rlista_param(): {} {"," parametro() rlista_param() | {}}
   void parametro(): {} {tipo_0() ref_op() <iden>}
   void ref_op(): {} {"&" | {}}
-  void tipo_0() : {} {array() | tipo_1()}
+  void tipo_0() : {} { tipo_1() tipo_0Prime() }
+  void tipo_0Prime() : {} { "[" <lit_ent> "]" tipo_0Prime() | {} } // Se asegura de que los arrays se reconozcan correctamente
   void tipo_1() : {} {puntero() | tipo_2()}
-  void tipo_2() : {} {<iden> | tipo_basico() | struct()}
-  void tipo_basico(): {} {<int> | <real> | <bool> | <string>}
-  void array(): {} {tipo_0() "[" <lit_ent> "]"}
-  void struct(): {} { campos_struct() }
-  void campos_struct(): {} {lista_campos_struct | {}}
-  void lista_campos_struct(): {campo_struct() rlista_campo_struct()}
+  void tipo_2() : {} {tipo_basico() | <iden> | struct()} // Se ajustó para que acepte tipos básicos
+  void tipo_basico(): {} {<t_int> | <t_real> | <t_bool> | <t_string>}
+  void struct(): {} { <struct> "{" campos_struct() "}" }
+  void campos_struct(): {} {lista_campos_struct() | {}}
+  void lista_campos_struct() : {} { campo_struct() rlista_campo_struct() }
   void rlista_campo_struct(): {} {"," campo_struct() rlista_campo_struct() | {}}
   void campo_struct(): {} {tipo_0() <iden>}
   void puntero(): {} {"^" tipo_1()}
@@ -82,62 +82,43 @@ PARSER_END(AnalizadorSintacticoTiny)
   void instr_opt() : {} {lista_instrucciones() | {}}
   void lista_instrucciones() : {} {instruccion() rlista_instrs()}
   void rlista_instrs() : {} {";" instruccion() rlista_instrs() | {}}
-  void instruccion() : {} {instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_proc() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_new() | instruccion_delete() | instruccion_call() | instruccion_compuesta()}
+  void instruccion() : {} {instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_new() | instruccion_delete() | instruccion_call() | instruccion_compuesta()}
   void instruccion_eval(): {} {"@" expresion()}
-  void instruccion_if(): {} {<if> expresion() bloque() instruccion_else_opt()}
+  void instruccion_if(): {} {<t_if> expresion() bloque() instruccion_else_opt()}
   void instruccion_else_opt(): {} {instruccion_else() | {}}
-  void instruccion_else(): {} {<else> bloque()}
-  void instruccion_while(): {} {<while> expresion() bloque()}
+  void instruccion_else(): {} {<t_else> bloque()}
+  void instruccion_while(): {} {<t_while> expresion() bloque()}
   void instruccion_read(): {} {<read> expresion()}
   void instruccion_write(): {} {<write> expresion()}
-  void instruccion_nl(): {} {"\n"}
-  void instruccion_new(): {} {<new> expresion()}
+  void instruccion_nl(): {} {<nl>}
+  void instruccion_new(): {} {<t_new> expresion()}
   void instruccion_delete(): {} {<delete> expresion()}
   void instruccion_call(): {} {<call> <iden> "(" params_reales() ")"}
   void params_reales(): {} {lista_params_reales() | {}}
   void lista_params_reales(): {} {param_real() rlista_params_reales()}
   void rlista_params_reales(): {} {"," param_real() rlista_params_reales() | {}}
-  void param_real(): {} {<iden>}
+  void param_real(): {} {expresion()}
   void instruccion_compuesta(): {} {bloque()}
+  void expresion() : {} { e0() }
 
-
-  void e0(): {} {e1() e0'()}
-  void e0'(): {} {"=" e0() | {}}
-  void e1(): {} {e2() e1'()}
-  void e1'(): {} {op1() e2() e1'() | {}}
-  void e2(): {} {e3() e2'()}
-  void e2'(): {} {"+" e3() e2'() | "-" e3() | {}}
-  void e3(): {} {e4() e3'()}
-  void e3'(): {} {<and> e3() | <or> e4() | {}}
-  void e4(): {} {e5() e4'()}
-  void e4'(): {} {op4() e5() e4'() | {}}
-  void e5(): {} {op5() e5() | e6()}
-  void e6(): {} {e7() e6'()}
-  void e6'(): {} {op6() e6'() | {}}
-  void e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <null>}
-  void booleano(): {} {<true> | <false>}
-  void e8(): { "(" e0() ")" }
-  void op1(): {} {"==" | "<" | ">" | ">=" | "<="}
+  void e0(): {} {e1() e0Prime()}
+  void e0Prime(): {} {"=" e0() | {}}
+  void e1(): {} {e2() e1Prime()}
+  void e1Prime(): {} {op1() e2() e1Prime() | {}}
+  void e2(): {} {e3() e2Prime()}
+  void e2Prime(): {} {"+" e3() e2Prime() | "-" e3() | {}}
+  void e3(): {} {e4() e3Prime()}
+  void e3Prime(): {} {<and> e3() | <or> e4() | {}}
+  void e4(): {} {e5() e4Prime()}
+  void e4Prime(): {} {op4() e5() e4Prime() | {}}
+  void e5(): {} {e6() | op5() e5() }
+  void e6(): {} {e7() e6Prime()}
+  void e6Prime(): {} {op6() e6Prime() | {}}
+  void e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <nulo> |e8()}
+  void booleano(): {} {<t_true> | <t_false>}
+  void e8(): {} { "(" e0() ")" }
+  void op1(): {} {"==" | "<" | ">" | ">=" | "<=" | "!="}
   void op4(): {} {"*" | "/" | "%"}
   void op5(): {} {"-" | <not>}
-  void op6(): {} { "[" expresion() "]" | "." <iden> | "^"}
+  void op6(): {} { "[" expresion() "]" | "." <iden> | "^." <iden>}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
