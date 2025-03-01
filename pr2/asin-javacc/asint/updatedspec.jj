@@ -120,5 +120,6 @@ PARSER_END(AnalizadorSintacticoTiny)
   void op1(): {} {"==" | "<" | ">" | ">=" | "<=" | "!="}
   void op4(): {} {"*" | "/" | "%"}
   void op5(): {} {"-" | <not>}
-  void op6(): {} { "[" expresion() "]" | "." <iden> | "^." <iden>}
+  void op6(): {} { "[" expresion() "]" | "." <iden> | "^." <iden> | "^" }
+
 
