@@ -30,7 +30,7 @@ public enum ClaseLexica {
     P_NOT("<not>"),
     P_TRUE("<true>"),
     P_FALSE("<false>"),
-    EOF("EOF");
+    EOF("<EOF>");
 
     private String image;
 
