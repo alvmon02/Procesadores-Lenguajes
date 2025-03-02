@@ -10,44 +10,41 @@ public class AnalizadorSintacticoTiny {
 }
 PARSER_END(AnalizadorSintacticoTiny)
 
-  TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
-  TOKEN:{<#digitoPositivo:["1"-"9"]>}
-  TOKEN:{<#digito:<digitoPositivo>|"0">} 
-  TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
-  TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
-  TOKEN:{<#parteExponencial: ("e"|"E") <parteEntera>>}
-  SKIP:{<["\t"," ","\r","\b","\n"]>}  
-  SKIP:{<"##"(~["\n"])*>}  
+  TOKEN: {<#letra:["a"-"z","A"-"Z"]>}
+  TOKEN: {<#digitoPositivo:["1"-"9"]>}
+  TOKEN: {<#digito:<digitoPositivo>|"0">} 
+  TOKEN: {<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
+  TOKEN: {<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
+  TOKEN: {<#parteExponencial: ("e"|"E") <parteEntera>>}
+  SKIP:  {<["\t"," ","\r","\b","\n"]>}  
+  SKIP:  {<"##"(~["\n"])*>}  
+  TOKEN: {<t_int:["i","I"]["n","N"]["t","T"]>}
+  TOKEN: {<t_real:["r","R"]["e","E"]["a","A"]["l","L"]>}
+  TOKEN: {<t_bool:["b","B"]["o","O"]["o","O"]["l","L"]>}
+  TOKEN: {<and:["a","A"]["n","N"]["d","D"]>}
+  TOKEN: {<or:["o","O"]["r","R"]>}
+  TOKEN: {<not:["n","N"]["o","O"]["t","T"]>}
+  TOKEN: {<t_string:["s","S"]["t","T"]["r","R"]["i","I"]["n","N"]["g","G"]>}
+  TOKEN: {<nulo:["n","N"]["u","U"]["l","L"]["l","L"]>}
+  TOKEN: {<t_true:["t","T"]["r","R"]["u","U"]["e","E"]>}
+  TOKEN: {<t_false:["f","F"]["a","A"]["l","L"]["s","S"]["e","E"]>}
+  TOKEN: {<proc:["p","P"]["r","R"]["o","O"]["c","C"]>}
+  TOKEN: {<t_if:["i","I"]["f","F"]>}
+  TOKEN: {<t_else:["e","E"]["l","L"]["s","S"]["e","E"]>}
+  TOKEN: {<t_while:["w","W"]["h","H"]["i","I"]["l","L"]["e","E"]>}
+  TOKEN: {<struct:["s","S"]["t","T"]["r","R"]["u","U"]["c","C"]["t","T"]>}
+  TOKEN: {<t_new:["n","N"]["e","E"]["w","W"]>}
+  TOKEN: {<delete:["d","D"]["e","E"]["l","L"]["e","E"]["t","T"]["e","E"]>}
+  TOKEN: {<read:["r","R"]["e","E"]["a","A"]["d","D"]>}
+  TOKEN: {<write:["w","W"]["r","R"]["i","I"]["t","T"]["e","E"]>}
+  TOKEN: {<nl:["n","N"]["l","L"]>}
+  TOKEN: {<type:["t","T"]["y","Y"]["p","P"]["e","E"]>}
+  TOKEN: {<call:["c","C"]["a","A"]["l","L"]["l","L"]>}
 
-  TOKEN: {<donde:"donde">}
-  TOKEN: {<evalua:"evalua">}
-  TOKEN: {<t_int:"int"|"INT">}
-  TOKEN: {<t_real:"real"|"REAL">}
-  TOKEN: {<t_bool:"bool"|"BOOL">}
-  TOKEN: {<and:"and"|"AND">}
-  TOKEN: {<or:"or"|"OR">}
-  TOKEN: {<not:"not"|"NOT">}
-  TOKEN: {<t_string:"string"|"STRING">}
-  TOKEN: {<nulo:"null"|"NULL">}
-  TOKEN: {<t_true:"true"|"TRUE">}
-  TOKEN: {<t_false:"false"|"FALSE">}
-  TOKEN: {<proc:"proc"|"PROC">}
-  TOKEN: {<t_if:"if"|"IF">}
-  TOKEN: {<t_else:"else"|"ELSE">}
-  TOKEN: {<t_while:"while"|"WHILE">}
-  TOKEN: {<struct:"struct"|"STRUCT">}
-  TOKEN: {<t_new:"new"|"NEW">}
-  TOKEN: {<delete:"delete"|"DELETE">}
-  TOKEN: {<read:"read"|"RfEAD">}
-  TOKEN: {<write:"write"|"WRITE">}
-  TOKEN: {<nl:"nl"|"NL">}
-  TOKEN: {<type:"type"|"TYPE">}
-  TOKEN: {<call:"call"|"CALL">}
-
-  TOKEN:{<iden:<letra>(<letra>|<digito>|"_")*>}
-  TOKEN:{<lit_ent:(["+","-"])?<parteEntera>>}
-  TOKEN:{<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>}
-  TOKEN:{<cadena: "\"" (~["\""])* "\"">}
+  TOKEN: {<iden:<letra>(<letra>|<digito>|"_")*>}
+  TOKEN: {<lit_ent:(["+","-"])?<parteEntera>>}
+  TOKEN: {<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>}
+  TOKEN: {<cadena: "\"" (~["\""])* "\"">}
 
   void analiza()   : {} {programa() <EOF> }
   void programa()  : {} {bloque()}
@@ -120,6 +117,6 @@ PARSER_END(AnalizadorSintacticoTiny)
   void op1(): {} {"==" | "<" | ">" | ">=" | "<=" | "!="}
   void op4(): {} {"*" | "/" | "%"}
   void op5(): {} {"-" | <not>}
-  void op6(): {} { "[" expresion() "]" | "." <iden> | "^." <iden> | "^" }
+  void op6(): {} { "[" expresion() "]" | "." <iden> | "^" }
 
 
