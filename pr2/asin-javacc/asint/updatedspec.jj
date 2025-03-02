@@ -73,7 +73,7 @@ PARSER_END(AnalizadorSintacticoTiny)
   void tipo_2() : {} {tipo_basico() | <iden> | struct()} // Se ajustó para que acepte tipos básicos
   void tipo_basico(): {} {<t_int> | <t_real> | <t_bool> | <t_string>}
   void struct(): {} { <struct> "{" campos_struct() "}" }
-  void campos_struct(): {} {lista_campos_struct() | {}}
+  void campos_struct(): {} {lista_campos_struct()}
   void lista_campos_struct() : {} { campo_struct() rlista_campo_struct() }
   void rlista_campo_struct(): {} {"," campo_struct() rlista_campo_struct() | {}}
   void campo_struct(): {} {tipo_0() <iden>}
