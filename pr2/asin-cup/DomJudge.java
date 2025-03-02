@@ -11,8 +11,8 @@ import java.io.Reader;
 public class DomJudge {
    public static void main(String[] args) throws Exception {
      Reader input = new InputStreamReader(System.in);
-     AnalizadorLexicoEval alex = new AnalizadorLexicoEval(input);
-     AnalizadorSintacticoEval asint = new AnalizadorSintacticoEvalDJ(alex);
+     AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
+     AnalizadorSintacticoTiny asint = new AnalizadorSintacticoTinyDJ(alex);
 	 //asint.setScanner(alex);
      try {    
         asint.debug_parse();

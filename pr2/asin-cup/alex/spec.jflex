@@ -9,9 +9,11 @@ import errors.GestionErroresTiny;
 %type  UnidadLexica
 %unicode
 %public
+%cup
 
 %{
   private ALexOperations ops;
+  private GestionErroresTiny errores; 
   public String lexema() {return yytext();}
   public int fila() {return yyline+1;}
   public int columna() {return yycolumn+1;}

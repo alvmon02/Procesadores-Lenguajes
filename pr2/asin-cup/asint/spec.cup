@@ -42,10 +42,10 @@ terminal     IDEN, ENT, REAL, STRING,
              COMA,
              CORCHETEAP,CORCHETECIERRE, 
              PUNTO, EXPONENTE,
-             EOF;
+             O_EOF ;
 
 
-non terminal programa, bloque, 
+non terminal	programa, bloque, 
 		
 				declar_opt, declaraciones, declaracion, 
 				declar_var, declar_tipo, declar_proc,
@@ -54,7 +54,7 @@ non terminal programa, bloque,
 		
 				instruccion_eval, instruccion_if , instruccion_else, instruccion_else_opt, instruccion_while , instruccion_read , instruccion_write , instruccion_nl , instruccion_new , instruccion_delete , instruccion_call , instruccion_compuesta , 
 	
-				lista_param_real_opt, lista_param_real
+				lista_param_real_opt, lista_param_real,
 
 				param_formales, lista_param_form_opt, lista_param_form, param_formal, ref_opt,
 
@@ -65,16 +65,16 @@ non terminal programa, bloque,
 				expresion,
 
 				R1, R2, R3, R4, R5,
-        
-        E0, RE0, 
-        E1, RE1, OP1,
-        E2, FE2, RE2,
-        E3, FE3,
-        E4, RE4, OP4,
-        E5, OP5,
-        E6, RE6, OP6,
-        E7,
-        E8;
+
+				E0, RE0, 
+				E1, RE1, OP1,
+				E2, FE2, RE2,
+				E3, FE3, RE3,
+				E4, RE4, OP4,
+				E5, OP5,
+				E6, RE6, OP6,
+				E7,
+				E8;
 
 programa				::= bloque ;
 bloque					::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
@@ -136,8 +136,8 @@ instruccion				::= instruccion_delete ;
 instruccion				::= instruccion_call ;
 instruccion				::= instruccion_compuesta ; 
 
-instruccion_eval		::= INIEVAL expresion
-instruccion_if			::= P_IF expresion bloque instruccion_else_opt
+instruccion_eval		::= INIEVAL expresion ;
+instruccion_if			::= P_IF expresion bloque instruccion_else_opt ;
 instruccion_else_opt	::= instruccion_else;
 instruccion_else_opt	::= ;
 instruccion_else		::= P_ELSE bloque ;
@@ -158,56 +158,56 @@ instruccion_compuesta	::= bloque ;
 
 expresion				::= E0;
 
-E0              ::= E1 RE0;
-RE0             ::= IGUAL E1 RE0;
-RE0             ::= ;
-
-E1              ::= E2 RE1;
-RE1             ::= OP1 E2 RE1;
-RE1             ::= ;
-OP1             ::= LT;
-OP1             ::= LEQ;
-OP1             ::= GT;
-OP1             ::= GEQ;
-OP1             ::= COMP;
-OP1             ::= DIST;
-
-E2              ::= E3 FE2 RE2;
-FE2             ::= MENOS E3;
-FE2             ::= ;
-RE2             ::= MAS E3 RE2;
-RE2             ::= ;
-
-E3              ::= E4 RE3;
-FE3             ::= P_AND E3;
-FE3             ::= P_OR E4;
-RE3             ::= ;
-
-E4              ::= E5 RE4;
-RE4             ::= OP4 E5 RE4;
-RE4             ::= ;
-OP4             ::= MUL;
-OP4             ::= DIV;
-
-E5              ::= OP5 E5;
-E5              ::= E6;
-OP5             ::= MENOS;
-OP5             ::= P_NOT;
-
-E6              ::= E7 RE6;
-RE6             ::= OP6 RE6;
-RE6             ::= ;
-OP6             ::= CORCHETEAP expresion CORCHETECIERRE;
-OP6             ::= PUNTO IDEN;
-OP6             ::= EXPONENTE;
-
-E7              ::= ENT;
-E7              ::= REAL;
-E7              ::= P_TRUE;
-E7              ::= P_FALSE;
-E7              ::= STRING;
-E7              ::= IDEN;
-E7              ::= P_NULL;
-E7              ::= E8;
-
-E8              ::= PAP E0 PCIERRE;
+E0 						::= E1 RE0;
+RE0						::= IGUAL E1 RE0;
+RE0						::= ;
+						
+E1 						::= E2 RE1;
+RE1						::= OP1 E2 RE1;
+RE1						::= ;
+OP1						::= LT;
+OP1						::= LEQ;
+OP1						::= GT;
+OP1						::= GEQ;
+OP1						::= COMP;
+OP1						::= DIST;
+						
+E2 						::= E3 FE2 RE2;
+FE2						::= MENOS E3;
+FE2						::= ;
+RE2						::= MAS E3 RE2;
+RE2						::= ;
+						
+E3 						::= E4 RE3;
+FE3						::= P_AND E3;
+FE3						::= P_OR E4;
+RE3						::= ;
+						
+E4 						::= E5 RE4;
+RE4						::= OP4 E5 RE4;
+RE4						::= ;
+OP4						::= MUL;
+OP4						::= DIV;
+						
+E5 						::= OP5 E5;
+E5 						::= E6;
+OP5						::= MENOS;
+OP5						::= P_NOT;
+						
+E6 						::= E7 RE6;
+RE6						::= OP6 RE6;
+RE6						::= ;
+OP6						::= CORCHETEAP expresion CORCHETECIERRE;
+OP6						::= PUNTO IDEN;
+OP6						::= EXPONENTE;
+						
+E7 						::= ENT;
+E7 						::= REAL;
+E7 						::= P_TRUE;
+E7 						::= P_FALSE;
+E7 						::= STRING;
+E7 						::= IDEN;
+E7 						::= P_NULL;
+E7 						::= E8;
+						
+E8 						::= PAP E0 PCIERRE;
