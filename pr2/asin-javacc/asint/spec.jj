@@ -102,8 +102,9 @@ PARSER_END(AnalizadorSintacticoTiny)
   void e0Prime(): {} {"=" e0() | {}}
   void e1(): {} {e2() e1Prime()}
   void e1Prime(): {} {op1() e2() e1Prime() | {}}
-  void e2(): {} {e3() e2Prime()}
-  void e2Prime(): {} {"+" e3() e2Prime() | "-" e3() | {}}
+  void e2(): {} {e3() fe2() re2()}
+  void fe2() : {} {"-" e3() | {}}
+  void re2(): {} {"+" e3() e2Prime() | {}}
   void e3(): {} {e4() e3Prime()}
   void e3Prime(): {} {<and> e3() | <or> e4() | {}}
   void e4(): {} {e5() e4Prime()}
