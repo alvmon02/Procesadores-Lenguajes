@@ -41,8 +41,7 @@ terminal     IDEN, ENT, REAL, STRING,
              PORCENTAJE, AND,
              COMA,
              CORCHETEAP,CORCHETECIERRE, 
-             PUNTO, EXPONENTE,
-             O_EOF;
+             PUNTO, EXPONENTE, O_EOF;
 
 
 non terminal	programa, bloque,
@@ -63,67 +62,58 @@ non terminal	programa, bloque,
 
 				      expresion,
 
-				      R1, R2, R3, R4, R5,
+				      E0, E1, E2, E3, E4, E5, E6, E7, E8,
+              OP1, OP4, OP5, OP6;
 
-				      E0, RE0, 
-				      E1, RE1, OP1,
-				      E2, FE2, RE2,
-				      E3, FE3,
-				      E4, RE4, OP4,
-				      E5, OP5,
-				      E6, RE6, OP6,
-				      E7,
-				      E8;
+start with programa;
 
-programa				::= bloque O_EOF;
-bloque					::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
-declar_opt				::= declaraciones FINDECLAR ;
-declar_opt				::= ;
-declaraciones			::= declaracion R1 ;
-R1						::= PCOMA declaracion R1 ;
-R1						::= ;
-declaracion				::= declar_var ;
-declaracion				::= declar_tipo ;
-declaracion				::= declar_proc ;
-declar_var				::= tipo_0 IDEN ; 
-declar_tipo				::= P_TYPE tipo_0 IDEN ; 
-declar_proc				::= P_PROC IDEN param_formales bloque ; 
-param_formales			::= PAP lista_param_form_opt PCIERRE ;
+programa				      ::= bloque O_EOF;
+bloque					      ::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
+
+declar_opt				    ::= declaraciones FINDECLAR ;
+declar_opt				    ::= ;
+declaraciones			    ::= declaraciones PCOMA declaracion ;
+declaraciones			    ::= declaracion ;
+declaracion				    ::= declar_var ;
+declaracion				    ::= declar_tipo ;
+declaracion				    ::= declar_proc ;
+declar_tipo				    ::= P_TYPE tipo_0 IDEN ; 
+declar_var				    ::= tipo_0 IDEN ; 
+declar_proc				    ::= P_PROC IDEN param_formales bloque ; 
+
+param_formales			  ::= PAP lista_param_form_opt PCIERRE ;
 lista_param_form_opt	::= lista_param_form ;
 lista_param_form_opt	::= ;
-lista_param_form		::= param_formal R2 ;
-R2						::= COMA param_formal R2 ;
-R2						::= ;
-param_formal			::= tipo_0 ref_opt IDEN ;
-ref_opt					::= AND ;
-ref_opt					::= ;
-tipo_0					::= array ;
+lista_param_form		  ::= lista_param_form COMA param_formal;
+lista_param_form		  ::= param_formal;
+param_formal			    ::= tipo_0 ref_opt IDEN ;
+ref_opt					      ::= AND ;
+ref_opt					      ::= ;
+tipo_0					      ::= array ;
 
 
-tipo_0					::= tipo_1 ;
-tipo_1					::= puntero ;
-tipo_1					::= tipo_2 ;
-tipo_2					::= IDEN ;
-tipo_2					::= tipo_basico ;
-tipo_2          ::= struct;
-tipo_basico				::= P_INT ;
-tipo_basico				::= P_REAL ;
-tipo_basico				::= P_BOOL ;
-tipo_basico				::= P_STRING ;
-array					::= tipo_0 CORCHETEAP ENT CORCHETECIERRE ;
-struct					::= P_STRUCT LLAVEAP campos_struct LLAVECIERRE ;
-campos_struct			::= campo_struct R3 ;
-R3						::= COMA campo_struct R3 ;
-R3						::= ;
-campo_struct			::= tipo_0 IDEN ;
-puntero					::= EXPONENTE tipo_1 ;
+tipo_0					      ::= tipo_1 ;
+tipo_1					      ::= puntero ;
+tipo_1					      ::= tipo_2 ;
+tipo_2					      ::= IDEN ;
+tipo_2					      ::= tipo_basico ;
+tipo_2                ::= struct;
+tipo_basico				    ::= P_INT ;
+tipo_basico				    ::= P_REAL ;
+tipo_basico				    ::= P_BOOL ;
+tipo_basico				    ::= P_STRING ;
+array					        ::= tipo_0 CORCHETEAP ENT CORCHETECIERRE ;
+struct					      ::= P_STRUCT LLAVEAP campos_struct LLAVECIERRE ;
+campos_struct			    ::= campos_struct COMA campo_struct ;
+campos_struct			    ::= campo_struct ;
+campo_struct			    ::= tipo_0 IDEN ;
+puntero					      ::= EXPONENTE tipo_1 ;
 
 
 intr_opt				::= lista_intr ;
 intr_opt				::= ;
-lista_intr				::= instruccion R4 ;
-R4						::= PCOMA instruccion R4 ;
-R4						::= ;
+lista_intr				::= lista_intr PCOMA instruccion;
+lista_intr				::= instruccion;
 
 instruccion				::= instruccion_eval ;
 instruccion				::= instruccion_if ;
@@ -150,21 +140,18 @@ instruccion_delete		::= P_DELETE expresion ;
 instruccion_call		::= P_CALL IDEN PAP lista_param_real_opt PCIERRE ;
 lista_param_real_opt	::= lista_param_real ;
 lista_param_real_opt	::= ;
-lista_param_real		::= expresion R5 ;
-R5						::= COMA expresion R5 ;
-R5						::= ;
+lista_param_real		::= lista_param_real COMA expresion;
+lista_param_real		::= expresion;
 instruccion_compuesta	::= bloque ;
 
 
 expresion				::= E0;
 
-E0 						::= E1 RE0;
-RE0						::= IGUAL E1 RE0;
-RE0						::= ;
-						
-E1 						::= E2 RE1;
-RE1						::= OP1 E2 RE1;
-RE1						::= ;
+E0 						::= E0 IGUAL E1;
+E0 						::= E1;
+
+E1 						::= E1 OP1 E2;
+E1 						::= E2;
 OP1						::= LT;
 OP1						::= LEQ;
 OP1						::= GT;
@@ -172,20 +159,16 @@ OP1						::= GEQ;
 OP1						::= COMP;
 OP1						::= DIST;
 						
-E2 						::= E3 FE2 RE2;
-FE2						::= MENOS E3;
-FE2						::= ;
-RE2						::= MAS E3 RE2;
-RE2						::= ;
+E2 						::= E2 MAS E3;
+E2 						::= E3 MENOS E3;
+E2 						::= E3;
+
+E3 						::= E4 P_AND E3;
+E3 						::= E4 P_OR E4;
+E3 						::= E4;
 						
-E3 						::= E4 FE3;
-FE3						::= P_AND E3;
-FE3						::= P_OR E4;
-FE3						::= ;
-						
-E4 						::= E5 RE4;
-RE4						::= OP4 E5 RE4;
-RE4						::= ;
+E4 						::= E4 OP4 E5;
+E4 						::= E5;
 OP4						::= MUL;
 OP4						::= DIV;
 OP4						::= PORCENTAJE;
@@ -195,9 +178,8 @@ E5 						::= E6;
 OP5						::= MENOS;
 OP5						::= P_NOT;
 						
-E6 						::= E7 RE6;
-RE6						::= OP6 RE6;
-RE6						::= ;
+E6 						::= E6 OP6;
+E6 						::= E7;
 OP6						::= CORCHETEAP expresion CORCHETECIERRE;
 OP6						::= PUNTO IDEN;
 OP6						::= EXPONENTE;
