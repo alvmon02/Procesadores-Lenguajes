@@ -42,40 +42,41 @@ terminal     IDEN, ENT, REAL, STRING,
              COMA,
              CORCHETEAP,CORCHETECIERRE, 
              PUNTO, EXPONENTE,
-             O_EOF;
+             O_EOF ;
 
 
-non terminal	programa, bloque,
-				      declar_opt, declaraciones, declaracion, 
-              declar_var, declar_tipo, declar_proc,
+non terminal	programa, bloque, 
+		
+				declar_opt, declaraciones, declaracion, 
+				declar_var, declar_tipo, declar_proc,
+		
+				intr_opt, lista_intr, instruccion,
+		
+				instruccion_eval, instruccion_if , instruccion_else, instruccion_else_opt, instruccion_while , instruccion_read , instruccion_write , instruccion_nl , instruccion_new , instruccion_delete , instruccion_call , instruccion_compuesta , 
+	
+				lista_param_real_opt, lista_param_real,
 
-				      intr_opt, lista_intr, instruccion,
+				param_formales, lista_param_form_opt, lista_param_form, param_formal, ref_opt,
 
-				      instruccion_eval, instruccion_if , instruccion_else, instruccion_else_opt, instruccion_while , instruccion_read , instruccion_write , instruccion_nl , instruccion_new , instruccion_delete , instruccion_call , instruccion_compuesta , 
+				tipo_0, tipo_1, tipo_2, tipo_basico,
 
-				      lista_param_real_opt, lista_param_real,
+				array, puntero, struct, campos_struct, campo_struct,
 
-				      param_formales, lista_param_form_opt, lista_param_form, param_formal, ref_opt,
+				expresion,
 
-				      tipo_0, tipo_1, tipo_2, tipo_basico,
+				R1, R2, R3, R4, R5,
 
-				      array, puntero, struct, campos_struct, campo_struct,
+				E0, RE0, 
+				E1, RE1, OP1,
+				E2, FE2, RE2,
+				E3, FE3, RE3,
+				E4, RE4, OP4,
+				E5, OP5,
+				E6, RE6, OP6,
+				E7,
+				E8;
 
-				      expresion,
-
-				      R1, R2, R3, R4, R5,
-
-				      E0, RE0, 
-				      E1, RE1, OP1,
-				      E2, FE2, RE2,
-				      E3, FE3,
-				      E4, RE4, OP4,
-				      E5, OP5,
-				      E6, RE6, OP6,
-				      E7,
-				      E8;
-
-programa				::= bloque O_EOF;
+programa				::= bloque ;
 bloque					::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
 declar_opt				::= declaraciones FINDECLAR ;
 declar_opt				::= ;
@@ -105,13 +106,12 @@ tipo_1					::= puntero ;
 tipo_1					::= tipo_2 ;
 tipo_2					::= IDEN ;
 tipo_2					::= tipo_basico ;
-tipo_2          ::= struct;
 tipo_basico				::= P_INT ;
 tipo_basico				::= P_REAL ;
 tipo_basico				::= P_BOOL ;
 tipo_basico				::= P_STRING ;
 array					::= tipo_0 CORCHETEAP ENT CORCHETECIERRE ;
-struct					::= P_STRUCT LLAVEAP campos_struct LLAVECIERRE ;
+struct					::= LLAVEAP campos_struct LLAVECIERRE ;
 campos_struct			::= campo_struct R3 ;
 R3						::= COMA campo_struct R3 ;
 R3						::= ;
@@ -150,8 +150,8 @@ instruccion_delete		::= P_DELETE expresion ;
 instruccion_call		::= P_CALL IDEN PAP lista_param_real_opt PCIERRE ;
 lista_param_real_opt	::= lista_param_real ;
 lista_param_real_opt	::= ;
-lista_param_real		::= expresion R5 ;
-R5						::= COMA expresion R5 ;
+lista_param_real		::= IDEN R5 ;
+R5						::= COMA IDEN R5 ;
 R5						::= ;
 instruccion_compuesta	::= bloque ;
 
@@ -178,17 +178,16 @@ FE2						::= ;
 RE2						::= MAS E3 RE2;
 RE2						::= ;
 						
-E3 						::= E4 FE3;
+E3 						::= E4 RE3;
 FE3						::= P_AND E3;
 FE3						::= P_OR E4;
-FE3						::= ;
+RE3						::= ;
 						
 E4 						::= E5 RE4;
 RE4						::= OP4 E5 RE4;
 RE4						::= ;
 OP4						::= MUL;
 OP4						::= DIV;
-OP4						::= PORCENTAJE;
 						
 E5 						::= OP5 E5;
 E5 						::= E6;
