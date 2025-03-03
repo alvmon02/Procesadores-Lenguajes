@@ -275,4 +275,3 @@ x
 }
 }
 <EOF>
-ERROR_SINTACTICO

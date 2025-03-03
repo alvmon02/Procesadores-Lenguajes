@@ -41,7 +41,7 @@ terminal     IDEN, ENT, REAL, STRING,
              PORCENTAJE, AND,
              COMA,
              CORCHETEAP,CORCHETECIERRE, 
-             PUNTO, EXPONENTE, O_EOF;
+             PUNTO, EXPONENTE;
 
 
 non terminal	programa, bloque,
@@ -67,7 +67,7 @@ non terminal	programa, bloque,
 
 start with programa;
 
-programa				      ::= bloque O_EOF;
+programa				      ::= bloque;
 bloque					      ::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
 
 declar_opt				    ::= declaraciones FINDECLAR ;

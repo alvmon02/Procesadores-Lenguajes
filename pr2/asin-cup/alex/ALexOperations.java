@@ -216,7 +216,7 @@ public class ALexOperations {
    }
 
    public UnidadLexica unidadEof() {
-      return new UnidadLexica(alex.fila(), alex.columna(), ClaseLexica.O_EOF, "<EOF>");
+      return new UnidadLexica(alex.fila(), alex.columna(), ClaseLexica.EOF, "<EOF>");
    }
 
 }
