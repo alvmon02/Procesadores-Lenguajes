@@ -491,4 +491,3 @@ arbol
 )
 }
 <EOF>
-ERROR_SINTACTICO
