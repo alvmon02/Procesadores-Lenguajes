@@ -1,7 +1,5 @@
 package asint;
 
-import java.util.Base64.Decoder;
-
 public class SintaxisAbstractaTiny {
 
     public static abstract class Nodo {
@@ -414,7 +412,301 @@ public class SintaxisAbstractaTiny {
         }
     }
 
-    // TODO InstruccionesOPT
+    public static abstract class IntrsOpt extends Nodo {
+        public IntrsOpt() {
+            super();
+        }
+    }
+
+    public static class Si_Intrs extends IntrsOpt {
+        private LIntrs intrs;
+
+        public Si_Intrs(LIntrs intrs) {
+            super();
+            this.intrs = intrs;
+        }
+
+        public String toString() {
+            return "si_intrs(" + intrs + ")";
+        }
+    }
+
+    public static class No_Intrs extends IntrsOpt {
+        public No_Intrs() {
+            super();
+        }
+
+        public String toString() {
+            return "no_intrs()";
+        }
+    }
+
+    public static abstract class LIntrs extends Nodo {
+        public LIntrs() {
+            super();
+        }
+    }
+
+    public static class Mas_Intrs extends LIntrs {
+        private LIntrs intrs;
+        private Intr intr;
+
+        public Mas_Intrs(LIntrs intrs, Intr intr) {
+            super();
+            this.intrs = intrs;
+            this.intr = intr;
+        }
+
+        public String toString() {
+            return "mas_intrs(" + intrs + "," + intr + ")";
+        }
+    }
+
+    public static class Una_Intr extends LIntrs {
+        private Intr intr;
+
+        public Una_Intr(Intr intr) {
+            super();
+            this.intr = intr;
+        }
+
+        public String toString() {
+            return "una_intr(" + intr + ")";
+        }
+    }
+
+    public static abstract class Intr extends Nodo {
+        public Intr() {
+            super();
+        }
+    }
+
+    public static class I_Eval extends Intr {
+        private Exp exp;
+
+        public I_Eval(Exp exp) {
+            super();
+            this.exp = exp;
+        }
+
+        public String toString() {
+            return "i_eval(" + exp + ")";
+        }
+    }
+
+    public static class I_If extends Intr {
+        private Exp exp;
+        private Prog prog;
+        private I_Else i_else;
+
+        public I_If(Exp exp, Prog prog, I_Else i_else) {
+            super();
+            this.exp = exp;
+            this.prog = prog;
+            this.i_else = i_else;
+        }
+
+        public String toString() {
+            return "i_if(" + exp + "," + prog + "," + i_else + ")";
+        }
+    }
+
+    public static class I_While extends Intr {
+        private Exp exp;
+        private Prog prog;
+
+        public I_While(Exp exp, Prog prog) {
+            super();
+            this.exp = exp;
+            this.prog = prog;
+        }
+
+        public String toString() {
+            return "i_while(" + exp + "," + prog + ")";
+        }
+    }
+
+    public static class I_Read extends Intr {
+        private Exp exp;
+
+        public I_Read(Exp exp) {
+            super();
+            this.exp = exp;
+        }
+
+        public String toString() {
+            return "i_read(" + exp + ")";
+        }
+    }
+
+    public static class I_Write extends Intr {
+        private Exp exp;
+
+        public I_Write(Exp exp) {
+            super();
+            this.exp = exp;
+        }
+
+        public String toString() {
+            return "i_write(" + exp + ")";
+        }
+    }
+
+    public static class I_NL extends Intr {
+        public I_NL() {
+            super();
+        }
+
+        public String toString() {
+            return "i_nl()";
+        }
+    }
+
+    public static class I_New extends Intr {
+        private Exp exp;
+
+        public I_New(Exp exp) {
+            super();
+            this.exp = exp;
+        }
+
+        public String toString() {
+            return "i_new(" + exp + ")";
+        }
+    }
+
+    public static class I_Delete extends Intr {
+        private Exp exp;
+
+        public I_Delete(Exp exp) {
+            super();
+            this.exp = exp;
+        }
+
+        public String toString() {
+            return "i_delete(" + exp + ")";
+        }
+    }
+
+    public static class I_Call extends Intr {
+        private String id;
+        private PReals preals;
+
+        public I_Call(String id, PReals preals) {
+            super();
+            this.id = id;
+            this.preals = preals;
+        }
+
+        public String toString() {
+            return "i_call(" + id + "[" + leeFila() + "," + leeCol() + "]," + preals + ")";
+        }
+    }
+
+    public static class I_Prog extends Intr {
+        private Prog prog;
+
+        public I_Prog(Prog prog) {
+            super();
+            this.prog = prog;
+        }
+
+        public String toString() {
+            return "i_prog(" + prog + ")";
+        }
+    }
+
+    public static abstract class I_Else extends Nodo {
+        public I_Else() {
+            super();
+        }
+    }
+
+    public static class Si_Else extends I_Else {
+        private Prog prog;
+
+        public Si_Else(Prog prog) {
+            super();
+            this.prog = prog;
+        }
+
+        public String toString() {
+            return "si_else(" + prog + ")";
+        }
+    }
+
+    public static class No_Else extends I_Else {
+        public No_Else() {
+            super();
+        }
+
+        public String toString() {
+            return "no_else()";
+        }
+    }
+
+    public static abstract class PReals extends Nodo {
+        public PReals() {
+            super();
+        }
+    }
+
+    public static class Si_PReals extends PReals {
+        private LPReals preals;
+
+        public Si_PReals(LPReals preals) {
+            super();
+            this.preals = preals;
+        }
+
+        public String toString() {
+            return "si_preals(" + preals + ")";
+        }
+    }
+
+    public static class No_PReals extends PReals {
+        public No_PReals() {
+            super();
+        }
+
+        public String toString() {
+            return "no_preals()";
+        }
+    }
+
+    public static abstract class LPReals extends Nodo {
+        public LPReals() {
+            super();
+        }
+    }
+
+    public static class Mas_PReals extends LPReals {
+        private LPReals preals;
+        private String id;
+
+        public Mas_PReals(LPReals preals, String id) {
+            super();
+            this.preals = preals;
+            this.id = id;
+        }
+
+        public String toString() {
+            return "mas_preals(" + preals + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+    }
+
+    public static class Un_Preal extends LPReals {
+        private String id;
+
+        public Un_Preal(String id) {
+            super();
+            this.id = id;
+        }
+
+        public String toString() {
+            return "un_preal(" + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+    }
 
     public static abstract class Exp extends Nodo {
         public Exp() {
