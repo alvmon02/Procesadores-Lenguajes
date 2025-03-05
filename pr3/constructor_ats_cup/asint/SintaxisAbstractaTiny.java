@@ -695,10 +695,10 @@ public class SintaxisAbstractaTiny {
         }
     }
 
-    public static class Un_Preal extends LPReals {
+    public static class Un_PReal extends LPReals {
         private String id;
 
-        public Un_Preal(String id) {
+        public Un_PReal(String id) {
             super();
             this.id = id;
         }
@@ -1005,4 +1005,191 @@ public class SintaxisAbstractaTiny {
             return "null([" + leeFila() + "," + leeCol() + "])";
         }
     }
+
+    // Constructoras
+    public Prog prog(DecsOpt decs, IntrsOpt intrs) {
+        return new Prog(decs, intrs);
+    }
+
+    public DecsOpt si_decs(LDecs decs) {
+        return new Si_Decs(decs);
+    }
+
+    public DecsOpt no_decs() {
+        return new No_Decs();
+    }
+
+    public LDecs mas_decs(LDecs decs, Dec dec) {
+        return new Mas_Decs(decs, dec);
+    }
+
+    public LDecs una_dec(Dec dec) {
+        return new Una_Dec(dec);
+    }
+
+    public Dec dec_var(Tipo tipo, String id) {
+        return new Dec_Var(tipo, id);
+    }
+
+    public Dec dec_tipo(Tipo tipo, String id) {
+        return new Dec_Tipo(tipo, id);
+    }
+
+    public Dec dec_proc(String id, PForms pforms, Prog prog) {
+        return new Dec_Proc(id, pforms, prog);
+    }
+
+    public PForms si_pforms(LPForms pfroms) {
+        return new Si_PForms(pfroms);
+    }
+
+    public PForms no_pforms() {
+        return new No_PForms();
+    }
+
+    public LPForms mas_pfroms(LPForms pforms, PForm pform) {
+        return new Mas_PForms(pforms, pform);
+    }
+
+    public LPForms una_pform(PForm pform) {
+        return new Una_PForm(pform);
+    }
+
+    public PForm pform(Tipo tipo, Ref ref, String id) {
+        return new PForm(tipo, ref, id);
+    }
+
+    public Ref si_ref() {
+        return new Si_Ref();
+    }
+
+    public Ref no_ref() {
+        return new No_Ref();
+    }
+
+    public Tipo t_iden(String id) {
+        return new T_Iden(id);
+    }
+
+    public Tipo t_string() {
+        return new T_String();
+    }
+
+    public Tipo t_int() {
+        return new T_Int();
+    }
+
+    public Tipo t_bool() {
+        return new T_Bool();
+    }
+
+    public Tipo t_real() {
+        return new T_Real();
+    }
+
+    public Tipo t_array(Tipo tipo, String ent) {
+        return new T_Array(tipo, ent);
+    }
+
+    public Tipo t_punter(Tipo tipo) {
+        return new T_Puntero(tipo);
+    }
+
+    public Tipo t_struct(CamposS camposs) {
+        return new T_Struct(camposs);
+    }
+
+    public CamposS mas_cmp_s(CamposS camposs, CampoS campos) {
+        return new Mas_Cmp_S(camposs, campos);
+    }
+
+    public CamposS un_cmp_s(CampoS campos) {
+        return new Un_Cmp_S(campos);
+    }
+
+    public CampoS cmp_s(Tipo tipo, String id) {
+        return new CampoS(tipo, id);
+    }
+
+    public IntrsOpt si_intrs(LIntrs intrs) {
+        return new Si_Intrs(intrs);
+    }
+
+    public IntrsOpt no_intrs() {
+        return new No_Intrs();
+    }
+
+    public LIntrs mas_intrs(LIntrs intrs, Intr intr) {
+        return new Mas_Intrs(intrs, intr);
+    }
+
+    public LIntrs una_intr(Intr intr) {
+        return new Una_Intr(intr);
+    }
+
+    public Intr i_eval(Exp exp) {
+        return new I_Eval(exp);
+    }
+
+    public Intr i_if(Exp exp, Prog prog, I_Else ielse) {
+        return new I_If(exp, prog, ielse);
+    }
+
+    public Intr i_while(Exp exp, Prog prog) {
+        return new I_While(exp, prog);
+    }
+
+    public Intr i_read(Exp exp) {
+        return new I_Read(exp);
+    }
+
+    public Intr i_write(Exp exp) {
+        return new I_Write(exp);
+    }
+
+    public Intr i_ln() {
+        return new I_NL();
+    }
+
+    public Intr i_new(Exp exp) {
+        return new I_New(exp);
+    }
+
+    public Intr i_delete(Exp exp) {
+        return new I_Delete(exp);
+    }
+
+    public Intr i_call(String id, PReals preals) {
+        return new I_Call(id, preals);
+    }
+
+    public Intr i_prog(Prog prog) {
+        return new I_Prog(prog);
+    }
+
+    public I_Else si_else(Prog prog) {
+        return new Si_Else(prog);
+    }
+
+    public I_Else no_else() {
+        return new No_Else();
+    }
+
+    public PReals si_preals(LPReals preals) {
+        return new Si_PReals(preals);
+    }
+
+    public PReals no_preals() {
+        return new No_PReals();
+    }
+
+    public LPReals mas_preals(LPReals preals, String id) {
+        return new Mas_PReals(preals, id);
+    }
+
+    public LPReals un_preals(String id) {
+        return new Un_PReal(id);
+    }
+
+    // TODO Constructoras de las expresiones
 }
