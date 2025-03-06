@@ -904,13 +904,18 @@ public class SintaxisAbstractaTiny {
         }
     }
 
-    public static class Acceso extends ExpBin {
-        public Acceso(Exp opnd0, Iden opnd1) {
-            super(opnd0, opnd1);
+    public static class Acceso extends Exp {
+        private Exp opnd;
+        private String id;
+
+        public Acceso(Exp opnd, String id) {
+            super();
+            this.opnd = opnd;
+            this.id = id;
         }
 
         public String toString() {
-            return "acceso(" + opnd0 + "," + opnd1 + ")";
+            return "acceso(" + opnd + "," + id + "[" + leeFila() + "," + leeCol() + "])";
         }
     }
 
@@ -1191,5 +1196,107 @@ public class SintaxisAbstractaTiny {
         return new Un_PReal(id);
     }
 
-    // TODO Constructoras de las expresiones
+    public Exp e_asig(Exp opnd0, Exp opnd1) {
+        return new Asig(opnd0, opnd1);
+    }
+
+    public Exp e_comp(Exp opnd0, Exp opnd1) {
+        return new Comp(opnd0, opnd1);
+    }
+
+    public Exp e_dist(Exp opnd0, Exp opnd1) {
+        return new Dist(opnd0, opnd1);
+    }
+
+    public Exp e_lt(Exp opnd0, Exp opnd1) {
+        return new Menor(opnd0, opnd1);
+    }
+
+    public Exp e_gt(Exp opnd0, Exp opnd1) {
+        return new Mayor(opnd0, opnd1);
+    }
+
+    public Exp e_leq(Exp opnd0, Exp opnd1) {
+        return new MenorIgual(opnd0, opnd1);
+    }
+
+    public Exp e_geq(Exp opnd0, Exp opnd1) {
+        return new MayorIgual(opnd0, opnd1);
+    }
+
+    public Exp e_suma(Exp opnd0, Exp opnd1) {
+        return new Suma(opnd0, opnd1);
+    }
+
+    public Exp e_resta(Exp opnd0, Exp opnd1) {
+        return new Resta(opnd0, opnd1);
+    }
+
+    public Exp e_and(Exp opnd0, Exp opnd1) {
+        return new And(opnd0, opnd1);
+    }
+
+    public Exp e_or(Exp opnd0, Exp opnd1) {
+        return new Or(opnd0, opnd1);
+    }
+
+    public Exp e_mul(Exp opnd0, Exp opnd1) {
+        return new Mul(opnd0, opnd1);
+    }
+
+    public Exp e_div(Exp opnd0, Exp opnd1) {
+        return new Div(opnd0, opnd1);
+    }
+
+    public Exp e_porcentaje(Exp opnd0, Exp opnd1) {
+        return new Porcentaje(opnd0, opnd1);
+    }
+
+    public Exp e_negativo(Exp opnd) {
+        return new Negativo(opnd);
+    }
+
+    public Exp e_negado(Exp opnd) {
+        return new Negado(opnd);
+    }
+
+    public Exp e_indexado(Exp opnd0, Exp opnd1) {
+        return new Index(opnd0, opnd0);
+    }
+
+    public Exp e_campo(Exp opnd, String id) {
+        return new Acceso(opnd, id);
+    }
+
+    public Exp e_puntero(Exp opnd) {
+        return new Indireccion(opnd);
+    }
+
+    public Exp e_lit_ent(String num) {
+        return new Lit_ent(num);
+    }
+
+    public Exp e_lit_real(String num) {
+        return new Lit_real(num);
+    }
+
+    public Exp e_true() {
+        return new True();
+    }
+
+    public Exp e_false() {
+        return new False();
+    }
+
+    public Exp e_string(String string) {
+        return new Cadena(string);
+    }
+
+    public Exp e_iden(String id) {
+        return new Iden(id);
+    }
+
+    public Exp e_null() {
+        return new Null();
+    }
 }
