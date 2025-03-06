@@ -61,6 +61,7 @@ public class TestCasos {
             System.setOut(new NullPrintStream());
             asint.analiza();
             System.setOut(salida);
+        	System.out.println("OK");
         } catch (ParseException e) {
             System.setOut(salida);
             System.out.println("ERROR_SINTACTICO");
@@ -68,7 +69,6 @@ public class TestCasos {
             System.setOut(salida);
             System.out.println("ERROR_LEXICO");
         }
-        System.out.println("OK");
     }
 
     private static class NullPrintStream extends PrintStream {
