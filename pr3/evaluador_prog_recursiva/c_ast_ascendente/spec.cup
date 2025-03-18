@@ -1,80 +1,196 @@
 package c_ast_ascendente;
 
 import java_cup.runtime.*;
-import asint.ClaseSemanticaEval;
-import asint.SintaxisAbstractaEval.Exp;
-import asint.SintaxisAbstractaEval.Decs;
-import asint.SintaxisAbstractaEval.LDecs;
-import asint.SintaxisAbstractaEval.Dec;
-import asint.SintaxisAbstractaEval.Prog;
-import c_ast_ascendente.UnidadLexica.StringLocalizado;
-
+import c_ast_ascendente.AnalizadorLexicoTiny;
+import c_ast_ascendente.UnidadLexica;
+import c_ast_ascendente.GestionErroresTiny;
 
 scan with {: 
   return getScanner().next_token(); 
 :};
 parser code {: 
-   private GestionErroresEval errores;
+   private GestionErroresTiny errores;
    public void syntax_error(Symbol unidadLexica) {
      errores.errorSintactico((UnidadLexica)unidadLexica);
    }
 :};
 init with {: 
-   errores = new GestionErroresEval();
-   AnalizadorLexicoEval alex = (AnalizadorLexicoEval)getScanner();
+   errores = new GestionErroresTiny();
+   AnalizadorLexicoTiny alex = (AnalizadorLexicoTiny)getScanner();
    alex.fijaGestionErrores(errores);
 :};
-action code {:
-  ClaseSemanticaEval sem = new ClaseSemanticaEval();
-:}
 
 
-terminal     DONDE, EVALUA, MAS,
-             MENOS, POR, DIV, IGUAL, COMA, PAP, PCIERRE;
-terminal StringLocalizado IDEN, ENT, REAL;
+terminal     IDEN, ENT, REAL, STRING, 
+             PAP, PCIERRE, 
+             LLAVEAP, LLAVECIERRE,
+             LT, LEQ, GT, GEQ,
+             COMP, DIST, IGUAL,
+             PCOMA,
+             MAS, MENOS, MUL, DIV,
+             INIEVAL, FINDECLAR,
+             P_INT, P_REAL, P_BOOL,
+             P_AND, P_OR, P_NOT,
+             P_TRUE, P_FALSE,
+             P_STRING, P_NULL, P_PROC,
+             P_IF, P_ELSE, P_WHILE,
+             P_STRUCT,
+             P_NEW, P_DELETE,
+             P_READ, P_WRITE,
+             P_NL, P_TYPE, P_CALL,
+             PORCENTAJE, AND,
+             COMA,
+             CORCHETEAP,CORCHETECIERRE, 
+             PUNTO, EXPONENTE;
 
-non terminal  Prog programa;
-non terminal  Exp expresion, E0, E1, E2;
-non terminal  Decs declaraciones;
-non terminal  LDecs lista_declaraciones;
-non terminal  Dec declaracion;
-non terminal  String OP0, OP1;
 
-programa      ::= expresion: exp declaraciones: decs 
-   {: RESULT = sem.prog(exp,decs); :};
-expresion     ::= EVALUA E0: exp 
-   {: RESULT = exp; :};
-declaraciones ::= DONDE lista_declaraciones: decs 
-   {: RESULT = sem.si_decs(decs); :};
-declaraciones ::= 
-   {: RESULT = sem.no_decs(); :};
-lista_declaraciones ::= lista_declaraciones: decs COMA declaracion: dec 
-   {: RESULT = sem.muchas_decs(decs,dec);:};
-lista_declaraciones ::= declaracion: dec 
-   {: RESULT = sem.una_dec(dec);:};
-declaracion ::= IDEN: id IGUAL E0: exp 
-   {: RESULT = (Dec)sem.dec(id.str(),exp).ponFila(id.fila()).ponCol(id.col()); :};
-E0 ::= E0: opnd1 OP0: op E1: opnd2 
-   {: RESULT = sem.mkop(op,opnd1,opnd2); :};
-E0 ::= E1: exp 
-   {: RESULT = exp; :};
-E1 ::= E1: opnd1  OP1: op E2: opnd2 
-   {: RESULT = sem.mkop(op,opnd1,opnd2); :};
-E1 ::= E2: exp 
-   {: RESULT = exp; :};
-E2 ::= IDEN: id 
-   {: RESULT = (Exp)sem.iden(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
-E2 ::= ENT: num 
-   {: RESULT = (Exp)sem.lit_ent(num.str()).ponFila(num.fila()).ponCol(num.col()); :};
-E2 ::= REAL: num 
-   {: RESULT = (Exp)sem.lit_real(num.str()).ponFila(num.fila()).ponCol(num.col()); :};
-E2 ::= PAP E0: exp PCIERRE
-   {: RESULT = exp; :};
-OP0 ::= MAS 
-   {: RESULT = "+"; :};
-OP0 ::= MENOS  
-   {: RESULT = "-"; :};
-OP1 ::= POR 
-   {: RESULT = "*"; :};
-OP1 ::= DIV 
-   {: RESULT = "/"; :};
+non terminal	programa, bloque,
+				      declar_opt, declaraciones, declaracion, 
+              declar_var, declar_tipo, declar_proc,
+
+				      intr_opt, lista_intr, instruccion,
+
+				      instruccion_eval, instruccion_if , instruccion_else, instruccion_else_opt, instruccion_while , instruccion_read , instruccion_write , instruccion_nl , instruccion_new , instruccion_delete , instruccion_call , instruccion_compuesta , 
+
+				      lista_param_real_opt, lista_param_real,
+
+				      param_formales, lista_param_form_opt, lista_param_form, param_formal, ref_opt,
+
+				      tipo_0, tipo_1, tipo_2, tipo_basico,
+
+				      array, puntero, struct, campos_struct, campo_struct,
+
+				      expresion,
+
+				      E0, E1, E2, E3, E4, E5, E6, E7, E8,
+              OP1, OP4, OP5, OP6;
+
+start with programa;
+
+programa				      ::= bloque;
+bloque					      ::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
+
+declar_opt				    ::= declaraciones FINDECLAR ;
+declar_opt				    ::= ;
+declaraciones			    ::= declaraciones PCOMA declaracion ;
+declaraciones			    ::= declaracion ;
+declaracion				    ::= declar_var ;
+declaracion				    ::= declar_tipo ;
+declaracion				    ::= declar_proc ;
+declar_var				    ::= tipo_0 IDEN ; 
+declar_tipo				    ::= P_TYPE tipo_0 IDEN ; 
+declar_proc				    ::= P_PROC IDEN param_formales bloque ; 
+
+param_formales			  ::= PAP lista_param_form_opt PCIERRE ;
+lista_param_form_opt	::= lista_param_form ;
+lista_param_form_opt	::= ;
+lista_param_form		  ::= lista_param_form COMA param_formal;
+lista_param_form		  ::= param_formal;
+param_formal			    ::= tipo_0 ref_opt IDEN ;
+ref_opt					      ::= AND ;
+ref_opt					      ::= ;
+tipo_0					      ::= array ;
+
+
+tipo_0					      ::= tipo_1 ;
+tipo_1					      ::= puntero ;
+tipo_1					      ::= tipo_2 ;
+tipo_2					      ::= IDEN ;
+tipo_2					      ::= tipo_basico ;
+tipo_2                ::= struct;
+tipo_basico				    ::= P_INT ;
+tipo_basico				    ::= P_REAL ;
+tipo_basico				    ::= P_BOOL ;
+tipo_basico				    ::= P_STRING ;
+array					        ::= tipo_0 CORCHETEAP ENT CORCHETECIERRE ;
+struct					      ::= P_STRUCT LLAVEAP campos_struct LLAVECIERRE ;
+campos_struct			    ::= campos_struct COMA campo_struct ;
+campos_struct			    ::= campo_struct ;
+campo_struct			    ::= tipo_0 IDEN ;
+puntero					      ::= EXPONENTE tipo_1 ;
+
+
+intr_opt				::= lista_intr ;
+intr_opt				::= ;
+lista_intr				::= lista_intr PCOMA instruccion;
+lista_intr				::= instruccion;
+
+instruccion				::= instruccion_eval ;
+instruccion				::= instruccion_if ;
+instruccion				::= instruccion_while ;
+instruccion				::= instruccion_read ;
+instruccion				::= instruccion_write ;
+instruccion				::= instruccion_nl ;
+instruccion				::= instruccion_new ;
+instruccion				::= instruccion_delete ;
+instruccion				::= instruccion_call ;
+instruccion				::= instruccion_compuesta ; 
+
+instruccion_eval		::= INIEVAL expresion ;
+instruccion_if			::= P_IF expresion bloque instruccion_else_opt ;
+instruccion_else_opt	::= instruccion_else;
+instruccion_else_opt	::= ;
+instruccion_else		::= P_ELSE bloque ;
+instruccion_while		::= P_WHILE expresion bloque ;
+instruccion_read		::= P_READ expresion ;
+instruccion_write		::= P_WRITE expresion ;
+instruccion_nl			::= P_NL ;
+instruccion_new			::= P_NEW expresion ;
+instruccion_delete		::= P_DELETE expresion ;
+instruccion_call		::= P_CALL IDEN PAP lista_param_real_opt PCIERRE ;
+lista_param_real_opt	::= lista_param_real ;
+lista_param_real_opt	::= ;
+lista_param_real		::= lista_param_real COMA expresion;
+lista_param_real		::= expresion;
+instruccion_compuesta	::= bloque ;
+
+
+expresion				::= E0;
+
+E0 						::= E1 IGUAL E0;
+E0 						::= E1;
+
+E1 						::= E1 OP1 E2;
+E1 						::= E2;
+OP1						::= LT;
+OP1						::= LEQ;
+OP1						::= GT;
+OP1						::= GEQ;
+OP1						::= COMP;
+OP1						::= DIST;
+						
+E2 						::= E2 MAS E3;
+E2 						::= E3 MENOS E3;
+E2 						::= E3;
+
+E3 						::= E4 P_AND E3;
+E3 						::= E4 P_OR E4;
+E3 						::= E4;
+						
+E4 						::= E4 OP4 E5;
+E4 						::= E5;
+OP4						::= MUL;
+OP4						::= DIV;
+OP4						::= PORCENTAJE;
+						
+E5 						::= OP5 E5;
+E5 						::= E6;
+OP5						::= MENOS;
+OP5						::= P_NOT;
+						
+E6 						::= E6 OP6;
+E6 						::= E7;
+OP6						::= CORCHETEAP expresion CORCHETECIERRE;
+OP6						::= PUNTO IDEN;
+OP6						::= EXPONENTE;
+						
+E7 						::= ENT;
+E7 						::= REAL;
+E7 						::= P_TRUE;
+E7 						::= P_FALSE;
+E7 						::= STRING;
+E7 						::= IDEN;
+E7 						::= P_NULL;
+E7 						::= E8;
+						
+E8 						::= PAP E0 PCIERRE;
