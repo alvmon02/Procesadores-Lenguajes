@@ -146,16 +146,15 @@ public class AnalizadorSintacticoTiny {
     private void E0() {
         // System.out.println("Pasando por E0");
         E1();
-        RE0();
+        FE0();
     }
 
-    private void RE0() {
+    private void FE0() {
         // System.out.println("Pasando por RE0");
         switch (anticipo.clase()) {
             case IGUAL:
                 empareja(ClaseLexica.IGUAL);
-                E1();
-                RE0();
+                E0();
                 break;
             default:
                 esperados(ClaseLexica.IGUAL);

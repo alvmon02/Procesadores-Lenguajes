@@ -147,7 +147,7 @@ instruccion_compuesta	::= bloque ;
 
 expresion				::= E0;
 
-E0 						::= E0 IGUAL E1;
+E0 						::= E1 IGUAL E0;
 E0 						::= E1;
 
 E1 						::= E1 OP1 E2;
