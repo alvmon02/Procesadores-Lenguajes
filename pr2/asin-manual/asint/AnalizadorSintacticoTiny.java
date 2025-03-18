@@ -253,16 +253,16 @@ public class AnalizadorSintacticoTiny {
     private void E3() {
         // System.out.println("Pasando por E3");
         E4();
-        RE3();
+        FE3();
     }
 
-    private void RE3() {
-        // System.out.println("Pasando por RE3");
+    private void FE3() {
+        // System.out.println("Pasando por FE3");
         switch (anticipo.clase()) {
             case P_AND:
                 empareja(ClaseLexica.P_AND);
                 E4();
-                RE3();
+                FE3();
                 break;
             case P_OR:
                 empareja(ClaseLexica.P_OR);

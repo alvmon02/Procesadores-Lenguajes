@@ -98,20 +98,20 @@ PARSER_END(AnalizadorSintacticoTiny)
   void instruccion_compuesta(): {} {bloque()}
   void expresion() : {} { e0() }
 
-  void e0(): {} {e1() e0Prime()}
-  void e0Prime(): {} {"=" e0() | {}}
-  void e1(): {} {e2() e1Prime()}
-  void e1Prime(): {} {op1() e2() e1Prime() | {}}
+  void e0(): {} {e1() fe0()}
+  void fe0(): {} {"=" e0() | {}}
+  void e1(): {} {e2() re1()}
+  void re1(): {} {op1() e2() re1() | {}}
   void e2(): {} {e3() fe2() re2()}
   void fe2() : {} {"-" e3() | {}}
   void re2(): {} {"+" e3() re2() | {}}
-  void e3(): {} {e4() e3Prime()}
-  void e3Prime(): {} {<and> e3() | <or> e4() | {}}
-  void e4(): {} {e5() e4Prime()}
-  void e4Prime(): {} {op4() e5() e4Prime() | {}}
+  void e3(): {} {e4() fe3()}
+  void fe3(): {} {<and> e3() | <or> e4() | {}}
+  void e4(): {} {e5() re4()}
+  void re4(): {} {op4() e5() re4() | {}}
   void e5(): {} {e6() | op5() e5() }
-  void e6(): {} {e7() e6Prime()}
-  void e6Prime(): {} {op6() e6Prime() | {}}
+  void e6(): {} {e7() re6()}
+  void re6(): {} {op6() re6() | {}}
   void e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <nulo> |e8()}
   void booleano(): {} {<t_true> | <t_false>}
   void e8(): {} { "(" e0() ")" }
