@@ -2,136 +2,614 @@ options  {
   STATIC=false;
   DEBUG_PARSER=true;
 }  
-PARSER_BEGIN(ConstructorASTsEval)
+PARSER_BEGIN(ConstructorASTsTiny)
 package c_ast_descendente;
-import asint.ClaseSemanticaEval;
-import asint.SintaxisAbstractaEval.Exp;
-import asint.SintaxisAbstractaEval.Decs;
-import asint.SintaxisAbstractaEval.LDecs;
-import asint.SintaxisAbstractaEval.Dec;
-import asint.SintaxisAbstractaEval.Prog;
+import asint*;
 import c_ast_ascendente.UnidadLexica.StringLocalizado;
 
-public class ConstructorASTsEval {
-   private ClaseSemanticaEval sem = new ClaseSemanticaEval();   
+public class ConstructorASTsTiny {
+   private ClaseSemanticaTiny sem = new ClaseSemanticaTiny();   
 }
-PARSER_END(ConstructorASTsEval)
+PARSER_END(ConstructorASTsTiny)
 
-  TOKEN:{<#letra:["a"-"z","A"-"Z"]>}
-  TOKEN:{<#digitoPositivo:["1"-"9"]>}
-  TOKEN:{<#digito:<digitoPositivo>|"0">} 
-  TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
-  TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
-  SKIP:{<["\t"," ","\r","\b","\n"]>}  
-  SKIP:{<"#"(~["\n"])*>}  
-  TOKEN: {<donde:"donde">}
-  TOKEN: {<evalua:"evalua">}
-  TOKEN:{<iden:<letra>(<letra>|<digito>)*>}
-  TOKEN:{<lit_ent:(["+","-"])?<parteEntera>>}
-  TOKEN:{<lit_real:(["+","-"])?<parteEntera>"."<parteDecimal>>  }
+  TOKEN: {<#letra:["a"-"z","A"-"Z"]>}
+  TOKEN: {<#digitoPositivo:["1"-"9"]>}
+  TOKEN: {<#digito:<digitoPositivo>|"0">} 
+  TOKEN: {<#parteEntera:<digitoPositivo> (<digito>)* |"0">} 
+  TOKEN: {<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
+  TOKEN: {<#parteExponencial: ("e"|"E") <parteEntera>>}
+  SKIP:  {<["\t"," ","\r","\b","\n"]>}  
+  SKIP:  {<"##"(~["\n"])*>}  
+  TOKEN: {<t_int:["i","I"]["n","N"]["t","T"]>}
+  TOKEN: {<t_real:["r","R"]["e","E"]["a","A"]["l","L"]>}
+  TOKEN: {<t_bool:["b","B"]["o","O"]["o","O"]["l","L"]>}
+  TOKEN: {<and:["a","A"]["n","N"]["d","D"]>}
+  TOKEN: {<or:["o","O"]["r","R"]>}
+  TOKEN: {<not:["n","N"]["o","O"]["t","T"]>}
+  TOKEN: {<t_string:["s","S"]["t","T"]["r","R"]["i","I"]["n","N"]["g","G"]>}
+  TOKEN: {<nulo:["n","N"]["u","U"]["l","L"]["l","L"]>}
+  TOKEN: {<t_true:["t","T"]["r","R"]["u","U"]["e","E"]>}
+  TOKEN: {<t_false:["f","F"]["a","A"]["l","L"]["s","S"]["e","E"]>}
+  TOKEN: {<proc:["p","P"]["r","R"]["o","O"]["c","C"]>}
+  TOKEN: {<t_if:["i","I"]["f","F"]>}
+  TOKEN: {<t_else:["e","E"]["l","L"]["s","S"]["e","E"]>}
+  TOKEN: {<t_while:["w","W"]["h","H"]["i","I"]["l","L"]["e","E"]>}
+  TOKEN: {<struct:["s","S"]["t","T"]["r","R"]["u","U"]["c","C"]["t","T"]>}
+  TOKEN: {<t_new:["n","N"]["e","E"]["w","W"]>}
+  TOKEN: {<delete:["d","D"]["e","E"]["l","L"]["e","E"]["t","T"]["e","E"]>}
+  TOKEN: {<read:["r","R"]["e","E"]["a","A"]["d","D"]>}
+  TOKEN: {<write:["w","W"]["r","R"]["i","I"]["t","T"]["e","E"]>}
+  TOKEN: {<nl:["n","N"]["l","L"]>}
+  TOKEN: {<type:["t","T"]["y","Y"]["p","P"]["e","E"]>}
+  TOKEN: {<call:["c","C"]["a","A"]["l","L"]["l","L"]>}
+
   
-  Prog analiza()   : 
-      {Prog prog;} 
-      {
-         prog = programa() <EOF> 
-            {return prog;} 
-      }
-  Prog programa()  : 
-     {Exp exp; Decs decs;} 
-     {
-         exp = expresion() decs = declaraciones() 
-           {return sem.prog(exp,decs);}
-     }
-  Exp expresion() : 
-      {Exp exp;} 
-      {
-         <evalua> exp =e0() 
-           {return exp;}
-      }
-  Decs declaraciones() : 
-      {LDecs decs;} 
-      {
-        <donde> decs = lista_declaraciones() 
-           {return sem.si_decs(decs);} 
-        | 
-           {return sem.no_decs();}
-      }
-  LDecs lista_declaraciones() : 
-       {LDecs decs; Dec dec;} 
-       {
-          dec = declaracion() decs = rlista_decs(sem.una_dec(dec)) 
-           {return decs;}
-       }
-  LDecs rlista_decs(LDecs decsh) : 
-       {LDecs decs; Dec dec;} 
-       {
-         "," dec = declaracion() decs = rlista_decs(sem.muchas_decs(decsh,dec))  
-           {return decs;}
-         | 
-           {return decsh;}
-       }
-  Dec declaracion() : 
-       {Token id; Exp exp;} 
-       {
-         id = <iden> "=" exp = e0() 
-          {return (Dec)sem.dec(id.image,exp).ponFila(id.beginLine).ponCol(id.beginColumn);}
-       }
-  Exp e0() : 
-        {Exp e1,e2;} 
-        {
-          e1 = e1() e2 = re0(e1) 
-            {return e2;}
-        }
-  Exp re0(Exp eh) : 
-        {String op; Exp e1,e2;} 
-        {
-          op = op0() e1 = e1() e2 = re0(sem.mkop(op,eh,e1))
-             {return e2;} 
-        | 
-             {return eh;}
-        }
-  Exp e1() : 
-        {Exp e1,e2;} 
-        {
-          e1 = e2() e2 = re1(e1) 
-             {return e2;}
-        }
-  Exp re1(Exp eh) : 
-        {String op; Exp e1,e2;} 
-        {
-          op = op1() e1 = e2() e2 = re1(sem.mkop(op,eh,e1))
-              {return e2;} 
-        | 
-              {return eh;}
-        }
-  Exp e2() : 
-       {Token t; Exp e;} 
-       {
-        t = <iden> 
-          {return (Exp)sem.iden(t.image).ponFila(t.beginLine).ponCol(t.beginColumn);} 
-        |
-        t = <lit_ent> 
-          {return (Exp)sem.lit_ent(t.image).ponFila(t.beginLine).ponCol(t.beginColumn);} 
-        |  
-        t = <lit_real> 
-          {return (Exp)sem.lit_real(t.image).ponFila(t.beginLine).ponCol(t.beginColumn);} 
-        | 
-        "(" e =e0() ")" 
-          {return e;}
-       }
-  String op0()  : 
-       {} 
-       {"+" 
-         {return "+";} 
-        |
-        "-" 
-         {return "-";}
-       }
-  String op1()  :       
-       {} 
-       {"*" 
-          {return "*";} 
-        |
-        "/" 
-          {return "/";}
-       }
+  TOKEN: {<iden:<letra>(<letra>|<digito>|"_")*>}
+  TOKEN: {<lit_ent:(["+","-"])?<parteEntera>>}
+  TOKEN: {<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>}
+  TOKEN: {<cadena: "\"" (~["\""])* "\"">}
+
+
+Prog analiza() :
+    { Prog prog; }
+{
+    prog = programa() <EOF> { return prog; }
+}
+
+Prog programa() :
+    { Prog p; }
+{
+    p = bloque() { return p; }
+}
+
+
+Prog bloque() :
+    { DecsOpt decs; IntrsOpt intrs; Prog p; }
+{
+    "{" 
+       decs = declar_opt() 
+       intrs = instr_opt() 
+    "}" { p = sem.prog(decs, intrs); return p; }
+}
+
+DecsOpt declar_opt() :
+    { LDecs ld; DecsOpt dopt; }
+{
+    ( ld = lista_declaraciones() "&&" { dopt = sem.si_decs(ld); } )
+    |
+    { dopt = sem.no_decs(); }
+    { return dopt; }
+}
+
+LDecs lista_declaraciones() :
+    { LDecs ld; Dec d; }
+{
+    d = declaracion() { ld = sem.una_dec(d); }
+    { ld = rlista_decs(ld); return ld; }
+}
+
+LDecs rlista_decs(LDecs ld0) :
+    { LDecs ld; Dec d; }
+{
+    ( ";" d = declaracion() { ld = sem.mas_decs(ld0, d); ld = rlista_decs(ld); return ld; } )
+    |
+    { return ld0; }
+}
+
+Dec declaracion() :
+    { Dec d; Token t; }
+{
+    // declaración variable
+    ( { Tipo tipo = tipo_0(); }
+      t = <iden> { d = sem.dec_var(tipo, t.image).ponFila(t.beginLine).ponCol(t.beginColumn); }
+    )
+    |
+    // declaración de tipo
+    ( <type> { Tipo tipo = tipo_0(); }
+      t = <iden> { d = sem.dec_tipo(tipo, t.image).ponFila(t.beginLine).ponCol(t.beginColumn); }
+    )
+    |
+    // declaración de procedimiento
+    ( <proc> 
+      t = <iden> 
+      "(" 
+         { PForms pf = param_formales(); }
+      ")" 
+         { Prog p = bloque(); }
+      { d = sem.dec_proc(t.image, pf, p).ponFila(t.beginLine).ponCol(t.beginColumn); }
+    )
+    { return d; }
+}
+
+PForms param_formales() :
+    { PForms pf; }
+{
+    ( lista_params() { pf = sem.si_pforms(lista_params()); } )
+    |
+    { pf = sem.no_pforms(); }
+    { return pf; }
+}
+
+
+LPForms lista_params() :
+    { LPForms lpf; PForm pf; }
+{
+    pf = parametro() { lpf = sem.una_pform(pf); }
+    { lpf = rlista_param(lpf); return lpf; }
+}
+
+LPForms rlista_param(LPForms lpf0) :
+    { LPForms lpf; PForm pf; }
+{
+    ( "," pf = parametro() { lpf = sem.mas_pfroms(lpf0, pf); lpf = rlista_param(lpf); return lpf; } )
+    |
+    { return lpf0; }
+}
+
+
+PForm parametro() :
+    { PForm pf; Tipo tipo; Ref ref; Token t; }
+{
+    { tipo = tipo_0(); }
+    { ref = ref_op(); }
+    t = <iden> { pf = sem.pform(tipo, ref, t.image); return pf; }
+}
+
+Ref ref_op() :
+    { Ref r; }
+{
+    ( "&" { r = sem.si_ref(); } )
+    |
+    { r = sem.no_ref(); }
+    { return r; }
+}
+
+
+Tipo tipo_0() :
+    { Tipo t; }
+{
+    t = tipo_1() { t = tipo_0Prime(t); return t; }
+}
+
+Tipo tipo_0Prime(Tipo base) :
+    { Tipo t; Token num; }
+{
+    ( "[" num = <lit_ent> "]" { t = sem.t_array(base, num.image); t = tipo_0Prime(t); return t; } )
+    |
+    { return base; }
+}
+
+
+Tipo tipo_1() :
+    { Tipo t; }
+{
+    ( "^" { t = sem.t_punter(tipo_1()); return t; } )
+    |
+    { t = tipo_2(); return t; }
+}
+
+
+Tipo tipo_2() :
+    { Tipo t; Token tkn; }
+{
+    ( t = tipo_basico() { return t; } )
+    |
+    ( tkn = <iden> { t = sem.t_iden(tkn.image); return t; } )
+    |
+    ( t = struct_type() { return t; } )
+}
+
+Tipo tipo_basico() :
+    { Tipo t; }
+{
+    <t_int> { t = sem.t_int(); return t; }
+    |
+    <t_real> { t = sem.t_real(); return t; }
+    |
+    <t_bool> { t = sem.t_bool(); return t; }
+    |
+    <t_string> { t = sem.t_string(); return t; }
+}
+
+
+Tipo struct_type() :
+    { Tipo t; CamposS cs; }
+{
+    <struct> "{" { cs = campos_struct(); } "}" { t = sem.t_struct(cs); return t; }
+}
+
+
+CamposS campos_struct() :
+    { CamposS cs; }
+{
+    cs = lista_campos_struct() { return cs; }
+}
+
+
+CamposS lista_campos_struct() :
+    { CamposS cs; CampoS campo; }
+{
+    campo = campo_struct() { cs = sem.un_cmp_s(campo); }
+    { cs = rlista_campo_struct(cs); return cs; }
+}
+
+
+CamposS rlista_campo_struct(CamposS cs0) :
+    { CamposS cs; CampoS campo; }
+{
+    ( "," campo = campo_struct() { cs = sem.mas_cmp_s(cs0, campo); cs = rlista_campo_struct(cs); return cs; } )
+    |
+    { return cs0; }
+}
+
+
+CampoS campo_struct() :
+    { CampoS cs; Tipo tipo; Token t; }
+{
+    tipo = tipo_0() 
+    t = <iden> { cs = sem.cmp_s(tipo, t.image).ponFila(t.beginLine).ponCol(t.beginColumn); return cs; }
+}
+
+
+IntrsOpt instr_opt() :
+    { IntrsOpt io; LIntrs lintrs; }
+{
+    ( lintrs = lista_instrucciones() { io = sem.si_intrs(lintrs); } )
+    |
+    { io = sem.no_intrs(); }
+    { return io; }
+}
+
+LIntrs lista_instrucciones() :
+    { LIntrs lintrs; Intr i; }
+{
+    i = instruccion() { lintrs = sem.una_intr(i); }
+    { lintrs = rlista_instrs(lintrs); return lintrs; }
+}
+
+LIntrs rlista_instrs(LIntrs lintrs0) :
+    { LIntrs lintrs; Intr i; }
+{
+    ( ";" i = instruccion() { lintrs = sem.mas_intrs(lintrs0, i); lintrs = rlista_instrs(lintrs); return lintrs; } )
+    |
+    { return lintrs0; }
+}
+
+
+Intr instruccion() :
+    { Intr i; }
+{
+    instruccion_eval() 
+    |
+    instruccion_if() 
+    |
+    instruccion_while() 
+    |
+    instruccion_read() 
+    |
+    instruccion_write()
+    |
+    instruccion_nl() 
+    |
+    instruccion_new()
+    |
+    instruccion_delete() 
+    |
+    instruccion_call() 
+    |
+    instruccion_compuesta()
+}
+
+
+Intr instruccion_eval() :
+    { Exp exp; }
+{
+    "@" exp = expresion() { return sem.i_eval(exp); }
+}
+
+
+Intr instruccion_if() :
+    { Exp exp; Prog prog; I_Else iElse; }
+{
+    <if> exp = expresion() 
+    prog = bloque() 
+    iElse = instruccion_else_opt() { return sem.i_if(exp, prog, iElse); }
+}
+
+
+I_Else instruccion_else_opt() :
+    { I_Else ie; Prog p; }
+{
+    ( instruccion_else() { ie = sem.si_else(p); } )
+    |
+    { ie = sem.no_else(); }
+    { return ie; }
+}
+
+
+Prog instruccion_else() :
+    { Prog p; }
+{
+    <else> p = bloque() { return p; }
+}
+
+Intr instruccion_while() :
+    { Exp exp; Prog p; }
+{
+    <while> exp = expresion() p = bloque() { return sem.i_while(exp, p); }
+}
+
+
+Intr instruccion_read() :
+    { Exp exp; }
+{
+    <read> exp = expresion() { return sem.i_read(exp); }
+}
+
+Intr instruccion_write() :
+    { Exp exp; }
+{
+    <write> exp = expresion() { return sem.i_write(exp); }
+}
+
+Intr instruccion_nl() :
+    {
+    }
+{
+    <nl> { return sem.i_ln(); }
+}
+
+Intr instruccion_new() :
+    { Exp exp; }
+{
+    <new> exp = expresion() { return sem.i_new(exp); }
+}
+
+Intr instruccion_delete() :
+    { Exp exp; }
+{
+    <delete> exp = expresion() { return sem.i_delete(exp); }
+}
+
+Intr instruccion_call() :
+    { Token t; PReals pr; }
+{
+    <call> 
+    t = <iden> 
+    "(" pr = params_reales() ")" { return sem.i_call(t.image, pr).ponFila(t.beginLine).ponCol(t.beginColumn); }
+}
+
+
+PReals params_reales() :
+    { PReals pr; }
+{
+    ( lista_params_reales() { pr = sem.si_preals(lista_params_reales()); } )
+    |
+    { pr = sem.no_preals(); }
+    { return pr; }
+}
+
+
+LPReals lista_params_reales() :
+    { LPReals lpr; Exp exp; }
+{
+    exp = expresion() { lpr = sem.un_preals(exp.toString()); }
+    { lpr = rlista_params_reales(lpr); return lpr; }
+}
+
+
+LPReals rlista_params_reales(LPReals lpr0) :
+    { LPReals lpr; Exp exp; }
+{
+    ( "," exp = expresion() { lpr = sem.mas_preals(lpr0, exp.toString()); lpr = rlista_params_reales(lpr); return lpr; } )
+    |
+    { return lpr0; }
+}
+
+Intr instruccion_compuesta() :
+    { Prog p; }
+{
+    p = bloque() { return sem.i_prog(p); }
+}
+
+
+Exp expresion() :
+    { Exp e; }
+{
+    e = e0() { return e; }
+}
+
+
+Exp e0() :
+    { Exp e1, eRes; }
+{
+    e1 = e1() { eRes = fe0(e1); return eRes; }
+}
+
+
+Exp fe0(Exp left) :
+    { Exp e; }
+{
+    ( "=" e = e0() { return sem.e_asig(left, e); } )
+    |
+    { return left; }
+}
+
+
+Exp e1() :
+    { Exp e2, eRes; }
+{
+    e2 = e2() { eRes = re1(e2); return eRes; }
+}
+
+
+Exp re1(Exp left) :
+    { String op; Exp e2, eRes; }
+{
+    ( op = op1() e2 = e2() { eRes = sem.mkop(op, left, e2); eRes = re1(eRes); return eRes; } )
+    |
+    { return left; }
+}
+
+
+Exp e2() :
+    { Exp e3, eRes; }
+{
+    e3 = e3() { eRes = fe2(e3); eRes = re2(eRes); return eRes; }
+}
+
+
+Exp fe2(Exp left) :
+    { Exp e; }
+{
+    ( "-" e = e3() { return sem.e_negativo(e); } )
+    |
+    { return left; }
+}
+
+
+Exp re2(Exp left) :
+    { Exp e3, eRes; }
+{
+    ( "+" e3 = e3() { eRes = sem.e_suma(left, e3); eRes = re2(eRes); return eRes; } )
+    |
+    { return left; }
+}
+
+
+Exp e3() :
+    { Exp e4, eRes; }
+{
+    e4 = e4() { eRes = fe3(e4); return eRes; }
+}
+
+
+Exp fe3(Exp left) :
+    { Exp e; }
+{
+    ( <and> e = e3() { return sem.e_and(left, e); } )
+    |
+    ( <or> e4 = e4() { return sem.e_or(left, e4); } )
+    |
+    { return left; }
+}
+
+
+Exp e4() :
+    { Exp e5, eRes; }
+{
+    e5 = e5() { eRes = re4(e5); return eRes; }
+}
+
+
+Exp re4(Exp left) :
+    { String op; Exp e5, eRes; }
+{
+    ( op = op4() e5 = e5() { eRes = sem.mkop(op, left, e5); eRes = re4(eRes); return eRes; } )
+    |
+    { return left; }
+}
+
+
+Exp e5() :
+    { Exp e; String op}
+{
+    ( e = e6() { return e; } )
+    |
+    ( op = op5() e = e5() { return sem.mkunary(op, e); } )
+    
+}
+
+
+Exp e6() :
+    { Exp e7, eRes; }
+{
+    e7 = e7() { eRes = re6(e7); return eRes; }
+}
+
+
+Exp re6(Exp left) :
+    { String op; Exp right, eRes; }
+{
+    ( op = op6() 
+      { 
+         right = e7(); 
+         eRes = sem.mkop(op, left, right); 
+         eRes = re6(eRes); 
+         return eRes; 
+      } )
+    |
+    { return left; }
+}
+
+
+Exp e7() :
+    { Exp e; Token t; }
+{
+    ( t = <lit_ent> { e = sem.e_lit_ent(t.image).ponFila(t.beginLine).ponCol(t.beginColumn); return e; } )
+    |
+    ( t = <lit_real> { e = sem.e_lit_real(t.image).ponFila(t.beginLine).ponCol(t.beginColum); return e; } )
+    |
+    ( booleano() {  
+         e = sem.e_true(); return e; 
+       } )
+    |
+    ( t = <cadena> { e = sem.e_string(t.image).ponFila(t.beginLine).ponCol(t.beginColum); return e; } )
+    |
+    ( t = <iden> { e = sem.e_iden(t.image).ponFila(t.beginLine).ponCol(t.beginColum); return e; } )
+    |
+    ( <null> { e = sem.e_null(); return e; } )
+    |
+    ( e = e8() { return e; } )
+}
+
+
+Exp e8() :
+    { Exp e; }
+{
+    "(" e = e0() ")" { return e; }
+}
+
+
+String op1() :
+{
+}
+{
+    "==" { return "=="; }
+    | "<" { return "<"; }
+    | ">" { return ">"; }
+    | ">=" { return ">="; }
+    | "<=" { return "<="; }
+    | "!=" { return "!="; }
+}
+
+
+String op4() :
+{
+}
+{
+    "*" { return "*"; }
+    | "/" { return "/"; }
+    | "%" { return "%"; }
+}
+
+
+String op5() :
+{
+}
+{
+    "-" { return "-"; }
+    | <not> { return "not"; }
+}
+
+
+String op6() :
+{
+}
+{
+    ( "[" expresion() "]" { return "[]"; } )
+    |
+    ( "." <iden> { return "."; } )
+    |
+    "^" { return "^"; }
+}
