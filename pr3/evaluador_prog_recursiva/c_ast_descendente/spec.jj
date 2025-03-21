@@ -5,6 +5,7 @@ options  {
 PARSER_BEGIN(ConstructorASTsTiny)
 package c_ast_descendente;
 
+import asint.SintaxisAbstractaTiny.*;
 import asint.*;
 
 public class ConstructorASTsTiny {
@@ -157,7 +158,7 @@ PARSER_END(ConstructorASTsTiny)
     { Tipo tipo; Ref ref; Token id; }
     {
       tipo = tipo_0() ref = ref_op() id = <iden>
-        { return sem.pform(tipo, ref, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+        { return (PForm)sem.pform(tipo, ref, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
     }
   
   Ref ref_op() :
@@ -179,13 +180,13 @@ PARSER_END(ConstructorASTsTiny)
   Tipo tipo_0Prime(Tipo tipoh) :
     { Tipo tipo; Token ent; }
     {
-      "[" ent = <lit_ent> "]" tipo = tipo_0Prime(sem.t_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn))
+      "[" ent = <lit_ent> "]" tipo = tipo_0Prime((Tipo)sem.t_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn))
         { return tipo; }
       |
         { return tipoh; }
     }
   
-  Tipo void tipo_1() :
+  Tipo tipo_1() :
     { Tipo tipo; }
     {
       tipo = puntero()
@@ -202,9 +203,9 @@ PARSER_END(ConstructorASTsTiny)
         { return tipo; }
       |
       id = <iden>
-        { return sem.t_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+        { return (Tipo)sem.t_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
       |
-      tipo struct()
+      tipo = struct()
         { return tipo; }
     } // Se ajustó para que acepte tipos básicos
   
@@ -251,7 +252,7 @@ PARSER_END(ConstructorASTsTiny)
     { Tipo tipo; Token id; }
     {
       tipo = tipo_0() id = <iden>
-        { return sem.cmp_s(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+        { return (CampoS)sem.cmp_s(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
     }
 
   Tipo puntero():
@@ -389,13 +390,13 @@ PARSER_END(ConstructorASTsTiny)
     { Token id; PReals preals; }
     {
       <call> id = <iden> "(" preals = params_reales() ")"
-        { sem. i_call(id.image, preals).ponFila(id.beginLine).ponCol(id.beginColumn); }
+        { return (Intr)sem.i_call(id.image, preals).ponFila(id.beginLine).ponCol(id.beginColumn); }
     }
   
   PReals params_reales():
     { LPReals preals; } 
     {
-      lista_params_reales()
+      preals = lista_params_reales()
         { return sem.si_preals(preals); }
       |
         { return sem.no_preals(); }
@@ -404,7 +405,7 @@ PARSER_END(ConstructorASTsTiny)
   LPReals lista_params_reales():
     { Exp exp; LPReals preals; }
     {
-      exp = expresion() preals = rlista_params_reales(sem.un_preal(exp))
+      exp = expresion() preals = rlista_params_reales(sem.un_preals(exp))
         { return preals; }
     }
   
@@ -424,28 +425,229 @@ PARSER_END(ConstructorASTsTiny)
         { return sem.i_prog(prog); }
     }
   
-  Exp expresion() : {} { e0() }
+  Exp expresion() :
+    { Exp exp; } 
+    { 
+      exp = e0()
+        { return exp; }
+    }
 
-  Exp e0(): {} {e1() fe0()}
-  Exp fe0(): {} {"=" e0() | {}}
-  Exp e1(): {} {e2() re1()}
-  Exp re1(): {} {op1() e2() re1() | {}}
-  Exp e2(): {} {e3() fe2() re2()}
-  Exp fe2() : {} {"-" e3() | {}}
-  Exp re2(): {} {"+" e3() re2() | {}}
-  Exp e3(): {} {e4() fe3()}
-  Exp fe3(): {} {<and> e3() | <or> e4() | {}}
-  Exp e4(): {} {e5() re4()}
-  Exp re4(): {} {op4() e5() re4() | {}}
-  Exp e5(): {} {e6() | op5() e5() }
-  Exp e6(): {} {e7() re6()}
-  Exp re6(): {} {op6() re6() | {}}
-  Exp e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <nulo> |e8()}
-  Exp booleano(): {} {<t_true> | <t_false>}
-  Exp e8(): {} { "(" e0() ")" }
-  String op1(): {} {"==" | "<" | ">" | ">=" | "<=" | "!="}
-  String op4(): {} {"*" | "/" | "%"}
-  String op5(): {} {"-" | <not>}
-  String op6(): {} { "[" expresion() "]" | "." <iden> | "^" }
+  Exp e0(): 
+    { Exp exp0, exp1; } 
+    {
+      exp0 = e1() exp1 = fe0(exp0)
+        { return exp1; }
+    }
+
+  Exp fe0(Exp exph):
+    { Exp exp; }
+    {
+      "=" exp = e0()
+        { return sem.e_asig(exph, exp); } 
+      | 
+        { return exph; }
+    }
+
+  Exp e1():
+    { Exp exp0, exp1; } 
+    {
+      exp0 = e2() exp1 = re1(exp0)
+        { return exp1; }
+    }
+  
+  Exp re1(Exp exph): 
+    { String op; Exp exp0, exp1; } 
+    {
+      op = op1() exp0 = e2() exp1 = re1(sem.mkop(op, exph, exp0)) 
+        { return exp1; }
+      | 
+        { return exph; }
+    }
+
+  Exp e2(): 
+    { Exp exp0, exp1, exp2; } 
+    {
+      exp0 = e3() exp1 = fe2(exp0) exp2 = re2(exp1)
+        { return exp2; }
+    }
+
+  Exp fe2(Exp exph) : 
+    { Exp exp; } 
+    {
+      "-" exp = e3()
+        { return sem.e_resta(exph, exp); } 
+      | 
+        { return exph; }
+    }
+
+  Exp re2(Exp exph): 
+    { Exp exp0, exp1; } 
+    {
+      "+" exp0 = e3() exp1 = re2(sem.e_suma(exph, exp0))
+        { return exp1; } 
+      | 
+        { return exph; }
+    }
+
+  Exp e3(): 
+    { Exp exp0, exp1; } 
+    {
+      exp0 = e4() exp1 = fe3(exp0)
+        { return exp0; }
+    }
+
+  Exp fe3(Exp exph): 
+    { Exp exp; } 
+    {
+      <and> exp = e3()
+        { return sem.e_and(exph, exp); }
+      | 
+      <or> exp = e4() 
+        { return sem.e_or(exph, exp); }
+      | 
+        { return exph; }
+    }
+
+  Exp e4(): 
+    { Exp exp0, exp1; } 
+    {
+      exp0 = e5() exp1 = re4(exp0)
+        { return exp1; }
+    }
+
+  Exp re4(Exp exph): 
+    { String op; Exp exp0, exp1; } 
+    {
+      op = op4() exp0 = e5() exp1 = re4(sem.mkop(op, exph, exp0))
+        { return exp1; } 
+      | 
+        { return exph; }
+    }
+
+  Exp e5(): 
+    { String op; Exp exp; } 
+    {
+      exp = e6()
+        { return exp; }
+      | 
+      op = op5() exp = e5() 
+        { return sem.mkunary(op, exp); }
+    }
+
+  Exp e6(): 
+    { Exp exp0, exp1; } 
+    {
+      exp0 = e7() exp1 = re6(exp0)
+        { return exp1; }
+    }
+
+  Exp re6(Exp exph): 
+    { Exp exp0, exp1; } 
+    {
+      exp0 = op6(exph) exp1 = re6(exp0) 
+        { return exp1; }
+      | 
+        { return exph; }
+    }
+
+  Exp e7(): 
+    { Token id; Exp exp; } 
+    {
+      id = <lit_ent> 
+        { return (Exp)sem.e_lit_ent(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+      | 
+      id = <lit_real> 
+        { return (Exp)sem.e_lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+      | 
+      exp = booleano() 
+        { return exp;  }
+      | 
+      id = <cadena> 
+        { return (Exp)sem.e_string(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+      | 
+      id = <iden> 
+        { return (Exp)sem.e_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+      | 
+      id = <nulo> 
+        { return sem.e_null(); }
+      |
+      exp = e8()
+        { return exp; }
+    }
+
+  Exp booleano(): 
+    { Token id; }
+    {
+      id = <t_true>
+        { return sem.e_true(); }
+      | 
+      id = <t_false>
+        { return sem.e_false(); }
+    }
+
+  Exp e8(): 
+    { Exp exp; } 
+    { 
+      "(" exp = e0() ")" 
+        { return exp; }
+    }
+  
+  String op1(): 
+    {} 
+    {
+      "=="
+        { return "=="; }
+      | 
+      "<" 
+        { return "<"; }
+      | 
+      ">" 
+        { return ">"; }
+      | 
+      ">=" 
+        { return ">="; }
+      | 
+      "<=" 
+        { return "<="; }
+      | 
+      "!="
+        { return "!="; }
+    }
+  
+  String op4(): 
+    {} 
+    {
+      "*" 
+        { return "*"; }
+      | 
+      "/" 
+        { return "/"; }
+      | 
+      "%"
+        { return "%"; }
+    }
+
+  String op5(): 
+    {} 
+    {
+      "-" 
+        { return "-"; }
+      | 
+      <not>
+        { return "not"; }
+    }
+  
+  Exp op6(Exp exph): 
+    { Exp exp; Token id; } 
+    { 
+      "[" exp = expresion() "]" 
+        { return sem.e_indexado(exph, exp); }
+      | 
+      "." id = <iden> 
+        { return (Exp)sem.e_campo(exph, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+      | 
+      "^" 
+        { return sem.e_puntero(exph); }
+    }
 
 
