@@ -1531,7 +1531,7 @@ public class SintaxisAbstractaTiny {
         return new I_Write(exp);
     }
 
-    public Intr i_ln() {
+    public Intr i_nl() {
         return new I_NL();
     }
 
