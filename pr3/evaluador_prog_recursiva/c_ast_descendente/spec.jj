@@ -98,75 +98,354 @@ PARSER_END(ConstructorASTsTiny)
     { Dec dec; }
     {
       dec = declaracion_variable()
+        { return dec; }
       |
       dec = declaracion_tipo()
+        { return dec; }
       |
       dec = declaracion_proc()
+        { return dec; }
     }
 
-  void declaracion_variable(): {} {tipo_0() <iden>}
-  void declaracion_tipo(): {} {<type> tipo_0() <iden>}
-  void declaracion_proc(): {} {<proc> <iden> "(" param_formales() ")" bloque()}
+  Dec declaracion_variable() :
+    { Tipo tipo; Token id; }
+    {
+      tipo = tipo_0() id = <iden>
+        { return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+    }
 
-  void param_formales(): {} {lista_params() | {}}
-  void lista_params(): {} {parametro() rlista_param()}
-  void rlista_param(): {} {"," parametro() rlista_param() | {}}
-  void parametro(): {} {tipo_0() ref_op() <iden>}
-  void ref_op(): {} {"&" | {}}
-  void tipo_0() : {} { tipo_1() tipo_0Prime() }
-  void tipo_0Prime() : {} { "[" <lit_ent> "]" tipo_0Prime() | {} } // Se asegura de que los arrays se reconozcan correctamente
-  void tipo_1() : {} {puntero() | tipo_2()}
-  void tipo_2() : {} {tipo_basico() | <iden> | struct()} // Se ajustó para que acepte tipos básicos
-  void tipo_basico(): {} {<t_int> | <t_real> | <t_bool> | <t_string>}
-  void struct(): {} { <struct> "{" campos_struct() "}" }
-  void campos_struct(): {} {lista_campos_struct()}
-  void lista_campos_struct() : {} { campo_struct() rlista_campo_struct() }
-  void rlista_campo_struct(): {} {"," campo_struct() rlista_campo_struct() | {}}
-  void campo_struct(): {} {tipo_0() <iden>}
-  void puntero(): {} {"^" tipo_1()}
+  Dec declaracion_tipo() :
+    { Tipo tipo; Token id; }
+    {
+      <type> tipo = tipo_0() id = <iden>
+        { return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+    }
 
-  void instr_opt() : {} {lista_instrucciones() | {}}
-  void lista_instrucciones() : {} {instruccion() rlista_instrs()}
-  void rlista_instrs() : {} {";" instruccion() rlista_instrs() | {}}
-  void instruccion() : {} {instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_new() | instruccion_delete() | instruccion_call() | instruccion_compuesta()}
-  void instruccion_eval(): {} {"@" expresion()}
-  void instruccion_if(): {} {<t_if> expresion() bloque() instruccion_else_opt()}
-  void instruccion_else_opt(): {} {instruccion_else() | {}}
-  void instruccion_else(): {} {<t_else> bloque()}
-  void instruccion_while(): {} {<t_while> expresion() bloque()}
-  void instruccion_read(): {} {<read> expresion()}
-  void instruccion_write(): {} {<write> expresion()}
-  void instruccion_nl(): {} {<nl>}
-  void instruccion_new(): {} {<t_new> expresion()}
-  void instruccion_delete(): {} {<delete> expresion()}
-  void instruccion_call(): {} {<call> <iden> "(" params_reales() ")"}
-  void params_reales(): {} {lista_params_reales() | {}}
-  void lista_params_reales(): {} {param_real() rlista_params_reales()}
-  void rlista_params_reales(): {} {"," param_real() rlista_params_reales() | {}}
-  void param_real(): {} {expresion()}
-  void instruccion_compuesta(): {} {bloque()}
-  void expresion() : {} { e0() }
+  Dec declaracion_proc() :
+    { Token id; PForms pforms; Prog prog; }
+    {
+      <proc> id = <iden> "(" pforms = param_formales() ")" prog = bloque()
+        { return (Dec)sem.dec_proc(id.image, pforms, prog).ponFila(id.beginLine).ponCol(id.beginColumn); }
+    }
 
-  void e0(): {} {e1() fe0()}
-  void fe0(): {} {"=" e0() | {}}
-  void e1(): {} {e2() re1()}
-  void re1(): {} {op1() e2() re1() | {}}
-  void e2(): {} {e3() fe2() re2()}
-  void fe2() : {} {"-" e3() | {}}
-  void re2(): {} {"+" e3() re2() | {}}
-  void e3(): {} {e4() fe3()}
-  void fe3(): {} {<and> e3() | <or> e4() | {}}
-  void e4(): {} {e5() re4()}
-  void re4(): {} {op4() e5() re4() | {}}
-  void e5(): {} {e6() | op5() e5() }
-  void e6(): {} {e7() re6()}
-  void re6(): {} {op6() re6() | {}}
-  void e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <nulo> |e8()}
-  void booleano(): {} {<t_true> | <t_false>}
-  void e8(): {} { "(" e0() ")" }
-  void op1(): {} {"==" | "<" | ">" | ">=" | "<=" | "!="}
-  void op4(): {} {"*" | "/" | "%"}
-  void op5(): {} {"-" | <not>}
-  void op6(): {} { "[" expresion() "]" | "." <iden> | "^" }
+  PForms param_formales() :
+    { LPForms pfroms; }
+    {
+      pfroms = lista_params()
+        { return sem.si_pforms(pfroms); }
+      |
+        { return sem.no_pforms(); }
+    }
+  
+  LPForms lista_params() :
+    { LPForms pforms; PForm pform; }
+    {
+      pform = parametro() pforms = rlista_param(sem.una_pform(pform))
+        { return pforms; }
+    }
+
+  LPForms rlista_param(LPForms pformsh) :
+    { LPForms pforms; PForm pform; }
+    {
+      "," pform = parametro() pforms = rlista_param(sem.mas_pfroms(pformsh, pform))
+        { return pforms; }
+      | 
+        { return pformsh; }
+    }
+  
+  PForm parametro() :
+    { Tipo tipo; Ref ref; Token id; }
+    {
+      tipo = tipo_0() ref = ref_op() id = <iden>
+        { return sem.pform(tipo, ref, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+    }
+  
+  Ref ref_op() :
+    {}
+    {
+      "&"
+        { return sem.si_ref(); }
+      |
+        { return sem.no_ref(); }
+    }
+  
+  Tipo tipo_0() :
+    { Tipo tipo0; Tipo tipo1; }
+    {
+      tipo0 = tipo_1() tipo1 = tipo_0Prime(tipo0)
+        { return tipo1; }
+    }
+
+  Tipo tipo_0Prime(Tipo tipoh) :
+    { Tipo tipo; Token ent; }
+    {
+      "[" ent = <lit_ent> "]" tipo = tipo_0Prime(sem.t_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn))
+        { return tipo; }
+      |
+        { return tipoh; }
+    }
+  
+  Tipo void tipo_1() :
+    { Tipo tipo; }
+    {
+      tipo = puntero()
+        { return tipo; }
+      |
+      tipo = tipo_2()
+        { return tipo; }
+    }
+  
+  Tipo tipo_2() :
+    { Tipo tipo; Token id; }
+    {
+      tipo = tipo_basico()
+        { return tipo; }
+      |
+      id = <iden>
+        { return sem.t_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+      |
+      tipo struct()
+        { return tipo; }
+    } // Se ajustó para que acepte tipos básicos
+  
+  Tipo tipo_basico() :
+    {}
+    {
+      <t_int>
+        { return sem.t_int(); }
+      |
+      <t_real>
+        { return sem.t_real(); }
+      |
+      <t_bool>
+        { return sem.t_bool(); }
+      |
+      <t_string>
+        { return sem.t_string(); }
+    }
+  
+  Tipo struct() :
+    { CamposS camposs; }
+    {
+      <struct> "{" camposs = lista_campos_struct() "}"
+        { return sem.t_struct(camposs); }
+    }
+  
+  CamposS lista_campos_struct() :
+    { CampoS campos; CamposS camposs; }
+    {
+      campos = campo_struct() camposs = rlista_campo_struct(sem.un_cmp_s(campos))
+        { return camposs; }
+    }
+  
+  CamposS rlista_campo_struct(CamposS campossh) :
+    { CampoS campos; CamposS camposs; }
+    {
+      "," campos = campo_struct() camposs = rlista_campo_struct(sem.mas_cmp_s(campossh, campos))
+        { return camposs; }
+      |
+        { return campossh; }
+    }
+  
+  CampoS campo_struct() :
+    { Tipo tipo; Token id; }
+    {
+      tipo = tipo_0() id = <iden>
+        { return sem.cmp_s(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
+    }
+
+  Tipo puntero():
+    { Tipo tipo; }
+    {
+      "^" tipo = tipo_1()
+        { return sem.t_punter(tipo); }
+    }
+
+  IntrsOpt instr_opt() :
+    { LIntrs intrs; }
+    {
+      intrs = lista_instrucciones()
+        { return sem.si_intrs(intrs); }
+      |
+        { return sem.no_intrs(); }
+    }
+
+  LIntrs lista_instrucciones() :
+    { Intr intr; LIntrs intrs; }
+    {
+      intr = instruccion() intrs = rlista_instrs(sem.una_intr(intr))
+        { return intrs; }
+    }
+  
+  LIntrs rlista_instrs(LIntrs intrsh) :
+    { Intr intr; LIntrs intrs; } 
+    {
+      ";" intr = instruccion() intrs = rlista_instrs(sem.mas_intrs(intrsh, intr))
+        { return intrs; }
+      |
+        { return intrsh; }
+    }
+  
+  Intr instruccion() :
+    { Intr intr; }
+    {
+      intr = instruccion_eval()
+        { return intr; }
+      |
+      intr = instruccion_if()
+        { return intr; }
+      |
+      intr = instruccion_while()
+        { return intr; }
+      |
+      intr = instruccion_read()
+        { return intr; }
+      |
+      intr = instruccion_write()
+        { return intr; }
+      | 
+      intr = instruccion_nl()
+        { return intr; }
+      |
+      intr = instruccion_new()
+        { return intr; }
+      | 
+      intr = instruccion_delete()
+        { return intr; }
+      |
+      intr = instruccion_call()
+        { return intr; }
+      |
+      intr = instruccion_compuesta()
+        { return intr; }
+    }
+
+  Intr instruccion_eval():
+    { Exp exp; }
+    {
+      "@" exp = expresion()
+        { return sem.i_eval(exp); }
+    }
+  
+  Intr instruccion_if():
+    { Exp exp; Prog prog; I_Else ielse; }
+    {
+      <t_if> exp = expresion() prog = bloque() ielse = instruccion_else_opt()
+        { return sem.i_if(exp, prog, ielse); }
+    }
+
+  I_Else instruccion_else_opt():
+    { Prog prog; }
+    {
+      <t_else> prog = bloque()
+        { return sem.si_else(prog); }
+      |
+        { return sem.no_else(); }
+    }
+  
+  Intr instruccion_while():
+    { Exp exp; Prog prog; }
+    {
+      <t_while> exp = expresion() prog = bloque()
+        { return sem.i_while(exp, prog); } 
+    }
+  
+  Intr instruccion_read():
+    { Exp exp; }
+    {
+      <read> exp = expresion()
+        { return sem.i_read(exp); }
+    }
+
+  Intr instruccion_write():
+    { Exp exp; }
+    {
+      <write> exp = expresion()
+        { return sem.i_write(exp); }
+    }
+  
+  Intr instruccion_nl():
+    {}
+    {
+      <nl>
+        { return sem.i_nl(); }
+    }
+
+  Intr instruccion_new(): 
+    { Exp exp; }
+    {
+      <t_new> exp = expresion()
+        { return sem.i_new(exp); }
+    }
+
+  Intr instruccion_delete():
+    { Exp exp; }
+    {
+      <delete> exp = expresion()
+      { return sem.i_delete(exp); }
+    }
+  
+  Intr instruccion_call():
+    { Token id; PReals preals; }
+    {
+      <call> id = <iden> "(" preals = params_reales() ")"
+        { sem. i_call(id.image, preals).ponFila(id.beginLine).ponCol(id.beginColumn); }
+    }
+  
+  PReals params_reales():
+    { LPReals preals; } 
+    {
+      lista_params_reales()
+        { return sem.si_preals(preals); }
+      |
+        { return sem.no_preals(); }
+    }
+
+  LPReals lista_params_reales():
+    { Exp exp; LPReals preals; }
+    {
+      exp = expresion() preals = rlista_params_reales(sem.un_preal(exp))
+        { return preals; }
+    }
+  
+  LPReals rlista_params_reales(LPReals prealsh):
+    { Exp exp; LPReals preals; } 
+    {
+      "," exp = expresion() preals = rlista_params_reales(sem.mas_preals(prealsh, exp))
+        { return preals; }
+      | 
+        { return prealsh; }
+    }
+  
+  Intr instruccion_compuesta(): 
+    { Prog prog; } 
+    {
+      prog = bloque()
+        { return sem.i_prog(prog); }
+    }
+  
+  Exp expresion() : {} { e0() }
+
+  Exp e0(): {} {e1() fe0()}
+  Exp fe0(): {} {"=" e0() | {}}
+  Exp e1(): {} {e2() re1()}
+  Exp re1(): {} {op1() e2() re1() | {}}
+  Exp e2(): {} {e3() fe2() re2()}
+  Exp fe2() : {} {"-" e3() | {}}
+  Exp re2(): {} {"+" e3() re2() | {}}
+  Exp e3(): {} {e4() fe3()}
+  Exp fe3(): {} {<and> e3() | <or> e4() | {}}
+  Exp e4(): {} {e5() re4()}
+  Exp re4(): {} {op4() e5() re4() | {}}
+  Exp e5(): {} {e6() | op5() e5() }
+  Exp e6(): {} {e7() re6()}
+  Exp re6(): {} {op6() re6() | {}}
+  Exp e7(): {} {<lit_ent> | <lit_real> | booleano() | <cadena> | <iden> | <nulo> |e8()}
+  Exp booleano(): {} {<t_true> | <t_false>}
+  Exp e8(): {} { "(" e0() ")" }
+  String op1(): {} {"==" | "<" | ">" | ">=" | "<=" | "!="}
+  String op4(): {} {"*" | "/" | "%"}
+  String op5(): {} {"-" | <not>}
+  String op6(): {} { "[" expresion() "]" | "." <iden> | "^" }
 
 
