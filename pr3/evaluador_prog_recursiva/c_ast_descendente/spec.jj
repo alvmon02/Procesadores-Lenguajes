@@ -48,14 +48,61 @@ PARSER_END(ConstructorASTsTiny)
   TOKEN: {<lit_real:(["+","-"])?<parteEntera>(<parteExponencial> | "."<parteDecimal> | "."<parteDecimal><parteExponencial>)>}
   TOKEN: {<cadena: "\"" (~["\""])* "\"">}
 
-  void analiza()   : {} {programa() <EOF> }
-  void programa()  : {} {bloque()}
-  void bloque(): {} { "{" declar_opt() instr_opt() "}" }
+  Prog analiza() : 
+    { Prog prog; }
+    {
+      prog = programa() <EOF>
+          { return prog; }
+    }
+  
+  Prog programa() :
+    { Prog prog; }
+    {
+      prog = bloque()
+          { return prog; }
+    }
 
-  void declar_opt() : {} {lista_declaraciones() "&&" | {}}
-  void lista_declaraciones() : {} {declaracion() rlista_decs()}
-  void rlista_decs() : {} {";" declaracion() rlista_decs() | {}}
-  void declaracion(): {} {declaracion_variable() | declaracion_tipo() | declaracion_proc()}
+  Prog bloque() :
+    { DecsOpt decs; IntrsOpt intrs; }
+    {
+      "{" decs = declar_opt() intrs = instr_opt() "}" 
+          { return sem.prog(decs, intrs); }
+    }
+
+  DecsOpt declar_opt() :
+    { LDecs decs; } 
+    {
+      decs = lista_declaraciones() "&&" 
+          { return sem.si_decs(decs); }
+      |
+          { return sem.no_decs(); }
+    }
+
+  LDecs lista_declaraciones() :
+    { LDecs decs; Dec dec; }
+    { 
+      dec = declaracion() decs = rlista_decs(sem.una_dec(dec))
+          { return decs; }
+    }
+  
+  LDecs rlista_decs(LDecs decsh) :
+    { LDecs decs; Dec dec; }
+    {
+      ";" dec = declaracion() decs = rlista_decs(sem.mas_decs(decsh, dec))
+          { return decs; }
+      | 
+          { return decsh; }
+    }
+
+  Dec declaracion() :
+    { Dec dec; }
+    {
+      dec = declaracion_variable()
+      |
+      dec = declaracion_tipo()
+      |
+      dec = declaracion_proc()
+    }
 
   void declaracion_variable(): {} {tipo_0() <iden>}
   void declaracion_tipo(): {} {<type> tipo_0() <iden>}
