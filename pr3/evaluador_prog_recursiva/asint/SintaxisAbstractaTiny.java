@@ -993,41 +993,41 @@ public class SintaxisAbstractaTiny {
 
     public static class Mas_PReals extends LPReals {
         private LPReals preals;
-        private String id;
+        private Exp exp;
 
-        public Mas_PReals(LPReals preals, String id) {
+        public Mas_PReals(LPReals preals, Exp exp) {
             super();
             this.preals = preals;
-            this.id = id;
+            this.exp = exp;
         }
 
         public LPReals preals() {
             return preals;
         }
 
-        public String id() {
-            return id;
+        public Exp exp() {
+            return exp;
         }
 
         public String toString() {
-            return "mas_preals(" + preals + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+            return "mas_preals(" + preals + "," + exp + "[" + leeFila() + "," + leeCol() + "])";
         }
     }
 
     public static class Un_PReal extends LPReals {
-        private String id;
+        private Exp exp;
 
-        public Un_PReal(String id) {
+        public Un_PReal(Exp exp) {
             super();
-            this.id = id;
+            this.exp = exp;
         }
 
-        public String id() {
-            return id;
+        public Exp exp() {
+            return exp;
         }
 
         public String toString() {
-            return "un_preal(" + id + "[" + leeFila() + "," + leeCol() + "])";
+            return "un_preal(" + exp + "[" + leeFila() + "," + leeCol() + "])";
         }
     }
 
@@ -1567,12 +1567,12 @@ public class SintaxisAbstractaTiny {
         return new No_PReals();
     }
 
-    public LPReals mas_preals(LPReals preals, String id) {
-        return new Mas_PReals(preals, id);
+    public LPReals mas_preals(LPReals preals, Exp exp) {
+        return new Mas_PReals(preals, exp);
     }
 
-    public LPReals un_preals(String id) {
-        return new Un_PReal(id);
+    public LPReals un_preals(Exp exp) {
+        return new Un_PReal(exp);
     }
 
     public Exp e_asig(Exp opnd0, Exp opnd1) {
