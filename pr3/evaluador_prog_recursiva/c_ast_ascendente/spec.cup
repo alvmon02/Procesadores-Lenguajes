@@ -1,6 +1,11 @@
 package c_ast_ascendente;
 
 import java_cup.runtime.*;
+
+import asint.ClaseSemanticaTiny;
+import asint.SintaxisAbstractaTiny.*;
+import c_ast_ascendente.UnidadLexica.StringLocalizado;
+
 import c_ast_ascendente.AnalizadorLexicoTiny;
 import c_ast_ascendente.UnidadLexica;
 import c_ast_ascendente.GestionErroresTiny;
@@ -19,9 +24,11 @@ init with {:
    AnalizadorLexicoTiny alex = (AnalizadorLexicoTiny)getScanner();
    alex.fijaGestionErrores(errores);
 :};
+action code {:
+   ClaseSemanticaTiny sem = new ClaseSemanticaTiny();
+}
 
-
-terminal     IDEN, ENT, REAL, STRING, 
+terminal     StringLocalizado IDEN, ENT, REAL, STRING, 
              PAP, PCIERRE, 
              LLAVEAP, LLAVECIERRE,
              LT, LEQ, GT, GEQ,
@@ -45,152 +52,256 @@ terminal     IDEN, ENT, REAL, STRING,
 
 
 non terminal	programa, bloque,
-				      declar_opt, declaraciones, declaracion, 
-              declar_var, declar_tipo, declar_proc,
+				declar_opt, declaraciones, declaracion, 
+				declar_var, declar_tipo, declar_proc,
 
-				      intr_opt, lista_intr, instruccion,
+				intr_opt, lista_intr, instruccion,
 
-				      instruccion_eval, instruccion_if , instruccion_else, instruccion_else_opt, instruccion_while , instruccion_read , instruccion_write , instruccion_nl , instruccion_new , instruccion_delete , instruccion_call , instruccion_compuesta , 
+				instruccion_eval, instruccion_if , instruccion_else, instruccion_else_opt, instruccion_while , instruccion_read , instruccion_write , instruccion_nl , instruccion_new , instruccion_delete , instruccion_call , instruccion_compuesta , 
 
-				      lista_param_real_opt, lista_param_real,
+				lista_param_real_opt, lista_param_real,
 
-				      param_formales, lista_param_form_opt, lista_param_form, param_formal, ref_opt,
+				param_formales, lista_param_form_opt, lista_param_form, param_formal, ref_opt,
 
-				      tipo_0, tipo_1, tipo_2, tipo_basico,
+				tipo_0, tipo_1, tipo_2, tipo_basico,
 
-				      array, puntero, struct, campos_struct, campo_struct,
+				array, puntero, struct, campos_struct, campo_struct,
 
-				      expresion,
+				expresion,
 
-				      E0, E1, E2, E3, E4, E5, E6, E7, E8,
-              OP1, OP4, OP5, OP6;
+				E0, E1, E2, E3, E4, E5, E6, E7, E8,
+				OP1, OP4, OP5, OP6;
 
 start with programa;
 
-programa				      ::= bloque;
-bloque					      ::= LLAVEAP declar_opt intr_opt LLAVECIERRE ;
+####REMEMBER TO ADD NON TERMINAL FUNCTIONS
 
-declar_opt				    ::= declaraciones FINDECLAR ;
-declar_opt				    ::= ;
-declaraciones			    ::= declaraciones PCOMA declaracion ;
-declaraciones			    ::= declaracion ;
-declaracion				    ::= declar_var ;
-declaracion				    ::= declar_tipo ;
-declaracion				    ::= declar_proc ;
-declar_var				    ::= tipo_0 IDEN ; 
-declar_tipo				    ::= P_TYPE tipo_0 IDEN ; 
-declar_proc				    ::= P_PROC IDEN param_formales bloque ; 
+programa					::= bloque: blq
+							{: RESULT = blq; :}; 
 
-param_formales			  ::= PAP lista_param_form_opt PCIERRE ;
-lista_param_form_opt	::= lista_param_form ;
-lista_param_form_opt	::= ;
-lista_param_form		  ::= lista_param_form COMA param_formal;
-lista_param_form		  ::= param_formal;
-param_formal			    ::= tipo_0 ref_opt IDEN ;
-ref_opt					      ::= AND ;
-ref_opt					      ::= ;
-tipo_0					      ::= array ;
+bloque						::= LLAVEAP declar_opt: declar_opts intr_opt:intr_opts LLAVECIERRE 
+							{: RESULT = sem.prog(declar_opts,intr_opts); :}; 
 
+declar_opt					::= declaraciones: declars FINDECLAR  
+							{: RESULT = sem.si_decs(declars); :}; 
+declar_opt					::= 
+							{: RESULT = no_decs(); :};
 
-tipo_0					      ::= tipo_1 ;
-tipo_1					      ::= puntero ;
-tipo_1					      ::= tipo_2 ;
-tipo_2					      ::= IDEN ;
-tipo_2					      ::= tipo_basico ;
-tipo_2                ::= struct;
-tipo_basico				    ::= P_INT ;
-tipo_basico				    ::= P_REAL ;
-tipo_basico				    ::= P_BOOL ;
-tipo_basico				    ::= P_STRING ;
-array					        ::= tipo_0 CORCHETEAP ENT CORCHETECIERRE ;
-struct					      ::= P_STRUCT LLAVEAP campos_struct LLAVECIERRE ;
-campos_struct			    ::= campos_struct COMA campo_struct ;
-campos_struct			    ::= campo_struct ;
-campo_struct			    ::= tipo_0 IDEN ;
-puntero					      ::= EXPONENTE tipo_1 ;
+declaraciones				::= declaraciones: decs PCOMA declaracion: dec 
+							{: RESULT = no_decs(decs,dec); :};
+declaraciones				::= declaracion: dec 
+							{: RESULT = una_dec(dec); :};
+declaracion					::= tipo_0: tipo IDEN:id  
+							{: RESULT = dec_var(tipo,id.string); :};
+declaracion					::= P_TYPE tipo_0:tipo IDEN:id  
+							{: RESULT = dec_tipo(tipo,id.string); :};
+declaracion					::= P_PROC IDEN:id param_formales:lst_param bloque:blq  
+							{: RESULT = dec_proc(id.str(),lst_param,blq); :};
 
+param_formales				::= PAP lista_param_form_opt:lst_param_form_opt PCIERRE 
+							{: RESULT = lst_param_form_opt; :};
 
-intr_opt				::= lista_intr ;
-intr_opt				::= ;
-lista_intr				::= lista_intr PCOMA instruccion;
-lista_intr				::= instruccion;
+lista_param_form_opt		::= lista_param_form: lst_param_form
+							{: RESULT = si_pforms(lst_param_form); :};
+lista_param_form_opt		::= 
+							{: RESULT = no_pforms(); :};
+lista_param_form			::= lista_param_form:lst_param_form COMA param_formal: param_form
+							{: RESULT = mas_pforms(lst_param_form,param_form); :};
+lista_param_form			::= param_formal: param_form
+							{: RESULT = un_pform(param_form); :};
+param_formal				::= tipo_0:tipo ref_opt:refer_opt IDEN: id 
+							{: RESULT = pform(tipo,refer_opt,id.string()); :};
+ref_opt						::= AND 
+							{: RESULT = si_ref(); :};
+ref_opt						::= 
+							{: RESULT = no_ref(); :};
 
-instruccion				::= instruccion_eval ;
-instruccion				::= instruccion_if ;
-instruccion				::= instruccion_while ;
-instruccion				::= instruccion_read ;
-instruccion				::= instruccion_write ;
-instruccion				::= instruccion_nl ;
-instruccion				::= instruccion_new ;
-instruccion				::= instruccion_delete ;
-instruccion				::= instruccion_call ;
-instruccion				::= instruccion_compuesta ; 
+tipo_0						::= array: tipo_arr 
+							{: RESULT = tipo_arr; :};
+tipo_0						::= tipo_1: tipo1 
+							{: RESULT = tipo1; :};
+tipo_1						::= puntero: tipo_ptr 
+							{: RESULT = tipo_ptr; :};
+tipo_1						::= tipo_2: tipo2 
+							{: RESULT = tipo2; :};
+tipo_2						::= IDEN: id 
+							{: RESULT = id.str(); :};
+tipo_2						::= tipo_basico: tipo_base 
+							{: RESULT = tipo_base; :};
+tipo_2						::= struct: tipo_struct 
+							{: RESULT = tipo_struct; :};
+tipo_basico					::= P_INT {: RESULT = t_int(); :};
+tipo_basico					::= P_REAL {: RESULT = t_real(); :};
+tipo_basico					::= P_BOOL {: RESULT = t_bool(); :};
+tipo_basico					::= P_STRING {: RESULT = t_string(); :};
 
-instruccion_eval		::= INIEVAL expresion ;
-instruccion_if			::= P_IF expresion bloque instruccion_else_opt ;
-instruccion_else_opt	::= instruccion_else;
-instruccion_else_opt	::= ;
-instruccion_else		::= P_ELSE bloque ;
-instruccion_while		::= P_WHILE expresion bloque ;
-instruccion_read		::= P_READ expresion ;
-instruccion_write		::= P_WRITE expresion ;
-instruccion_nl			::= P_NL ;
-instruccion_new			::= P_NEW expresion ;
-instruccion_delete		::= P_DELETE expresion ;
-instruccion_call		::= P_CALL IDEN PAP lista_param_real_opt PCIERRE ;
-lista_param_real_opt	::= lista_param_real ;
-lista_param_real_opt	::= ;
-lista_param_real		::= lista_param_real COMA expresion;
-lista_param_real		::= expresion;
-instruccion_compuesta	::= bloque ;
+array						::= tipo_0: tipo CORCHETEAP ENT: en CORCHETECIERRE 
+							{: RESULT = t_array(tipo,en.str()); :};
+struct						::= P_STRUCT LLAVEAP campos_struct: cmps_str LLAVECIERRE 
+							{: RESULT = t_struct(cmps_str); :};
+campos_struct				::= campos_struct: cmps_str COMA campo_struct: cmp_str 
+							{: RESULT = mas_cmp_s(cmps_str,cmp_str); :};
+campos_struct				::= campo_struct: cmp_str 
+							{: RESULT = un_cmp_s(cmp_str); :};
+campo_struct				::= tipo_0: tipo IDEN: id ;
+							{: RESULT = cmp_s(tipo,id.str()); :};
+puntero						::= EXPONENTE tipo_1: tipo1 ;
+							{: RESULT = t_puntero(tipo1); :};
 
 
-expresion				::= E0;
+intr_opt					::= lista_intr: lst_intr
+							{: RESULT = si_intrs(lst_intr); :};
+intr_opt					::= 
+							{: RESULT = no_intrs(); :};
+lista_intr					::= lista_intr: lst_intr PCOMA instruccion: intr 
+							{: RESULT = mas_intrs(lst_intr,intr); :};
+lista_intr					::= instruccion: intr 
+							{: RESULT = una_intrs(intr); :};
 
-E0 						::= E1 IGUAL E0;
-E0 						::= E1;
+instruccion					::= instruccion_eval: intr_eval
+							{: RESULT = intr_eval; :};
+instruccion					::= instruccion_if: intr_if
+							{: RESULT = intr_if; :}; 
+instruccion					::= instruccion_while: intr_while
+							{: RESULT = intr_while; :}; 
+instruccion					::= instruccion_read: intr_read
+							{: RESULT = intr_read; :}; 
+instruccion					::= instruccion_write: intr_write
+							{: RESULT = intr_write; :}; 
+instruccion					::= instruccion_nl: intr_nl
+							{: RESULT = intr_nl; :}; 
+instruccion					::= instruccion_new: intr_new
+							{: RESULT = intr_new; :}; 
+instruccion					::= instruccion_delete: intr_del
+							{: RESULT = intr_del; :}; 
+instruccion					::= instruccion_call: intr_call
+							{: RESULT = intr_call; :}; 
+instruccion					::= instruccion_compuesta: intr_comp
+							{: RESULT = intr_comp; :};  
 
-E1 						::= E1 OP1 E2;
-E1 						::= E2;
-OP1						::= LT;
-OP1						::= LEQ;
-OP1						::= GT;
-OP1						::= GEQ;
-OP1						::= COMP;
-OP1						::= DIST;
+instruccion_eval			::= INIEVAL expresion: exp 
+							{: RESULT = i_eval(exp); :};  
+instruccion_if				::= P_IF expresion: exp bloque: blq instruccion_else_opt: intr_else_opt  
+							{: RESULT = i_if(exp,blq,intr_else_opt); :};  
+instruccion_else_opt		::= instruccion_else: intr_else
+							{: RESULT = intr_else; :};  
+instruccion_else_opt		::=  
+							{: RESULT = no_else(); :}; 
+instruccion_else			::= P_ELSE bloque: blq  
+							{: RESULT = si_else(blq); :};  
+instruccion_while			::= P_WHILE expresion: exp bloque: blq
+							{: RESULT = i_while(exp,blq); :};  
+instruccion_read			::= P_READ expresion: exp  
+							{: RESULT = i_read(exp); :};  
+instruccion_write			::= P_WRITE expresion: exp  
+							{: RESULT = i_write(exp); :};  
+instruccion_nl				::= P_NL
+							{: RESULT = i_nl(); :};  
+instruccion_new				::= P_NEW expresion: exp  
+							{: RESULT = i_new(exp); :};  
+instruccion_delete			::= P_DELETE expresion: exp  
+							{: RESULT = i_delete(exp); :};  
+instruccion_call			::= P_CALL IDEN: id PAP lista_param_real_opt: lst_param_real_opt PCIERRE  
+							{: RESULT = i_call(id.str(),lst_param_real_opt); :};  
+
+lista_param_real_opt		::= lista_param_real: lst_param_real  
+							{: RESULT = si_preals(lst_param_real); :};  
+lista_param_real_opt		::=  
+							{: RESULT = no_preals(); :};  
+lista_param_real			::= lista_param_real: lst_param_real COMA expresion: exp 
+							{: RESULT = mas_preals(lst_param_real,exp); :}; 
+lista_param_real			::= expresion: exp 
+							{: RESULT = un_preal(exp.str()); :};  
+instruccion_compuesta		::= bloque: blq
+							{: RESULT = i_prog(blq); :};  
+
+
+expresion					::= E0: e_0 
+							{: RESULT = e_0; :};  
+
+E0 							::= E1: e_1 IGUAL E0: e_0 
+							{: RESULT = e_asig(e_1,e_0); :};  
+E0 							::= E1: e_1 
+							{: RESULT = e_1; :};  
+
+E1 							::= E1: e_1 OP1:op_1 E2: e_2 
+							{: RESULT = mkop(op_1,e_1,e_2); :};  
+E1 							::= E2: e_2
+							{: RESULT = e_2; :};  
+OP1							::= LT 
+							{: RESULT = "<"; :};
+OP1							::= LEQ 
+							{: RESULT = "<="; :};
+OP1							::= GT 
+							{: RESULT = ">"; :};
+OP1							::= GEQ 
+							{: RESULT = ">="; :};
+OP1							::= COMP
+							{: RESULT = "=="; :};
+OP1							::= DIST 
+							{: RESULT = "!="; :};
 						
-E2 						::= E2 MAS E3;
-E2 						::= E3 MENOS E3;
-E2 						::= E3;
+E2 							::= E2: e_2_1 MAS E3: e_3 
+							{: RESULT = e_suma(e_2_1,e_3); :};  
+E2 							::= E3: e_3 MENOS E3: e_3_1 
+							{: RESULT = e_resta(e_3,e_3_1); :};  
+E2 							::= E3: e_3
+							{: RESULT = e_3; :};  
 
-E3 						::= E4 P_AND E3;
-E3 						::= E4 P_OR E4;
-E3 						::= E4;
+E3 							::= E4: e_4 P_AND E3: e_3_1  
+							{: RESULT = e_and(e_4,e_3_1); :};  
+E3 							::= E4: e_4 P_OR E4: e_4_1 
+							{: RESULT = e_or(e_4,e_4_1); :};  
+E3 							::= E4: e_4
+							{: RESULT = e_4; :};  
 						
-E4 						::= E4 OP4 E5;
-E4 						::= E5;
-OP4						::= MUL;
-OP4						::= DIV;
-OP4						::= PORCENTAJE;
+E4 							::= E4: e_4_1 OP4:op_4 E5: e_5 
+							{: RESULT = mkop(op_4,e_4_1,e_5); :};  
+E4 							::= E5 e_5
+							{: RESULT = e_5; :};  
+OP4							::= MUL 
+							{: RESULT = "*"; :};
+OP4							::= DIV 
+							{: RESULT = "/"; :};
+OP4							::= PORCENTAJE 
+							{: RESULT = "%"; :};
 						
-E5 						::= OP5 E5;
-E5 						::= E6;
-OP5						::= MENOS;
-OP5						::= P_NOT;
+E5 							::= OP5: op_5 E5: e_5_1
+							{: RESULT = mkunary(op_5,e_5_1); :};  
+E5 							::= E6: e_6
+							{: RESULT = e_6; :};  
+OP5							::= MENOS 
+							{: RESULT = "-"; :}; 
+
+OP5							::= P_NOT 
+							{: RESULT = "<not>"; :}; 
+
+E6							::= E6: e_6_1 CORCHETEAP expresion: exp CORCHETECIERRE 
+							{: RESULT = e_indexado(e_6_1,exp); :};  
+E6							::= E6: e_6_1 PUNTO IDEN: id 
+							{: RESULT = e_campo(e_6_1,id.str()); :};  
+E6							::= E6:e_6_1 EXPONENTE
+							{: RESULT = e_puntero(e_6_1); :};  
 						
-E6 						::= E6 OP6;
-E6 						::= E7;
-OP6						::= CORCHETEAP expresion CORCHETECIERRE;
-OP6						::= PUNTO IDEN;
-OP6						::= EXPONENTE;
+E6 							::= E7: e_7 
+							{: RESULT = e_7; :};  
+					
+E7 							::= ENT: entero 
+							{: RESULT = e_lit_ent(entero.str()); :};  
+E7 							::= REAL: rl 
+							{: RESULT = e_lit_real(rl.str()); :};  
+E7 							::= P_TRUE 
+							{: RESULT = e_true(); :};  
+E7 							::= P_FALSE 
+							{: RESULT = e_false(); :};  
+E7 							::= STRING: strg 
+							{: RESULT = e_string(strg.str()); :};  
+E7 							::= IDEN: id 
+							{: RESULT = e_inden(id.str()); :};  
+E7 							::= P_NULL 
+							{: RESULT = e_null(); :};  
+E7 							::= E8 e_8
+							{: RESULT = e_8; :};  
 						
-E7 						::= ENT;
-E7 						::= REAL;
-E7 						::= P_TRUE;
-E7 						::= P_FALSE;
-E7 						::= STRING;
-E7 						::= IDEN;
-E7 						::= P_NULL;
-E7 						::= E8;
-						
-E8 						::= PAP E0 PCIERRE;
+E8 							::= PAP E0:e_0 PCIERRE 
+							{: RESULT = e_0; :};  
