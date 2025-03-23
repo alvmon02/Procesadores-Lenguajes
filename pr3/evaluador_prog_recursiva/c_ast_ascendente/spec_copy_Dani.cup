@@ -71,7 +71,7 @@ non terminal I_Else instruccion_else_opt;
 non terminal PReals lista_param_real_opt;
 non terminal LPReals lista_param_real;
 non terminal Exp expresion, E0, E1, E2, E3, E4, E5, E6, E7, E8;
-non terminal String OP1, OP4, OP5, OP6;
+non terminal String OP1, OP4, OP5;
 
 start with programa;
 
