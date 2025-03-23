@@ -986,7 +986,7 @@ public class SintaxisAbstractaTiny {
             throw new UnsupportedOperationException();
         }
 
-        public String id() {
+        public Exp exp() {
             throw new UnsupportedOperationException();
         }
     }
@@ -1034,6 +1034,10 @@ public class SintaxisAbstractaTiny {
     public static abstract class Exp extends Nodo {
         public Exp() {
             super();
+        }
+
+        public int prioridad() {
+            throw new UnsupportedOperationException();
         }
 
         public Exp opnd0() {
@@ -1094,6 +1098,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 0;
+        }
+
         public String toString() {
             return "asig(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1102,6 +1110,10 @@ public class SintaxisAbstractaTiny {
     public static class Comp extends ExpBin {
         public Comp(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 1;
         }
 
         public String toString() {
@@ -1114,6 +1126,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "dist(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1122,6 +1138,10 @@ public class SintaxisAbstractaTiny {
     public static class Menor extends ExpBin {
         public Menor(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 1;
         }
 
         public String toString() {
@@ -1134,6 +1154,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "mayor(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1142,6 +1166,10 @@ public class SintaxisAbstractaTiny {
     public static class MenorIgual extends ExpBin {
         public MenorIgual(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 1;
         }
 
         public String toString() {
@@ -1154,6 +1182,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "mayorIgual(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1162,6 +1194,10 @@ public class SintaxisAbstractaTiny {
     public static class Suma extends ExpBin {
         public Suma(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 2;
         }
 
         public String toString() {
@@ -1174,6 +1210,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 2;
+        }
+
         public String toString() {
             return "resta(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1182,6 +1222,10 @@ public class SintaxisAbstractaTiny {
     public static class And extends ExpBin {
         public And(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 3;
         }
 
         public String toString() {
@@ -1194,6 +1238,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 3;
+        }
+
         public String toString() {
             return "or(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1202,6 +1250,10 @@ public class SintaxisAbstractaTiny {
     public static class Mul extends ExpBin {
         public Mul(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 4;
         }
 
         public String toString() {
@@ -1214,6 +1266,10 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        public int prioridad() {
+            return 4;
+        }
+
         public String toString() {
             return "div(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1222,6 +1278,10 @@ public class SintaxisAbstractaTiny {
     public static class Porcentaje extends ExpBin {
         public Porcentaje(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 4;
         }
 
         public String toString() {
@@ -1234,6 +1294,10 @@ public class SintaxisAbstractaTiny {
             super(opnd);
         }
 
+        public int prioridad() {
+            return 5;
+        }
+
         public String toString() {
             return "negativo(" + opnd + ")";
         }
@@ -1244,6 +1308,10 @@ public class SintaxisAbstractaTiny {
             super(opnd);
         }
 
+        public int prioridad() {
+            return 5;
+        }
+
         public String toString() {
             return "negado(" + opnd + ")";
         }
@@ -1252,6 +1320,10 @@ public class SintaxisAbstractaTiny {
     public static class Index extends ExpBin {
         public Index(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
+        }
+
+        public int prioridad() {
+            return 6;
         }
 
         public String toString() {
@@ -1267,6 +1339,10 @@ public class SintaxisAbstractaTiny {
             super();
             this.opnd = opnd;
             this.id = id;
+        }
+
+        public int prioridad() {
+            return 6;
         }
 
         public Exp opnd0() {
@@ -1287,6 +1363,10 @@ public class SintaxisAbstractaTiny {
             super(opnd);
         }
 
+        public int prioridad() {
+            return 6;
+        }
+
         public String toString() {
             return "indireccion(" + opnd + ")";
         }
@@ -1298,6 +1378,10 @@ public class SintaxisAbstractaTiny {
         public Lit_ent(String num) {
             super();
             this.num = num;
+        }
+
+        public int prioridad() {
+            return 7;
         }
 
         public String num() {
@@ -1317,6 +1401,10 @@ public class SintaxisAbstractaTiny {
             this.num = num;
         }
 
+        public int prioridad() {
+            return 7;
+        }
+
         public String num() {
             return num;
         }
@@ -1331,6 +1419,10 @@ public class SintaxisAbstractaTiny {
             super();
         }
 
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "true([" + leeFila() + "," + leeCol() + "])";
         }
@@ -1339,6 +1431,10 @@ public class SintaxisAbstractaTiny {
     public static class False extends Exp {
         public False() {
             super();
+        }
+
+        public int prioridad() {
+            return 7;
         }
 
         public String toString() {
@@ -1352,6 +1448,10 @@ public class SintaxisAbstractaTiny {
         public Cadena(String string) {
             super();
             this.string = string;
+        }
+
+        public int prioridad() {
+            return 7;
         }
 
         public String string() {
@@ -1371,6 +1471,10 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public int prioridad() {
+            return 7;
+        }
+
         public String id() {
             return id;
         }
@@ -1383,6 +1487,10 @@ public class SintaxisAbstractaTiny {
     public static class Null extends Exp {
         public Null() {
             super();
+        }
+
+        public int prioridad() {
+            return 7;
         }
 
         public String toString() {

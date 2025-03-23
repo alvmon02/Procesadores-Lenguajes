@@ -130,10 +130,10 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   PForms param_formales() :
-    { LPForms pfroms; }
+    { LPForms pforms; }
     {
-      pfroms = lista_params()
-        { return sem.si_pforms(pfroms); }
+      pforms = lista_params()
+        { return sem.si_pforms(pforms); }
       |
         { return sem.no_pforms(); }
     }
@@ -148,7 +148,7 @@ PARSER_END(ConstructorASTsTiny)
   LPForms rlista_param(LPForms pformsh) :
     { LPForms pforms; PForm pform; }
     {
-      "," pform = parametro() pforms = rlista_param(sem.mas_pfroms(pformsh, pform))
+      "," pform = parametro() pforms = rlista_param(sem.mas_pforms(pformsh, pform))
         { return pforms; }
       | 
         { return pformsh; }
