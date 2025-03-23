@@ -1431,7 +1431,7 @@ public class SintaxisAbstractaTiny {
         return new No_PForms();
     }
 
-    public LPForms mas_pfroms(LPForms pforms, PForm pform) {
+    public LPForms mas_pforms(LPForms pforms, PForm pform) {
         return new Mas_PForms(pforms, pform);
     }
 
