@@ -727,7 +727,7 @@ Exp exp;
     try {
 
       jj_consume_token(nl);
-{if ("" != null) return sem.i_nl();}
+{if ("" != null) return sem.i_ln();}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("instruccion_nl");
@@ -781,7 +781,7 @@ Token id; PReals preals;
     try {
 LPReals preals;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case not:
+      case NOT:
       case nulo:
       case t_true:
       case t_false:
@@ -789,8 +789,7 @@ LPReals preals;
       case lit_ent:
       case lit_real:
       case cadena:
-      case 39:
-      case 48:{
+      case 39:{
         preals = lista_params_reales();
 {if ("" != null) return sem.si_preals(preals);}
         break;
@@ -880,12 +879,14 @@ Exp exp0, exp1;
   final public Exp fe0(Exp exph) throws ParseException {
     trace_call("fe0");
     try {
-Exp exp;
+Exp exp; Token eqToken;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 47:{
-        jj_consume_token(47);
+        eqToken = jj_consume_token(47);
         exp = e0();
-{if ("" != null) return sem.e_asig(exph, exp);}
+Exp asigExp = sem.e_asig(exph, exp);
+        asigExp.ponFila(eqToken.beginLine).ponCol(eqToken.beginColumn);
+        {if ("" != null) return asigExp;}
         break;
         }
       default:
@@ -914,18 +915,54 @@ Exp exp0, exp1;
   final public Exp re1(Exp exph) throws ParseException {
     trace_call("re1");
     try {
-String op; Exp exp0, exp1;
+Exp exp0; Token opToken;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 50:
-      case 51:
-      case 52:
-      case 53:
-      case 54:
-      case 55:{
-        op = op1();
+      case 48:{
+        opToken = jj_consume_token(48);
         exp0 = e2();
-        exp1 = re1(sem.mkop(op, exph, exp0));
-{if ("" != null) return exp1;}
+Exp eqExp = sem.mkop("==", exph, exp0);
+        eqExp.ponFila(opToken.beginLine).ponCol(opToken.beginColumn);
+        {if ("" != null) return eqExp;}
+        break;
+        }
+      case 49:{
+        opToken = jj_consume_token(49);
+        exp0 = e2();
+Exp ltExp = sem.mkop("<", exph, exp0);
+        ltExp.ponFila(opToken.beginLine).ponCol(opToken.beginColumn);
+        {if ("" != null) return ltExp;}
+        break;
+        }
+      case 50:{
+        opToken = jj_consume_token(50);
+        exp0 = e2();
+Exp gtExp = sem.mkop(">", exph, exp0);
+        gtExp.ponFila(opToken.beginLine).ponCol(opToken.beginColumn);
+        {if ("" != null) return gtExp;}
+        break;
+        }
+      case 51:{
+        opToken = jj_consume_token(51);
+        exp0 = e2();
+Exp geExp = sem.mkop(">=", exph, exp0);
+        geExp.ponFila(opToken.beginLine).ponCol(opToken.beginColumn);
+        {if ("" != null) return geExp;}
+        break;
+        }
+      case 52:{
+        opToken = jj_consume_token(52);
+        exp0 = e2();
+Exp leExp = sem.mkop("<=", exph, exp0);
+        leExp.ponFila(opToken.beginLine).ponCol(opToken.beginColumn);
+        {if ("" != null) return leExp;}
+        break;
+        }
+      case 53:{
+        opToken = jj_consume_token(53);
+        exp0 = e2();
+Exp neExp = sem.mkop("!=", exph, exp0);
+        neExp.ponFila(opToken.beginLine).ponCol(opToken.beginColumn);
+        {if ("" != null) return neExp;}
         break;
         }
       default:
@@ -955,12 +992,14 @@ Exp exp0, exp1, exp2;
   final public Exp fe2(Exp exph) throws ParseException {
     trace_call("fe2");
     try {
-Exp exp;
+Exp exp, resta; Token minus;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 48:{
-        jj_consume_token(48);
+      case 54:{
+        minus = jj_consume_token(54);
         exp = e3();
-{if ("" != null) return sem.e_resta(exph, exp);}
+resta = sem.e_resta(exph, exp);
+        resta.ponFila(minus.beginLine).ponCol(minus.beginColumn);
+        {if ("" != null) return resta;}
         break;
         }
       default:
@@ -976,14 +1015,13 @@ Exp exp;
   final public Exp re2(Exp exph) throws ParseException {
     trace_call("re2");
     try {
-Exp exp0, exp1, suma;
-        Token plus;
+Exp exp0, exp1, suma; Token plus;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 49:{
-        plus = jj_consume_token(49);
+      case 55:{
+        plus = jj_consume_token(55);
         exp0 = e3();
 suma = sem.e_suma(exph, exp0);
-         suma.ponFila(plus.beginLine).ponCol(plus.beginColumn);
+        suma.ponFila(plus.beginLine).ponCol(plus.beginColumn);
         exp1 = re2(suma);
 {if ("" != null) return exp1;}
         break;
@@ -1004,7 +1042,7 @@ suma = sem.e_suma(exph, exp0);
 Exp exp0, exp1;
       exp0 = e4();
       exp1 = fe3(exp0);
-{if ("" != null) return exp0;}
+{if ("" != null) return exp1;}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("e3");
@@ -1014,18 +1052,22 @@ Exp exp0, exp1;
   final public Exp fe3(Exp exph) throws ParseException {
     trace_call("fe3");
     try {
-Exp exp;
+Exp exp, andExp, orExp; Token andToken, orToken;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case and:{
-        jj_consume_token(and);
+        andToken = jj_consume_token(and);
         exp = e3();
-{if ("" != null) return sem.e_and(exph, exp);}
+andExp = sem.e_and(exph, exp);
+        andExp.ponFila(andToken.beginLine).ponCol(andToken.beginColumn);
+        {if ("" != null) return andExp;}
         break;
         }
       case or:{
-        jj_consume_token(or);
+        orToken = jj_consume_token(or);
         exp = e4();
-{if ("" != null) return sem.e_or(exph, exp);}
+orExp = sem.e_or(exph, exp);
+        orExp.ponFila(orToken.beginLine).ponCol(orToken.beginColumn);
+        {if ("" != null) return orExp;}
         break;
         }
       default:
@@ -1054,15 +1096,30 @@ Exp exp0, exp1;
   final public Exp re4(Exp exph) throws ParseException {
     trace_call("re4");
     try {
-String op; Exp exp0, exp1;
+Exp exp0, mulExp, divExp, modExp; Token mul, div, mod;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 56:
-      case 57:
-      case 58:{
-        op = op4();
+      case 56:{
+        mul = jj_consume_token(56);
         exp0 = e5();
-        exp1 = re4(sem.mkop(op, exph, exp0));
-{if ("" != null) return exp1;}
+mulExp = sem.mkop("*", exph, exp0);
+        mulExp.ponFila(mul.beginLine).ponCol(mul.beginColumn);
+        {if ("" != null) return mulExp;}
+        break;
+        }
+      case 57:{
+        div = jj_consume_token(57);
+        exp0 = e5();
+divExp = sem.mkop("/", exph, exp0);
+        divExp.ponFila(div.beginLine).ponCol(div.beginColumn);
+        {if ("" != null) return divExp;}
+        break;
+        }
+      case 58:{
+        mod = jj_consume_token(58);
+        exp0 = e5();
+modExp = sem.mkop("%", exph, exp0);
+        modExp.ponFila(mod.beginLine).ponCol(mod.beginColumn);
+        {if ("" != null) return modExp;}
         break;
         }
       default:
@@ -1078,7 +1135,7 @@ String op; Exp exp0, exp1;
   final public Exp e5() throws ParseException {
     trace_call("e5");
     try {
-String op; Exp exp;
+Exp exp, negExp; Token not;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case nulo:
       case t_true:
@@ -1092,11 +1149,12 @@ String op; Exp exp;
 {if ("" != null) return exp;}
         break;
         }
-      case not:
-      case 48:{
-        op = op5();
+      case NOT:{
+        not = jj_consume_token(NOT);
         exp = e5();
-{if ("" != null) return sem.mkunary(op, exp);}
+negExp = sem.mkunary("not", exp);
+        negExp.ponFila(not.beginLine).ponCol(not.beginColumn);
+        {if ("" != null) return negExp;}
         break;
         }
       default:
@@ -1243,33 +1301,33 @@ Exp exp;
     try {
 
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case 48:{
+        jj_consume_token(48);
+{if ("" != null) return "==";}
+        break;
+        }
+      case 49:{
+        jj_consume_token(49);
+{if ("" != null) return "<";}
+        break;
+        }
       case 50:{
         jj_consume_token(50);
-{if ("" != null) return "==";}
+{if ("" != null) return ">";}
         break;
         }
       case 51:{
         jj_consume_token(51);
-{if ("" != null) return "<";}
+{if ("" != null) return ">=";}
         break;
         }
       case 52:{
         jj_consume_token(52);
-{if ("" != null) return ">";}
+{if ("" != null) return "<=";}
         break;
         }
       case 53:{
         jj_consume_token(53);
-{if ("" != null) return ">=";}
-        break;
-        }
-      case 54:{
-        jj_consume_token(54);
-{if ("" != null) return "<=";}
-        break;
-        }
-      case 55:{
-        jj_consume_token(55);
 {if ("" != null) return "!=";}
         break;
         }
@@ -1320,13 +1378,13 @@ Exp exp;
     try {
 
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 48:{
-        jj_consume_token(48);
+      case 54:{
+        jj_consume_token(54);
 {if ("" != null) return "-";}
         break;
         }
-      case not:{
-        jj_consume_token(not);
+      case NOT:{
+        jj_consume_token(NOT);
 {if ("" != null) return "not";}
         break;
         }
@@ -1344,13 +1402,16 @@ Exp exp;
   final public Exp op6(Exp exph) throws ParseException {
     trace_call("op6");
     try {
-Exp exp; Token id;
+Exp exp;
+      Token id, caretToken, corcheteToken;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 43:{
-        jj_consume_token(43);
+        corcheteToken = jj_consume_token(43);
         exp = expresion();
         jj_consume_token(44);
-{if ("" != null) return sem.e_indexado(exph, exp);}
+Exp indexadoExp = sem.e_indexado(exph, exp);
+          indexadoExp.ponFila(corcheteToken.beginLine).ponCol(corcheteToken.beginColumn);
+          {if ("" != null) return indexadoExp;}
         break;
         }
       case 59:{
@@ -1360,8 +1421,10 @@ Exp exp; Token id;
         break;
         }
       case 45:{
-        jj_consume_token(45);
-{if ("" != null) return sem.e_puntero(exph);}
+        caretToken = jj_consume_token(45);
+Exp punteroExp = sem.e_puntero(exph);
+          punteroExp.ponFila(caretToken.beginLine).ponCol(caretToken.beginColumn);
+          {if ("" != null) return punteroExp;}
         break;
         }
       default:
@@ -1395,7 +1458,7 @@ Exp exp; Token id;
 	   jj_la1_0 = new int[] {0xa0888e00,0x0,0xa0888e00,0x80808e00,0x0,0x0,0x0,0x80808e00,0x80808e00,0x8e00,0x0,0x5f500000,0x0,0x5f500000,0x200000,0x80074000,0x0,0x0,0x0,0x0,0x0,0x3000,0x0,0x80074000,0x0,0x80070000,0x60000,0x0,0x0,0x4000,0x0,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x2000,0x40,0x2000,0x2000,0x200,0x400,0x800,0x2000,0x0,0x0,0x200,0x4008,0x40,0x4008,0x0,0x10087,0x200,0x8000,0xfc0000,0x10000,0x20000,0x0,0x7000000,0x10087,0x8002800,0x87,0x0,0xfc0000,0x7000000,0x10000,0x8002800,};
+	   jj_la1_1 = new int[] {0x2000,0x40,0x2000,0x2000,0x200,0x400,0x800,0x2000,0x0,0x0,0x200,0x4008,0x40,0x4008,0x0,0x87,0x200,0x8000,0x3f0000,0x400000,0x800000,0x0,0x7000000,0x87,0x8002800,0x87,0x0,0x3f0000,0x7000000,0x400000,0x8002800,};
 	}
 
   {

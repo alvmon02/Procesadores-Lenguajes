@@ -14,8 +14,8 @@ public class SintaxisAbstractaTiny {
         imprimeOpnd(opnd1,np1);
     }
 
-    private static void imprimeExpUni(String op, Exp opnd, int np) {
-        System.out.print(op);
+    private static void imprimeExpUni(String op, Exp opnd, int np, int i, int j) {
+        System.out.println(" " + op + "$f:" + i + ",c:" + j + "$");
         imprimeOpnd(opnd, np);
     }
 
@@ -1659,7 +1659,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("-", opnd, 5);
+            imprimeExpUni("-", opnd, 5, leeFila(), leeCol());
             
         }
     }
@@ -1680,7 +1680,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("<not>", opnd, 5);
+            imprimeExpUni("<not>", opnd, 5, leeFila(), leeCol());
         }
     }
 
@@ -1700,8 +1700,8 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("[", opnd0, 6);
-            imprimeExpUni("]", opnd1, 6);
+            imprimeExpUni("[", opnd0, 6, leeFila(), leeCol());
+            imprimeExpUni("]", opnd1, 6, leeFila(), leeCol());
         }
     }
 
@@ -1734,7 +1734,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni(".", opnd, 6);
+            imprimeExpUni(".", opnd, 6, leeFila(), leeCol());
             System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
@@ -1755,7 +1755,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("^", opnd, 6);
+            imprimeExpUni("^", opnd, 6, leeFila(), leeCol());
         }
     }
 
