@@ -74,12 +74,11 @@ non terminal	programa, bloque,
 
 start with programa;
 
-####REMEMBER TO ADD NON TERMINAL FUNCTIONS
 
-programa					::= bloque: blq
+programa					::= bloque: blq 
 							{: RESULT = blq; :}; 
 
-bloque						::= LLAVEAP declar_opt: declar_opts intr_opt:intr_opts LLAVECIERRE 
+bloque						::= LLAVEAP declar_opt: declar_opts intr_opt: intr_opts LLAVECIERRE 
 							{: RESULT = sem.prog(declar_opts,intr_opts); :}; 
 
 declar_opt					::= declaraciones: declars FINDECLAR  
@@ -91,11 +90,17 @@ declaraciones				::= declaraciones: decs PCOMA declaracion: dec
 							{: RESULT = no_decs(decs,dec); :};
 declaraciones				::= declaracion: dec 
 							{: RESULT = una_dec(dec); :};
-declaracion					::= tipo_0: tipo IDEN:id  
+declaracion					::= declar_var: d_var 
+							{: RESULT = d_var; :}; 
+declaracion					::= declar_tipo: d_tipo 
+							{: RESULT = d_tipo); :}; 
+declaracion					::= declar_proc: d_proc  
+							{: RESULT = d_proc; :}; 
+eclar_var					::= tipo_0: tipo IDEN: id  
 							{: RESULT = dec_var(tipo,id.string); :};
-declaracion					::= P_TYPE tipo_0:tipo IDEN:id  
+declar_tipo					::= P_TYPE tipo_0: tipo IDEN: id  
 							{: RESULT = dec_tipo(tipo,id.string); :};
-declaracion					::= P_PROC IDEN:id param_formales:lst_param bloque:blq  
+declar_proc					::= P_PROC IDEN: id param_formales: lst_param bloque: blq  
 							{: RESULT = dec_proc(id.str(),lst_param,blq); :};
 
 param_formales				::= PAP lista_param_form_opt:lst_param_form_opt PCIERRE 
