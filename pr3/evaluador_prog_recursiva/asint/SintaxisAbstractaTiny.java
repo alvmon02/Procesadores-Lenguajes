@@ -1748,7 +1748,7 @@ public class SintaxisAbstractaTiny {
     }
 
     public Exp e_indexado(Exp opnd0, Exp opnd1) {
-        return new Index(opnd0, opnd0);
+        return new Index(opnd0, opnd1);
     }
 
     public Exp e_campo(Exp opnd, String id) {

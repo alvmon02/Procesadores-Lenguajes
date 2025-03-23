@@ -35,12 +35,45 @@ public class Evaluador extends SintaxisAbstractaTiny {
 
     private void imprime(Dec dec) {
         if (claseDe(dec, Dec_Proc.class)) {
+            System.out.println("<proc>");
+            imprime(dec.id(), dec.leeFila(), dec.leeCol());
+            System.out.println("(");
+            imprime(dec.pforms());
+            System.out.println(")");
+            imprime(dec.prog());
         } else {
             if (claseDe(dec, Dec_Tipo.class)) {
                 System.out.println("<type>");
             }
             imprime(dec.tipo());
             imprime(dec.id(), dec.leeFila(), dec.leeCol());
+        }
+    }
+
+    private void imprime(PForms pforms) {
+        if (claseDe(pforms, Si_PForms.class)) {
+            imprime(pforms.pforms());
+        }
+    }
+
+    private void imprime(LPForms pforms) {
+        if (claseDe(pforms, Mas_PForms.class)) {
+            imprime(pforms.pforms());
+            System.out.println(",");
+        }
+        imprime(pforms.pform());
+    }
+
+    private void imprime(PForm pform) {
+        imprime(pform.tipo());
+        imprime(pform.ref());
+        imprime(pform.id(), pform.leeFila(), pform.leeCol());
+    }
+
+    private void imprime(Ref ref) {
+        if (claseDe(ref, Si_Ref.class)) {
+            System.out.println("&");
+            // imprime("&", ref.leeFila(), ref.leeCol());
         }
     }
 
@@ -166,31 +199,31 @@ public class Evaluador extends SintaxisAbstractaTiny {
             imprime(exp.opnd1(), 2);
         } else if (claseDe(exp, Dist.class)) {
             imprime(exp.opnd0(), 1);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("!=", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 2);
         } else if (claseDe(exp, Menor.class)) {
             imprime(exp.opnd0(), 1);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("<", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 2);
         } else if (claseDe(exp, Mayor.class)) {
             imprime(exp.opnd0(), 1);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime(">", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 2);
         } else if (claseDe(exp, MenorIgual.class)) {
             imprime(exp.opnd0(), 1);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("<=", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 2);
         } else if (claseDe(exp, MayorIgual.class)) {
             imprime(exp.opnd0(), 1);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime(">=", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 2);
         } else if (claseDe(exp, Suma.class)) {
             imprime(exp.opnd0(), 2);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("+", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 3);
         } else if (claseDe(exp, Resta.class)) {
             imprime(exp.opnd0(), 3);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("-", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 3);
         } else if (claseDe(exp, And.class)) {
             imprime(exp.opnd0(), 4);
@@ -202,30 +235,33 @@ public class Evaluador extends SintaxisAbstractaTiny {
             imprime(exp.opnd1(), 4);
         } else if (claseDe(exp, Mul.class)) {
             imprime(exp.opnd0(), 4);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("*", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 5);
         } else if (claseDe(exp, Div.class)) {
             imprime(exp.opnd0(), 4);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("/", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 5);
         } else if (claseDe(exp, Porcentaje.class)) {
             imprime(exp.opnd0(), 4);
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("%", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd1(), 5);
         } else if (claseDe(exp, Negativo.class)) {
-            imprime("=", exp.leeFila(), exp.leeCol());
+            imprime("-", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd0(), 5);
         } else if (claseDe(exp, Negado.class)) {
             System.out.println("<not>");
             imprime(exp.opnd0(), 5);
         } else if (claseDe(exp, Index.class)) {
-            imprime("[", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd0());
+            imprime("[", exp.leeFila(), exp.leeCol());
+            imprime(exp.opnd1());
             System.out.println("]");
         } else if (claseDe(exp, Acceso.class)) {
+            imprime(exp.opnd0());
             System.out.println(".");
             imprime(exp.id(), exp.leeFila(), exp.leeCol());
         } else if (claseDe(exp, Indireccion.class)) {
+            imprime(exp.opnd0());
             imprime("^", exp.leeFila(), exp.leeCol());
         } else if (claseDe(exp, Lit_ent.class) || claseDe(exp, Lit_real.class)) {
             imprime(exp.num(), exp.leeFila(), exp.leeCol());

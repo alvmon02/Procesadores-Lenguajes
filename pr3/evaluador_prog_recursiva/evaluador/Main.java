@@ -15,11 +15,12 @@ public class Main {
             AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
             c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTiny(alex);
             Prog prog = (Prog) asint.parse().value;
-            System.out.println(new Evaluador_org().evalua(prog));
+            // System.out.println(prog);
+            new Evaluador().imprime(prog);
         } else {
             ConstructorASTsTiny asint = new ConstructorASTsTiny(new FileReader(args[1]));
             asint.disable_tracing();
-            System.out.println(new Evaluador_org().evalua(asint.analiza()));
+            new Evaluador().imprime(asint.analiza());
         }
     }
 }
