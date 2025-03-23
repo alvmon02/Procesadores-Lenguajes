@@ -1,4 +1,4 @@
-package asint2;
+package asint;
 
 import java.nio.channels.UnsupportedAddressTypeException;
 
@@ -18,13 +18,8 @@ public class SintaxisAbstractaTiny {
 
     private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1, int i, int j) {
         imprimeOpnd(opnd0, np0);
-        System.out.println(" " + op + "$f:" + i + ",c:" + j + "$");
+        System.out.println(op + "$f:" + i + ",c:" + j + "$");
         imprimeOpnd(opnd1, np1);
-    }
-
-    private static void imprimeExpUni(String op, Exp opnd, int np, int i, int j) {
-        System.out.println(" " + op + "$f:" + i + ",c:" + j + "$");
-        imprimeOpnd(opnd, np);
     }
 
     public static abstract class Nodo {
@@ -117,6 +112,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             decs.imprime();
+            System.out.println("&&");
         }
     }
 
@@ -174,6 +170,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             decs.imprime();
+            System.out.println(";");
             dec.imprime();
         }
     }
@@ -247,7 +244,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(" " + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -275,8 +272,9 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
+            System.out.println("<type>");
             tipo.imprime();
-            System.out.println(" " + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -311,7 +309,9 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println("<proc>\n" + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println("(");
             pforms.imprime();
+            System.out.println(")");
             prog.imprime();
         }
     }
@@ -402,6 +402,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             pforms.imprime();
+            System.out.println(",");
             pform.imprime();
         }
     }
@@ -460,7 +461,7 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             tipo.imprime();
             ref.imprime();
-            System.out.println(" " + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -539,7 +540,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(" " + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -674,7 +675,9 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println("<struct>");
+            System.out.println("{");
             camposS.imprime();
+            System.out.println("}");
         }
     }
 
@@ -716,6 +719,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             camposS.imprime();
+            System.out.println(",");
             campoS.imprime();
         }
     }
@@ -765,7 +769,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(" " + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -855,6 +859,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             intrs.imprime();
+            System.out.println(";");
             intr.imprime();
         }
     }
@@ -1054,6 +1059,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
+            System.out.println("<nl>");
         }
     }
 
@@ -1230,7 +1236,9 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
+            System.out.println("(");
             preals.imprime();
+            System.out.println(")");
         }
     }
 
@@ -1287,6 +1295,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             preals.imprime();
+            System.out.println(",");
             exp.imprime();
         }
     }
@@ -1670,7 +1679,8 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("-", opnd, 5, leeFila(), leeCol());
+            System.out.println("-$f:" + leeFila() + ",c:" + leeCol() + "$");
+            imprimeOpnd(opnd, 5);
 
         }
     }
@@ -1691,7 +1701,8 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("<not>", opnd, 5, leeFila(), leeCol());
+            System.out.println("<not>$f:" + leeFila() + ",c:" + leeCol() + "$");
+            imprimeOpnd(opnd, 5);
         }
     }
 
@@ -1711,8 +1722,10 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("[", opnd0, 6, leeFila(), leeCol());
-            imprimeExpUni("]", opnd1, 6, leeFila(), leeCol());
+            imprimeOpnd(opnd0, 6);
+            System.out.println("[$f:" + leeFila() + ",c:" + leeCol() + "$");
+            imprimeOpnd(opnd1, 0);
+            System.out.println("]");
         }
     }
 
@@ -1745,7 +1758,8 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni(".", opnd, 6, leeFila(), leeCol());
+            imprimeOpnd(opnd, 6);
+            System.out.println(".");
             System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
@@ -1766,7 +1780,8 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUni("^", opnd, 6, leeFila(), leeCol());
+            imprimeOpnd(opnd, 6);
+            System.out.println("^$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -1840,7 +1855,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println("<true>");
+            System.out.println("<true>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -1860,7 +1875,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println("<false>");
+            System.out.println("<false>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -1934,7 +1949,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println("<null>");
+            System.out.println("<null>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -2188,7 +2203,7 @@ public class SintaxisAbstractaTiny {
     }
 
     public Exp e_indexado(Exp opnd0, Exp opnd1) {
-        return new Index(opnd0, opnd0);
+        return new Index(opnd0, opnd1);
     }
 
     public Exp e_campo(Exp opnd, String id) {

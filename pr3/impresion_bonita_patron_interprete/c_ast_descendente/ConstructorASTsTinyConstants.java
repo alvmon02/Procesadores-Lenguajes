@@ -33,7 +33,7 @@ public interface ConstructorASTsTinyConstants {
   /** RegularExpression Id. */
   int or = 13;
   /** RegularExpression Id. */
-  int NOT = 14;
+  int not = 14;
   /** RegularExpression Id. */
   int t_string = 15;
   /** RegularExpression Id. */
@@ -94,7 +94,7 @@ public interface ConstructorASTsTinyConstants {
     "<t_bool>",
     "<and>",
     "<or>",
-    "<NOT>",
+    "<not>",
     "<t_string>",
     "<nulo>",
     "<t_true>",
@@ -128,14 +128,14 @@ public interface ConstructorASTsTinyConstants {
     "\"^\"",
     "\"@\"",
     "\"=\"",
+    "\"-\"",
+    "\"+\"",
     "\"==\"",
     "\"<\"",
     "\">\"",
     "\">=\"",
     "\"<=\"",
     "\"!=\"",
-    "\"-\"",
-    "\"+\"",
     "\"*\"",
     "\"/\"",
     "\"%\"",

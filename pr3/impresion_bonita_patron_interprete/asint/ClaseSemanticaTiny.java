@@ -1,4 +1,4 @@
-package asint2;
+package asint;
 
 public class ClaseSemanticaTiny extends SintaxisAbstractaTiny {
     public ClaseSemanticaTiny() {
