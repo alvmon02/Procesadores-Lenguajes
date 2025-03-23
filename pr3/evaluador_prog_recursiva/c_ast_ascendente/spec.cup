@@ -51,7 +51,7 @@ terminal     StringLocalizado IDEN, ENT, REAL, STRING,
              PUNTO, EXPONENTE;
 
 
-non terminal	programa, bloque,
+non terminal	Prog programa, bloque,
 				declar_opt, declaraciones, declaracion, 
 				declar_var, declar_tipo, declar_proc,
 
@@ -67,10 +67,10 @@ non terminal	programa, bloque,
 
 				array, puntero, struct, campos_struct, campo_struct,
 
-				expresion,
+				Exp expresion,
 
 				E0, E1, E2, E3, E4, E5, E6, E7, E8,
-				OP1, OP4, OP5, OP6;
+				String OP1, OP4, OP5, OP6;
 
 start with programa;
 
@@ -84,42 +84,42 @@ bloque						::= LLAVEAP declar_opt: declar_opts intr_opt: intr_opts LLAVECIERRE
 declar_opt					::= declaraciones: declars FINDECLAR  
 							{: RESULT = sem.si_decs(declars); :}; 
 declar_opt					::= 
-							{: RESULT = no_decs(); :};
+							{: RESULT = sem.no_decs(); :};
 
 declaraciones				::= declaraciones: decs PCOMA declaracion: dec 
-							{: RESULT = no_decs(decs,dec); :};
+							{: RESULT = sem.mas_decs(decs,dec); :};
 declaraciones				::= declaracion: dec 
-							{: RESULT = una_dec(dec); :};
+							{: RESULT = sem.una_dec(dec); :};
 declaracion					::= declar_var: d_var 
 							{: RESULT = d_var; :}; 
 declaracion					::= declar_tipo: d_tipo 
 							{: RESULT = d_tipo); :}; 
 declaracion					::= declar_proc: d_proc  
 							{: RESULT = d_proc; :}; 
-eclar_var					::= tipo_0: tipo IDEN: id  
-							{: RESULT = dec_var(tipo,id.string); :};
+declar_var					::= tipo_0: tipo IDEN: id  
+							{: RESULT = sem.dec_var(tipo,id.string); :};
 declar_tipo					::= P_TYPE tipo_0: tipo IDEN: id  
-							{: RESULT = dec_tipo(tipo,id.string); :};
+							{: RESULT = sem.dec_tipo(tipo,id.string); :};
 declar_proc					::= P_PROC IDEN: id param_formales: lst_param bloque: blq  
-							{: RESULT = dec_proc(id.str(),lst_param,blq); :};
+							{: RESULT = sem.dec_proc(id.str(),lst_param,blq); :};
 
 param_formales				::= PAP lista_param_form_opt:lst_param_form_opt PCIERRE 
 							{: RESULT = lst_param_form_opt; :};
 
 lista_param_form_opt		::= lista_param_form: lst_param_form
-							{: RESULT = si_pforms(lst_param_form); :};
+							{: RESULT = sem.si_pforms(lst_param_form); :};
 lista_param_form_opt		::= 
-							{: RESULT = no_pforms(); :};
+							{: RESULT = sem.no_pforms(); :};
 lista_param_form			::= lista_param_form:lst_param_form COMA param_formal: param_form
-							{: RESULT = mas_pforms(lst_param_form,param_form); :};
+							{: RESULT = sem.mas_pforms(lst_param_form,param_form); :};
 lista_param_form			::= param_formal: param_form
-							{: RESULT = un_pform(param_form); :};
+							{: RESULT = sem.un_pform(param_form); :};
 param_formal				::= tipo_0:tipo ref_opt:refer_opt IDEN: id 
-							{: RESULT = pform(tipo,refer_opt,id.string()); :};
+							{: RESULT = sem.pform(tipo,refer_opt,id.string()); :};
 ref_opt						::= AND 
-							{: RESULT = si_ref(); :};
+							{: RESULT = sem.si_ref(); :};
 ref_opt						::= 
-							{: RESULT = no_ref(); :};
+							{: RESULT = sem.no_ref(); :};
 
 tipo_0						::= array: tipo_arr 
 							{: RESULT = tipo_arr; :};
@@ -130,38 +130,38 @@ tipo_1						::= puntero: tipo_ptr
 tipo_1						::= tipo_2: tipo2 
 							{: RESULT = tipo2; :};
 tipo_2						::= IDEN: id 
-							{: RESULT = id.str(); :};
+							{: RESULT = (Exp)sem.iden(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
 tipo_2						::= tipo_basico: tipo_base 
 							{: RESULT = tipo_base; :};
 tipo_2						::= struct: tipo_struct 
 							{: RESULT = tipo_struct; :};
-tipo_basico					::= P_INT {: RESULT = t_int(); :};
-tipo_basico					::= P_REAL {: RESULT = t_real(); :};
-tipo_basico					::= P_BOOL {: RESULT = t_bool(); :};
-tipo_basico					::= P_STRING {: RESULT = t_string(); :};
+tipo_basico					::= P_INT {: RESULT = sem.t_int(); :};
+tipo_basico					::= P_REAL {: RESULT = sem.t_real(); :};
+tipo_basico					::= P_BOOL {: RESULT = sem.t_bool(); :};
+tipo_basico					::= P_STRING {: RESULT = sem.t_string(); :};
 
 array						::= tipo_0: tipo CORCHETEAP ENT: en CORCHETECIERRE 
-							{: RESULT = t_array(tipo,en.str()); :};
+							{: RESULT = sem.t_array(tipo,en.str()); :};
 struct						::= P_STRUCT LLAVEAP campos_struct: cmps_str LLAVECIERRE 
-							{: RESULT = t_struct(cmps_str); :};
+							{: RESULT = sem.t_struct(cmps_str); :};
 campos_struct				::= campos_struct: cmps_str COMA campo_struct: cmp_str 
-							{: RESULT = mas_cmp_s(cmps_str,cmp_str); :};
+							{: RESULT = sem.mas_cmp_s(cmps_str,cmp_str); :};
 campos_struct				::= campo_struct: cmp_str 
-							{: RESULT = un_cmp_s(cmp_str); :};
+							{: RESULT = sem.un_cmp_s(cmp_str); :};
 campo_struct				::= tipo_0: tipo IDEN: id ;
-							{: RESULT = cmp_s(tipo,id.str()); :};
+							{: RESULT = sem.cmp_s(tipo,id.str()); :};
 puntero						::= EXPONENTE tipo_1: tipo1 ;
-							{: RESULT = t_puntero(tipo1); :};
+							{: RESULT = sem.t_puntero(tipo1); :};
 
 
 intr_opt					::= lista_intr: lst_intr
-							{: RESULT = si_intrs(lst_intr); :};
+							{: RESULT = sem.si_intrs(lst_intr); :};
 intr_opt					::= 
-							{: RESULT = no_intrs(); :};
+							{: RESULT = sem.no_intrs(); :};
 lista_intr					::= lista_intr: lst_intr PCOMA instruccion: intr 
-							{: RESULT = mas_intrs(lst_intr,intr); :};
+							{: RESULT = sem.mas_intrs(lst_intr,intr); :};
 lista_intr					::= instruccion: intr 
-							{: RESULT = una_intrs(intr); :};
+							{: RESULT = sem.una_intrs(intr); :};
 
 instruccion					::= instruccion_eval: intr_eval
 							{: RESULT = intr_eval; :};
@@ -185,52 +185,52 @@ instruccion					::= instruccion_compuesta: intr_comp
 							{: RESULT = intr_comp; :};  
 
 instruccion_eval			::= INIEVAL expresion: exp 
-							{: RESULT = i_eval(exp); :};  
+							{: RESULT = sem.i_eval(exp); :};  
 instruccion_if				::= P_IF expresion: exp bloque: blq instruccion_else_opt: intr_else_opt  
-							{: RESULT = i_if(exp,blq,intr_else_opt); :};  
+							{: RESULT = sem.i_if(exp,blq,intr_else_opt); :};  
 instruccion_else_opt		::= instruccion_else: intr_else
 							{: RESULT = intr_else; :};  
 instruccion_else_opt		::=  
-							{: RESULT = no_else(); :}; 
+							{: RESULT = sem.no_else(); :}; 
 instruccion_else			::= P_ELSE bloque: blq  
-							{: RESULT = si_else(blq); :};  
+							{: RESULT = sem.si_else(blq); :};  
 instruccion_while			::= P_WHILE expresion: exp bloque: blq
-							{: RESULT = i_while(exp,blq); :};  
+							{: RESULT = sem.i_while(exp,blq); :};  
 instruccion_read			::= P_READ expresion: exp  
-							{: RESULT = i_read(exp); :};  
+							{: RESULT = sem.i_read(exp); :};  
 instruccion_write			::= P_WRITE expresion: exp  
-							{: RESULT = i_write(exp); :};  
+							{: RESULT = sem.i_write(exp); :};  
 instruccion_nl				::= P_NL
-							{: RESULT = i_nl(); :};  
+							{: RESULT = sem.i_nl(); :};  
 instruccion_new				::= P_NEW expresion: exp  
-							{: RESULT = i_new(exp); :};  
+							{: RESULT = sem.i_new(exp); :};  
 instruccion_delete			::= P_DELETE expresion: exp  
-							{: RESULT = i_delete(exp); :};  
+							{: RESULT = sem.i_delete(exp); :};  
 instruccion_call			::= P_CALL IDEN: id PAP lista_param_real_opt: lst_param_real_opt PCIERRE  
-							{: RESULT = i_call(id.str(),lst_param_real_opt); :};  
+							{: RESULT = sem.i_call(id.str(),lst_param_real_opt); :};  
 
 lista_param_real_opt		::= lista_param_real: lst_param_real  
-							{: RESULT = si_preals(lst_param_real); :};  
+							{: RESULT = sem.si_preals(lst_param_real); :};  
 lista_param_real_opt		::=  
-							{: RESULT = no_preals(); :};  
+							{: RESULT = sem.no_preals(); :};  
 lista_param_real			::= lista_param_real: lst_param_real COMA expresion: exp 
-							{: RESULT = mas_preals(lst_param_real,exp); :}; 
+							{: RESULT = sem.mas_preals(lst_param_real,exp); :}; 
 lista_param_real			::= expresion: exp 
-							{: RESULT = un_preal(exp.str()); :};  
+							{: RESULT = sem.un_preal(exp.str()); :};  
 instruccion_compuesta		::= bloque: blq
-							{: RESULT = i_prog(blq); :};  
+							{: RESULT = sem.i_prog(blq); :};  
 
 
 expresion					::= E0: e_0 
 							{: RESULT = e_0; :};  
 
 E0 							::= E1: e_1 IGUAL E0: e_0 
-							{: RESULT = e_asig(e_1,e_0); :};  
+							{: RESULT = sem.e_asig(e_1,e_0); :};  
 E0 							::= E1: e_1 
 							{: RESULT = e_1; :};  
 
 E1 							::= E1: e_1 OP1:op_1 E2: e_2 
-							{: RESULT = mkop(op_1,e_1,e_2); :};  
+							{: RESULT = sem.mkop(op_1,e_1,e_2); :};  
 E1 							::= E2: e_2
 							{: RESULT = e_2; :};  
 OP1							::= LT 
@@ -247,21 +247,21 @@ OP1							::= DIST
 							{: RESULT = "!="; :};
 						
 E2 							::= E2: e_2_1 MAS E3: e_3 
-							{: RESULT = e_suma(e_2_1,e_3); :};  
+							{: RESULT = sem.e_suma(e_2_1,e_3); :};  
 E2 							::= E3: e_3 MENOS E3: e_3_1 
-							{: RESULT = e_resta(e_3,e_3_1); :};  
+							{: RESULT = sem.e_resta(e_3,e_3_1); :};  
 E2 							::= E3: e_3
 							{: RESULT = e_3; :};  
 
 E3 							::= E4: e_4 P_AND E3: e_3_1  
-							{: RESULT = e_and(e_4,e_3_1); :};  
+							{: RESULT = sem.e_and(e_4,e_3_1); :};  
 E3 							::= E4: e_4 P_OR E4: e_4_1 
-							{: RESULT = e_or(e_4,e_4_1); :};  
+							{: RESULT = sem.e_or(e_4,e_4_1); :};  
 E3 							::= E4: e_4
 							{: RESULT = e_4; :};  
 						
 E4 							::= E4: e_4_1 OP4:op_4 E5: e_5 
-							{: RESULT = mkop(op_4,e_4_1,e_5); :};  
+							{: RESULT = sem.mkop(op_4,e_4_1,e_5); :};  
 E4 							::= E5 e_5
 							{: RESULT = e_5; :};  
 OP4							::= MUL 
@@ -272,7 +272,7 @@ OP4							::= PORCENTAJE
 							{: RESULT = "%"; :};
 						
 E5 							::= OP5: op_5 E5: e_5_1
-							{: RESULT = mkunary(op_5,e_5_1); :};  
+							{: RESULT = sem.mkunary(op_5,e_5_1); :};  
 E5 							::= E6: e_6
 							{: RESULT = e_6; :};  
 OP5							::= MENOS 
@@ -282,29 +282,29 @@ OP5							::= P_NOT
 							{: RESULT = "<not>"; :}; 
 
 E6							::= E6: e_6_1 CORCHETEAP expresion: exp CORCHETECIERRE 
-							{: RESULT = e_indexado(e_6_1,exp); :};  
+							{: RESULT = sem.e_indexado(e_6_1,exp); :};  
 E6							::= E6: e_6_1 PUNTO IDEN: id 
-							{: RESULT = e_campo(e_6_1,id.str()); :};  
+							{: RESULT = sem.e_campo(e_6_1,id.str()); :};  
 E6							::= E6:e_6_1 EXPONENTE
-							{: RESULT = e_puntero(e_6_1); :};  
+							{: RESULT = sem.e_puntero(e_6_1); :};  
 						
 E6 							::= E7: e_7 
 							{: RESULT = e_7; :};  
 					
 E7 							::= ENT: entero 
-							{: RESULT = e_lit_ent(entero.str()); :};  
+							{: RESULT = sem.e_lit_ent(entero.str()); :};  
 E7 							::= REAL: rl 
-							{: RESULT = e_lit_real(rl.str()); :};  
+							{: RESULT = sem.e_lit_real(rl.str()); :};  
 E7 							::= P_TRUE 
-							{: RESULT = e_true(); :};  
+							{: RESULT = sem.e_true(); :};  
 E7 							::= P_FALSE 
-							{: RESULT = e_false(); :};  
+							{: RESULT = sem.e_false(); :};  
 E7 							::= STRING: strg 
-							{: RESULT = e_string(strg.str()); :};  
+							{: RESULT = sem.e_string(strg.str()); :};  
 E7 							::= IDEN: id 
-							{: RESULT = e_inden(id.str()); :};  
+							{: RESULT = sem.e_inden(id.str()); :};  
 E7 							::= P_NULL 
-							{: RESULT = e_null(); :};  
+							{: RESULT = sem.e_null(); :};  
 E7 							::= E8 e_8
 							{: RESULT = e_8; :};  
 						
