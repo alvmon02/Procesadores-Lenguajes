@@ -1284,6 +1284,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 0;
+        }
+
         public String toString() {
             return "asig(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1298,6 +1302,9 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 1;
+        }
         public String toString() {
             return "comp(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1312,6 +1319,9 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 1;
+        }
         public String toString() {
             return "dist(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1326,6 +1336,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 1;
+        }
+        
         public String toString() {
             return "menor(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1338,6 +1352,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 1;
         }
 
         public String toString() {
@@ -1354,6 +1372,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 1;
+        }
+
         public String toString() {
             return "menorIgual(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1366,6 +1388,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 1;
         }
 
         public String toString() {
@@ -1382,6 +1408,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 2;
+        }
+
         public String toString() {
             return "suma(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1394,6 +1424,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 2;
         }
 
         public String toString() {
@@ -1410,6 +1444,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 3;
+        }
+
         public String toString() {
             return "and(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1422,6 +1460,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 3;
         }
 
         public String toString() {
@@ -1438,6 +1480,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 4;
+        }
+
         public String toString() {
             return "mul(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1450,6 +1496,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 4;
         }
 
         public String toString() {
@@ -1466,6 +1516,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 4;
+        }
+
         public String toString() {
             return "porcentaje(" + opnd0 + "," + opnd1 + ")";
         }
@@ -1478,6 +1532,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 5;
         }
 
         public String toString() {
@@ -1494,6 +1552,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 5;
+        }
+
         public String toString() {
             return "negado(" + opnd + ")";
         }
@@ -1506,6 +1568,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 6;
         }
 
         public String toString() {
@@ -1535,6 +1601,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 6;
+        }
+
         public String toString() {
             return "acceso(" + opnd + "," + id + "[" + leeFila() + "," + leeCol() + "])";
         }
@@ -1547,6 +1617,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 6;
         }
 
         public String toString() {
@@ -1570,6 +1644,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 7;
+        }
+
         public String toString() {
             return "lit_ent(" + num + "[" + leeFila() + "," + leeCol() + "])";
         }
@@ -1591,6 +1669,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 7;
+        }
+
         public String toString() {
             return "lit_real(" + num + "[" + leeFila() + "," + leeCol() + "])";
         }
@@ -1605,6 +1687,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 7;
+        }
+
         public String toString() {
             return "true([" + leeFila() + "," + leeCol() + "])";
         }
@@ -1617,6 +1703,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 7;
         }
 
         public String toString() {
@@ -1640,6 +1730,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 7;
+        }
+
         public String toString() {
             return "iden(" + string + "[" + leeFila() + "," + leeCol() + "])";
         }
@@ -1661,6 +1755,10 @@ public class SintaxisAbstractaTiny {
             p.procesa(this);
         }
 
+        public int prioridad(){
+            return 7;
+        }
+
         public String toString() {
             return "iden(" + id + "[" + leeFila() + "," + leeCol() + "])";
         }
@@ -1673,6 +1771,10 @@ public class SintaxisAbstractaTiny {
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
+
+        public int prioridad(){
+            return 7;
         }
 
         public String toString() {
