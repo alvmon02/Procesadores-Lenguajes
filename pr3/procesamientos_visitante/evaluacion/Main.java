@@ -1,9 +1,9 @@
 package evaluacion;
 
 import asint.Procesamiento;
-import asint.SintaxisAbstractaEval.Prog;
-import c_ast_ascendente.AnalizadorLexicoEval;
-import c_ast_descendente.ConstructorASTsEval;
+import asint.SintaxisAbstractaTiny.Prog;
+import c_ast_ascendente.AnalizadorLexicoTiny;
+import c_ast_descendente.ConstructorASTsTiny;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -14,12 +14,12 @@ public class Main {
          Prog prog;
          if(args[0].equals("asc")) {
            Reader input = new InputStreamReader(new FileInputStream(args[1]));
-  	   AnalizadorLexicoEval alex = new AnalizadorLexicoEval(input);
-	   c_ast_ascendente.ConstructorASTEval asint = new c_ast_ascendente.ConstructorASTEval(alex);
+  	   AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
+	   c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTiny(alex);
            prog = (Prog)asint.parse().value;
          }
          else {
-             ConstructorASTsEval asint = new ConstructorASTsEval(new FileReader(args[1]));
+             ConstructorASTsTiny asint = new ConstructorASTsTiny(new FileReader(args[1]));
              asint.disable_tracing();
              prog = asint.analiza();
          }
