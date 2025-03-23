@@ -1,7 +1,7 @@
 package c_ast_ascendente;
 
 
-public class GestionErroresEval {
+public class GestionErroresTiny {
    public class ErrorLexico extends RuntimeException {
        public ErrorLexico(String msg) {
            super(msg);

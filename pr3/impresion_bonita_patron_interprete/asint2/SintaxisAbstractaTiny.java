@@ -1,17 +1,25 @@
 package asint2;
+
 import java.nio.channels.UnsupportedAddressTypeException;
 
 public class SintaxisAbstractaTiny {
 
     private static void imprimeOpnd(Exp opnd, int np) {
-        if(opnd.prioridad() < np) {System.out.print("(");};
+        if (opnd.prioridad() < np) {
+            System.out.print("(");
+        }
+        ;
         opnd.imprime();
-        if(opnd.prioridad() < np) {System.out.print(")");};        
+        if (opnd.prioridad() < np) {
+            System.out.print(")");
+        }
+        ;
     }
+
     private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1, int i, int j) {
-        imprimeOpnd(opnd0,np0);
+        imprimeOpnd(opnd0, np0);
         System.out.println(" " + op + "$f:" + i + ",c:" + j + "$");
-        imprimeOpnd(opnd1,np1);
+        imprimeOpnd(opnd1, np1);
     }
 
     private static void imprimeExpUni(String op, Exp opnd, int np, int i, int j) {
@@ -25,6 +33,7 @@ public class SintaxisAbstractaTiny {
         }
 
         public abstract void imprime();
+
         private int fila;
 
         private int col;
@@ -122,7 +131,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            
+
         }
     }
 
@@ -350,7 +359,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            
+
         }
     }
 
@@ -619,7 +628,8 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(" [" + ent + "]");}
+            System.out.println(" [" + ent + "]");
+        }
     }
 
     public static class T_Puntero extends Tipo {
@@ -802,7 +812,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            
+
         }
     }
 
@@ -1307,7 +1317,8 @@ public class SintaxisAbstractaTiny {
         public Exp() {
             super();
         }
-       public abstract int prioridad();
+
+        public abstract int prioridad();
 
         public Exp opnd0() {
             throw new UnsupportedOperationException();
@@ -1360,7 +1371,7 @@ public class SintaxisAbstractaTiny {
         public Exp opnd1() {
             return opnd1;
         }
-        
+
     }
 
     public static class Asig extends ExpBin {
@@ -1479,7 +1490,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0, "<=", opnd1, 1, 2, leeFila(), leeCol());   
+            imprimeExpBin(opnd0, "<=", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -1559,7 +1570,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0, "and", opnd1, 4, 3, leeFila(), leeCol());  
+            imprimeExpBin(opnd0, "and", opnd1, 4, 3, leeFila(), leeCol());
         }
     }
 
@@ -1660,7 +1671,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpUni("-", opnd, 5, leeFila(), leeCol());
-            
+
         }
     }
 
@@ -1960,15 +1971,15 @@ public class SintaxisAbstractaTiny {
         return new Dec_Proc(id, pforms, prog);
     }
 
-    public PForms si_pforms(LPForms pfroms) {
-        return new Si_PForms(pfroms);
+    public PForms si_pforms(LPForms pforms) {
+        return new Si_PForms(pforms);
     }
 
     public PForms no_pforms() {
         return new No_PForms();
     }
 
-    public LPForms mas_pfroms(LPForms pforms, PForm pform) {
+    public LPForms mas_pforms(LPForms pforms, PForm pform) {
         return new Mas_PForms(pforms, pform);
     }
 
@@ -2068,7 +2079,7 @@ public class SintaxisAbstractaTiny {
         return new I_Write(exp);
     }
 
-    public Intr i_ln() {
+    public Intr i_nl() {
         return new I_NL();
     }
 

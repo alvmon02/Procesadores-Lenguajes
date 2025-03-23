@@ -196,7 +196,7 @@ Token id; PForms pforms; Prog prog;
   final public PForms param_formales() throws ParseException {
     trace_call("param_formales");
     try {
-LPForms pfroms;
+LPForms pforms;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case t_int:
       case t_real:
@@ -205,8 +205,8 @@ LPForms pfroms;
       case struct:
       case iden:
       case 45:{
-        pfroms = lista_params();
-{if ("" != null) return sem.si_pforms(pfroms);}
+        pforms = lista_params();
+{if ("" != null) return sem.si_pforms(pforms);}
         break;
         }
       default:
@@ -240,7 +240,7 @@ LPForms pforms; PForm pform;
       case 41:{
         jj_consume_token(41);
         pform = parametro();
-        pforms = rlista_param(sem.mas_pfroms(pformsh, pform));
+        pforms = rlista_param(sem.mas_pforms(pformsh, pform));
 {if ("" != null) return pforms;}
         break;
         }
@@ -727,7 +727,7 @@ Exp exp;
     try {
 
       jj_consume_token(nl);
-{if ("" != null) return sem.i_ln();}
+{if ("" != null) return sem.i_nl();}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("instruccion_nl");
