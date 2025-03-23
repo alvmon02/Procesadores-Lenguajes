@@ -32,7 +32,7 @@ public class SintaxisAbstractaTiny {
         public int leeCol() {
             return col;
         }
-           public abstract void procesa(Procesamiento p);
+        public abstract void procesa(Procesamiento p);
     }
 
     public static class Prog extends Nodo {
@@ -1274,10 +1274,6 @@ public class SintaxisAbstractaTiny {
     public static class Asig extends ExpBin {
         public Asig(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
-        }
-
-        public void procesa(Procesamiento p) {
-            p.procesa(this);
         }
 
         public void procesa(Procesamiento p) {
