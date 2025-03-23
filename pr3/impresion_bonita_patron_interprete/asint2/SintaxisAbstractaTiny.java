@@ -310,7 +310,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println("<proc> " + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println("<proc>\n" + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
             pforms.imprime();
             prog.imprime();
         }
@@ -628,7 +628,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(" [" + ent + "]");
+            System.out.printf("[\n" + ent + "\n]$f:" + leeFila() + ",c:" + leeCol() + "$\n");
         }
     }
 
