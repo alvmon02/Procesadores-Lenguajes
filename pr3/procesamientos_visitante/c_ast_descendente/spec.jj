@@ -130,10 +130,10 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   PForms param_formales() :
-    { LPForms pfroms; }
+    { LPForms pforms; }
     {
-      pfroms = lista_params()
-        { return sem.si_pforms(pfroms); }
+      pforms = lista_params()
+        { return sem.si_pforms(pforms); }
       |
         { return sem.no_pforms(); }
     }
@@ -148,7 +148,7 @@ PARSER_END(ConstructorASTsTiny)
   LPForms rlista_param(LPForms pformsh) :
     { LPForms pforms; PForm pform; }
     {
-      "," pform = parametro() pforms = rlista_param(sem.mas_pfroms(pformsh, pform))
+      "," pform = parametro() pforms = rlista_param(sem.mas_pforms(pformsh, pform))
         { return pforms; }
       | 
         { return pformsh; }
@@ -440,10 +440,10 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   Exp fe0(Exp exph):
-    { Exp exp; }
+    { Exp exp; Token op; }
     {
-      "=" exp = e0()
-        { return sem.e_asig(exph, exp); } 
+      op = "=" exp = e0()
+        { return (Exp)sem.e_asig(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn); } 
       | 
         { return exph; }
     }
@@ -456,9 +456,9 @@ PARSER_END(ConstructorASTsTiny)
     }
   
   Exp re1(Exp exph): 
-    { String op; Exp exp0, exp1; } 
+    { Token op; Exp exp0, exp1; } 
     {
-      op = op1() exp0 = e2() exp1 = re1(sem.mkop(op, exph, exp0)) 
+      op = op1() exp0 = e2() exp1 = re1((Exp)sem.mkop(op.image, exph, exp0).ponFila(op.beginLine).ponCol(op.beginColumn)) 
         { return exp1; }
       | 
         { return exph; }
@@ -472,18 +472,18 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   Exp fe2(Exp exph) : 
-    { Exp exp; } 
+    { Exp exp; Token op; } 
     {
-      "-" exp = e3()
-        { return sem.e_resta(exph, exp); } 
+      op = "-" exp = e3()
+        { return (Exp)sem.e_resta(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn); } 
       | 
         { return exph; }
     }
 
   Exp re2(Exp exph): 
-    { Exp exp0, exp1; } 
+    { Exp exp0, exp1; Token op; } 
     {
-      "+" exp0 = e3() exp1 = re2(sem.e_suma(exph, exp0))
+      op = "+" exp0 = e3() exp1 = re2((Exp)sem.e_suma(exph, exp0).ponFila(op.beginLine).ponCol(op.beginColumn))
         { return exp1; } 
       | 
         { return exph; }
@@ -497,13 +497,13 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   Exp fe3(Exp exph): 
-    { Exp exp; } 
+    { Exp exp; Token op; } 
     {
-      <and> exp = e3()
-        { return sem.e_and(exph, exp); }
+      op = <and> exp = e3()
+        { return (Exp)sem.e_and(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn); }
       | 
-      <or> exp = e4() 
-        { return sem.e_or(exph, exp); }
+      op = <or> exp = e4() 
+        { return (Exp)sem.e_or(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn); }
       | 
         { return exph; }
     }
@@ -516,22 +516,22 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   Exp re4(Exp exph): 
-    { String op; Exp exp0, exp1; } 
+    { Token op; Exp exp0, exp1; } 
     {
-      op = op4() exp0 = e5() exp1 = re4(sem.mkop(op, exph, exp0))
+      op = op4() exp0 = e5() exp1 = re4((Exp)sem.mkop(op.image, exph, exp0).ponFila(op.beginLine).ponCol(op.beginColumn))
         { return exp1; } 
       | 
         { return exph; }
     }
 
   Exp e5(): 
-    { String op; Exp exp; } 
+    { Token op; Exp exp; } 
     {
       exp = e6()
         { return exp; }
       | 
       op = op5() exp = e5() 
-        { return sem.mkunary(op, exp); }
+        { return (Exp)sem.mkunary(op.image, exp).ponFila(op.beginLine).ponCol(op.beginColumn); }
     }
 
   Exp e6(): 
@@ -569,7 +569,7 @@ PARSER_END(ConstructorASTsTiny)
         { return (Exp)sem.e_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
       | 
       id = <nulo> 
-        { return sem.e_null(); }
+        { return (Exp)sem.e_null().ponFila(id.beginLine).ponCol(id.beginColumn); }
       |
       exp = e8()
         { return exp; }
@@ -592,62 +592,62 @@ PARSER_END(ConstructorASTsTiny)
         { return exp; }
     }
   
-  String op1(): 
-    {} 
+  Token op1(): 
+    { Token op; } 
     {
-      "=="
-        { return "=="; }
+      op ="=="
+        { return op; }
       | 
-      "<" 
-        { return "<"; }
+      op ="<" 
+        { return op; }
       | 
-      ">" 
-        { return ">"; }
+      op =">" 
+        { return op; }
       | 
-      ">=" 
-        { return ">="; }
+      op =">=" 
+        { return op; }
       | 
-      "<=" 
-        { return "<="; }
+      op ="<=" 
+        { return op; }
       | 
-      "!="
-        { return "!="; }
+      op ="!="
+        { return op; }
     }
   
-  String op4(): 
-    {} 
+  Token op4(): 
+    { Token op; } 
     {
-      "*" 
-        { return "*"; }
+      op = "*" 
+        { return op; }
       | 
-      "/" 
-        { return "/"; }
+      op = "/" 
+        { return op; }
       | 
-      "%"
-        { return "%"; }
+      op = "%"
+        { return op; }
     }
 
-  String op5(): 
-    {} 
+  Token op5(): 
+    { Token op; } 
     {
-      "-" 
-        { return "-"; }
+      op = "-" 
+        { return op; }
       | 
-      <not>
-        { return "not"; }
+      op = <not>
+        { return op; }
     }
   
   Exp op6(Exp exph): 
     { Exp exp; Token id; } 
     { 
-      "[" exp = expresion() "]" 
-        { return sem.e_indexado(exph, exp); }
+      id = "[" exp = expresion() "]" 
+        { return (Exp)sem.e_indexado(exph, exp).ponFila(id.beginLine).ponCol(id.beginColumn); }
       | 
       "." id = <iden> 
         { return (Exp)sem.e_campo(exph, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); }
       | 
-      "^" 
-        { return sem.e_puntero(exph); }
+      id = "^" 
+        { return (Exp)sem.e_puntero(exph).ponFila(id.beginLine).ponCol(id.beginColumn); }
     }
 
 

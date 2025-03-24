@@ -28,7 +28,7 @@ action code {:
   ClaseSemanticaTiny sem = new ClaseSemanticaTiny();
 :}
 
-terminal     PAP, PCIERRE, 
+terminal StringLocalizado PAP, PCIERRE, 
              LLAVEAP, LLAVECIERRE,
              LT, LEQ, GT, GEQ,
              COMP, DIST, IGUAL,
@@ -47,9 +47,7 @@ terminal     PAP, PCIERRE,
              PORCENTAJE, AND,
              COMA,
              CORCHETEAP,CORCHETECIERRE, 
-             PUNTO, EXPONENTE;
-      
-terminal StringLocalizado IDEN, ENT, REAL, STRING;
+             PUNTO, EXPONENTE,  IDEN, ENT, REAL, STRING;
 
 non terminal Prog programa, bloque;
 non terminal DecsOpt declar_opt;
@@ -71,7 +69,7 @@ non terminal I_Else instruccion_else_opt;
 non terminal PReals lista_param_real_opt;
 non terminal LPReals lista_param_real;
 non terminal Exp expresion, E0, E1, E2, E3, E4, E5, E6, E7, E8;
-non terminal String OP1, OP4, OP5;
+non terminal StringLocalizado OP1, OP4, OP5;
 
 start with programa;
 
@@ -222,68 +220,68 @@ instruccion_compuesta	::= bloque: prog
 expresion				::= E0: exp
     {: RESULT = exp; :};
 
-E0 						::= E1: opnd0 IGUAL E0: opnd1
-    {: RESULT = sem.e_asig(opnd0, opnd1); :};
+E0 						::= E1: opnd0 IGUAL: op E0: opnd1
+    {: RESULT = (Exp)sem.e_asig(opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
 E0 						::= E1: exp
     {: RESULT = exp; :};
 
 E1 						::= E1: opnd0 OP1: op E2: opnd1
-    {: RESULT = sem.mkop(op, opnd0, opnd1); :};
+    {: RESULT = (Exp)sem.mkop(op.str(), opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
 E1 						::= E2: exp
     {: RESULT = exp; :};
-OP1						::= LT
-    {: RESULT = "<"; :};
-OP1						::= LEQ
-    {: RESULT = "<="; :};
-OP1						::= GT
-    {: RESULT = ">"; :};
-OP1						::= GEQ
-    {: RESULT = ">="; :};
-OP1						::= COMP
-    {: RESULT = "=="; :};
-OP1						::= DIST
-    {: RESULT = "!="; :};
+OP1						::= LT: op
+    {: RESULT = op; :};
+OP1						::= LEQ: op
+    {: RESULT = op; :};
+OP1						::= GT: op
+    {: RESULT = op; :};
+OP1						::= GEQ: op
+    {: RESULT = op; :};
+OP1						::= COMP: op
+    {: RESULT = op; :};
+OP1						::= DIST: op
+    {: RESULT = op; :};
 
-E2 						::= E2: opnd0 MAS E3: opnd1
-    {: RESULT = sem.e_suma(opnd0, opnd1); :};
-E2 						::= E3: opnd0 MENOS E3: opnd1
-    {: RESULT = sem.e_resta(opnd0, opnd1); :};
+E2 						::= E2: opnd0 MAS: op E3: opnd1
+    {: RESULT = (Exp)sem.e_suma(opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
+E2 						::= E3: opnd0 MENOS: op E3: opnd1
+    {: RESULT = (Exp)sem.e_resta(opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
 E2 						::= E3: exp
     {: RESULT = exp; :};
 
-E3 						::= E4: opnd0 P_AND E3: opnd1
-    {: RESULT = sem.e_and(opnd0, opnd1); :};
-E3 						::= E4: opnd0 P_OR E4: opnd1
-    {: RESULT = sem.e_or(opnd0, opnd1); :};
+E3 						::= E4: opnd0 P_AND: op E3: opnd1
+    {: RESULT = (Exp)sem.e_and(opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
+E3 						::= E4: opnd0 P_OR: op E4: opnd1
+    {: RESULT = (Exp)sem.e_or(opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
 E3 						::= E4: exp
     {: RESULT = exp; :};
 
 E4 						::= E4: opnd0 OP4: op E5: opnd1
-    {: RESULT = sem.mkop(op, opnd0, opnd1); :};
+    {: RESULT = (Exp)sem.mkop(op.str(), opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
 E4 						::= E5: exp
     {: RESULT = exp; :};
-OP4						::= MUL
-    {: RESULT = "*"; :};
-OP4						::= DIV
-    {: RESULT = "/"; :};
-OP4						::= PORCENTAJE
-    {: RESULT = "%"; :};
+OP4						::= MUL: op
+    {: RESULT = op; :};
+OP4						::= DIV: op
+    {: RESULT = op; :};
+OP4						::= PORCENTAJE: op
+    {: RESULT = op; :};
 
 E5 						::= OP5: op E5: exp
-    {: RESULT = sem.mkunary(op, exp); :};
+    {: RESULT = (Exp)sem.mkunary(op.str(), exp).ponFila(op.fila()).ponCol(op.col()); :};
 E5 						::= E6: exp
     {: RESULT = exp; :};
-OP5						::= MENOS
-    {: RESULT = "-"; :};
-OP5						::= P_NOT
-    {: RESULT = "not"; :};
+OP5						::= MENOS: op
+    {: RESULT = op; :};
+OP5						::= P_NOT: op
+    {: RESULT = op; :};
 
-E6 						::= E6: opnd0 CORCHETEAP expresion: opnd1 CORCHETECIERRE
-    {: RESULT = sem.e_indexado(opnd0, opnd1); :};
+E6 						::= E6: opnd0 CORCHETEAP: op expresion: opnd1 CORCHETECIERRE
+    {: RESULT = (Exp)sem.e_indexado(opnd0, opnd1).ponFila(op.fila()).ponCol(op.col()); :};
 E6 						::= E6: opnd PUNTO IDEN: id
     {: RESULT = (Exp)sem.e_campo(opnd, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
-E6 						::= E6: opnd EXPONENTE
-    {: RESULT = sem.e_puntero(opnd); :};
+E6 						::= E6: opnd EXPONENTE: op
+    {: RESULT = (Exp)sem.e_puntero(opnd).ponFila(op.fila()).ponCol(op.col()); :};
 E6 						::= E7: exp
     {: RESULT = exp; :};
 
@@ -291,16 +289,16 @@ E7 						::= ENT: ent
     {: RESULT = (Exp)sem.e_lit_ent(ent.str()).ponFila(ent.fila()).ponCol(ent.col()); :};
 E7 						::= REAL: real
     {: RESULT = (Exp)sem.e_lit_ent(real.str()).ponFila(real.fila()).ponCol(real.col()); :};
-E7 						::= P_TRUE
-    {: RESULT = sem.e_true(); :};
-E7 						::= P_FALSE
-    {: RESULT = sem.e_false(); :};
+E7 						::= P_TRUE: exp
+    {: RESULT = (Exp)sem.e_true().ponFila(exp.fila()).ponCol(exp.col()); :};
+E7 						::= P_FALSE: exp
+    {: RESULT = (Exp)sem.e_false().ponFila(exp.fila()).ponCol(exp.col()); :};
 E7 						::= STRING: string
     {: RESULT = (Exp)sem.e_string(string.str()).ponFila(string.fila()).ponCol(string.col()); :};
 E7 						::= IDEN: id
     {: RESULT = (Exp)sem.e_iden(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
-E7 						::= P_NULL
-    {: RESULT = sem.e_null(); :};
+E7 						::= P_NULL: exp
+    {: RESULT = (Exp)sem.e_null().ponFila(exp.fila()).ponCol(exp.col()); :};
 E7 						::= E8: exp
     {: RESULT = exp; :};
 
