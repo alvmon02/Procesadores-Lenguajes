@@ -2,12 +2,31 @@ package asint;
 
 public class SintaxisAbstractaTiny {
 
+    private static void imprimeOpnd(Exp opnd, int np) {
+        if (opnd.prioridad() < np) {
+            System.out.print("(");
+        }
+        ;
+        opnd.imprime();
+        if (opnd.prioridad() < np) {
+            System.out.print(")");
+        }
+        ;
+    }
+
+    private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1, int i, int j) {
+        imprimeOpnd(opnd0, np0);
+        System.out.println(op + "$f:" + i + ",c:" + j + "$");
+        imprimeOpnd(opnd1, np1);
+    }
+
     public static abstract class Nodo {
         public Nodo() {
             fila = col = -1;
         }
 
         private int fila;
+
         private int col;
 
         public Nodo ponFila(int fila) {
@@ -27,6 +46,10 @@ public class SintaxisAbstractaTiny {
         public int leeCol() {
             return col;
         }
+
+        public abstract void procesa(Procesamiento p);
+
+        public abstract void imprime();
     }
 
     public static class Prog extends Nodo {
@@ -39,14 +62,38 @@ public class SintaxisAbstractaTiny {
             this.intrs = intrs;
         }
 
+        public DecsOpt decs() {
+            return decs;
+        }
+
+        public IntrsOpt intrs() {
+            return intrs;
+        }
+
         public String toString() {
             return "prog(" + decs + "," + intrs + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("{");
+            decs.imprime();
+            intrs.imprime();
+            System.out.println("}");
         }
     }
 
     public static abstract class DecsOpt extends Nodo {
         public DecsOpt() {
             super();
+        }
+
+        public LDecs ldecs() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -61,6 +108,20 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "si_decs(" + decs + ")";
         }
+
+        public LDecs ldecs() {
+            return decs;
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            decs.imprime();
+            System.out.println("&&");
+        }
     }
 
     public static class No_Decs extends DecsOpt {
@@ -71,11 +132,28 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_decs()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+
+        }
     }
 
     public static abstract class LDecs extends Nodo {
         public LDecs() {
             super();
+        }
+
+        public Dec dec() {
+            throw new UnsupportedOperationException();
+        }
+
+        public LDecs ldecs() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -89,8 +167,27 @@ public class SintaxisAbstractaTiny {
             this.dec = dec;
         }
 
+        public LDecs ldecs() {
+            return decs;
+        }
+
+        public Dec dec() {
+            return dec;
+        }
+
         public String toString() {
             return "mas_decs(" + decs + "," + dec + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            decs.imprime();
+            System.out.println(";");
+            dec.imprime();
         }
     }
 
@@ -102,14 +199,43 @@ public class SintaxisAbstractaTiny {
             this.dec = dec;
         }
 
+        public Dec dec() {
+            return dec;
+        }
+
         public String toString() {
             return "una_dec(" + dec + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            dec.imprime();
         }
     }
 
     public static abstract class Dec extends Nodo {
         public Dec() {
             super();
+        }
+
+        public Tipo tipo() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String id() {
+            throw new UnsupportedOperationException();
+        }
+
+        public PForms pforms() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Prog prog() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -123,8 +249,26 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public Tipo tipo() {
+            return tipo;
+        }
+
+        public String id() {
+            return id;
+        }
+
         public String toString() {
             return "dec_var(" + tipo + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -138,8 +282,27 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public Tipo tipo() {
+            return tipo;
+        }
+
+        public String id() {
+            return id;
+        }
+
         public String toString() {
             return "dec_tipo(" + tipo + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<type>");
+            tipo.imprime();
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -155,14 +318,43 @@ public class SintaxisAbstractaTiny {
             this.prog = prog;
         }
 
+        public String id() {
+            return id;
+        }
+
+        public PForms pforms() {
+            return pforms;
+        }
+
+        public Prog prog() {
+            return prog;
+        }
+
         public String toString() {
             return "dec_proc(" + id + "[" + leeFila() + "," + leeCol() + "]," + pforms + prog + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<proc>\n" + id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            System.out.println("(");
+            pforms.imprime();
+            System.out.println(")");
+            prog.imprime();
         }
     }
 
     public static abstract class PForms extends Nodo {
         public PForms() {
             super();
+        }
+
+        public LPForms pforms() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -174,8 +366,21 @@ public class SintaxisAbstractaTiny {
             this.pforms = pforms;
         }
 
+        public LPForms pforms() {
+            return pforms;
+        }
+
         public String toString() {
             return "si_pforms(" + pforms + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            pforms.imprime();
         }
     }
 
@@ -187,11 +392,28 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_pforms()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+
+        }
     }
 
     public static abstract class LPForms extends Nodo {
         public LPForms() {
             super();
+        }
+
+        public LPForms pforms() {
+            throw new UnsupportedOperationException();
+        }
+
+        public PForm pform() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -205,8 +427,27 @@ public class SintaxisAbstractaTiny {
             this.pform = pform;
         }
 
+        public LPForms pforms() {
+            return pforms;
+        }
+
+        public PForm pform() {
+            return pform;
+        }
+
         public String toString() {
             return "mas_pforms(" + pforms + "," + pform + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            pforms.imprime();
+            System.out.println(",");
+            pform.imprime();
         }
     }
 
@@ -218,8 +459,21 @@ public class SintaxisAbstractaTiny {
             this.pform = pform;
         }
 
+        public PForm pform() {
+            return pform;
+        }
+
         public String toString() {
             return "una_pform(" + pform + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            pform.imprime();
         }
     }
 
@@ -235,8 +489,31 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public Tipo tipo() {
+            return tipo;
+        }
+
+        public Ref ref() {
+            return ref;
+        }
+
+        public String id() {
+            return id;
+        }
+
         public String toString() {
             return "pform(" + tipo + "," + ref + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            ref.imprime();
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -254,6 +531,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "si_ref()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("&");
+        }
     }
 
     public static class No_Ref extends Ref {
@@ -264,11 +550,36 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_ref()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+
+        }
     }
 
     public static abstract class Tipo extends Nodo {
         public Tipo() {
             super();
+        }
+
+        public String id() {
+            throw new UnsupportedOperationException();
+        }
+
+        public CamposS camposS() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Tipo tipo() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String ent() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -280,8 +591,21 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public String id() {
+            return id;
+        }
+
         public String toString() {
             return "tipo(" + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -293,6 +617,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "t_string()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<string>");
+        }
     }
 
     public static class T_Int extends Tipo {
@@ -302,6 +635,15 @@ public class SintaxisAbstractaTiny {
 
         public String toString() {
             return "t_int()";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<int>");
         }
     }
 
@@ -313,6 +655,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "t_bool()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<bool>");
+        }
     }
 
     public static class T_Real extends Tipo {
@@ -322,6 +673,15 @@ public class SintaxisAbstractaTiny {
 
         public String toString() {
             return "t_real()";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<real>");
         }
     }
 
@@ -335,8 +695,26 @@ public class SintaxisAbstractaTiny {
             this.ent = ent;
         }
 
+        public Tipo tipo() {
+            return tipo;
+        }
+
+        public String ent() {
+            return ent;
+        }
+
         public String toString() {
             return "t_array(" + tipo + "," + ent + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.printf("[\n" + ent + "\n]$f:" + leeFila() + ",c:" + leeCol() + "$\n");
         }
     }
 
@@ -348,8 +726,22 @@ public class SintaxisAbstractaTiny {
             this.tipo = tipo;
         }
 
+        public Tipo tipo() {
+            return tipo;
+        }
+
         public String toString() {
             return "t_puntero(" + tipo + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("^");
+            tipo.imprime();
         }
     }
 
@@ -361,14 +753,38 @@ public class SintaxisAbstractaTiny {
             this.camposS = camposS;
         }
 
+        public CamposS camposS() {
+            return camposS;
+        }
+
         public String toString() {
             return "t_struct(" + camposS + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<struct>");
+            System.out.println("{");
+            camposS.imprime();
+            System.out.println("}");
         }
     }
 
     public static abstract class CamposS extends Nodo {
         public CamposS() {
             super();
+        }
+
+        public CamposS camposS() {
+            throw new UnsupportedOperationException();
+        }
+
+        public CampoS campoS() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -381,8 +797,27 @@ public class SintaxisAbstractaTiny {
             this.campoS = campoS;
         }
 
+        public CamposS camposS() {
+            return camposS;
+        }
+
+        public CampoS campoS() {
+            return campoS;
+        }
+
         public String toString() {
             return "mas_cmp_s(" + camposS + "," + campoS + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            camposS.imprime();
+            System.out.println(",");
+            campoS.imprime();
         }
     }
 
@@ -393,8 +828,21 @@ public class SintaxisAbstractaTiny {
             this.campoS = campoS;
         }
 
+        public CampoS campoS() {
+            return campoS;
+        }
+
         public String toString() {
             return "un_cmp_s(" + campoS + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            campoS.imprime();
         }
     }
 
@@ -407,14 +855,36 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public Tipo tipo() {
+            return tipo;
+        }
+
+        public String id() {
+            return id;
+        }
+
         public String toString() {
             return "campo_s(" + tipo + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
     public static abstract class IntrsOpt extends Nodo {
         public IntrsOpt() {
             super();
+        }
+
+        public LIntrs intrs() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -426,8 +896,21 @@ public class SintaxisAbstractaTiny {
             this.intrs = intrs;
         }
 
+        public LIntrs intrs() {
+            return intrs;
+        }
+
         public String toString() {
             return "si_intrs(" + intrs + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            intrs.imprime();
         }
     }
 
@@ -439,11 +922,28 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_intrs()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+
+        }
     }
 
     public static abstract class LIntrs extends Nodo {
         public LIntrs() {
             super();
+        }
+
+        public LIntrs intrs() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Intr intr() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -457,8 +957,27 @@ public class SintaxisAbstractaTiny {
             this.intr = intr;
         }
 
+        public LIntrs intrs() {
+            return intrs;
+        }
+
+        public Intr intr() {
+            return intr;
+        }
+
         public String toString() {
             return "mas_intrs(" + intrs + "," + intr + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            intrs.imprime();
+            System.out.println(";");
+            intr.imprime();
         }
     }
 
@@ -470,14 +989,47 @@ public class SintaxisAbstractaTiny {
             this.intr = intr;
         }
 
+        public Intr intr() {
+            return intr;
+        }
+
         public String toString() {
             return "una_intr(" + intr + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            intr.imprime();
         }
     }
 
     public static abstract class Intr extends Nodo {
         public Intr() {
             super();
+        }
+
+        public String id() {
+            throw new UnsupportedOperationException();
+        }
+
+        public PReals preals() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Exp exp() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Prog prog() {
+            throw new UnsupportedOperationException();
+        }
+
+        public I_Else i_else() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -489,8 +1041,22 @@ public class SintaxisAbstractaTiny {
             this.exp = exp;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
         public String toString() {
             return "i_eval(" + exp + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("@");
+            exp.imprime();
         }
     }
 
@@ -506,8 +1072,32 @@ public class SintaxisAbstractaTiny {
             this.i_else = i_else;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
+        public Prog prog() {
+            return prog;
+        }
+
+        public I_Else i_else() {
+            return i_else;
+        }
+
         public String toString() {
             return "i_if(" + exp + "," + prog + "," + i_else + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<if>");
+            exp.imprime();
+            prog.imprime();
+            i_else.imprime();
         }
     }
 
@@ -521,8 +1111,27 @@ public class SintaxisAbstractaTiny {
             this.prog = prog;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
+        public Prog prog() {
+            return prog;
+        }
+
         public String toString() {
             return "i_while(" + exp + "," + prog + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<while>");
+            exp.imprime();
+            prog.imprime();
         }
     }
 
@@ -534,8 +1143,22 @@ public class SintaxisAbstractaTiny {
             this.exp = exp;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
         public String toString() {
             return "i_read(" + exp + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<read>");
+            exp.imprime();
         }
     }
 
@@ -547,8 +1170,22 @@ public class SintaxisAbstractaTiny {
             this.exp = exp;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
         public String toString() {
             return "i_write(" + exp + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<write>");
+            exp.imprime();
         }
     }
 
@@ -560,6 +1197,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "i_nl()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<nl>");
+        }
     }
 
     public static class I_New extends Intr {
@@ -570,8 +1216,22 @@ public class SintaxisAbstractaTiny {
             this.exp = exp;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
         public String toString() {
             return "i_new(" + exp + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<new>");
+            exp.imprime();
         }
     }
 
@@ -583,8 +1243,22 @@ public class SintaxisAbstractaTiny {
             this.exp = exp;
         }
 
+        public Exp exp() {
+            return exp;
+        }
+
         public String toString() {
             return "i_delete(" + exp + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<delete>");
+            exp.imprime();
         }
     }
 
@@ -598,8 +1272,27 @@ public class SintaxisAbstractaTiny {
             this.preals = preals;
         }
 
+        public String id() {
+            return id;
+        }
+
+        public PReals preals() {
+            return preals;
+        }
+
         public String toString() {
             return "i_call(" + id + "[" + leeFila() + "," + leeCol() + "]," + preals + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<call>");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
+            preals.imprime();
         }
     }
 
@@ -611,14 +1304,31 @@ public class SintaxisAbstractaTiny {
             this.prog = prog;
         }
 
+        public Prog prog() {
+            return prog;
+        }
+
         public String toString() {
             return "i_prog(" + prog + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            prog.imprime();
         }
     }
 
     public static abstract class I_Else extends Nodo {
         public I_Else() {
             super();
+        }
+
+        public Prog prog() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -630,8 +1340,22 @@ public class SintaxisAbstractaTiny {
             this.prog = prog;
         }
 
+        public Prog prog() {
+            return prog;
+        }
+
         public String toString() {
             return "si_else(" + prog + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<else>");
+            prog.imprime();
         }
     }
 
@@ -643,11 +1367,24 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_else()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+
+        }
     }
 
     public static abstract class PReals extends Nodo {
         public PReals() {
             super();
+        }
+
+        public LPReals preals() {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -659,8 +1396,23 @@ public class SintaxisAbstractaTiny {
             this.preals = preals;
         }
 
+        public LPReals preals() {
+            return preals;
+        }
+
         public String toString() {
             return "si_preals(" + preals + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("(");
+            preals.imprime();
+            System.out.println(")");
         }
     }
 
@@ -672,39 +1424,88 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_preals()";
         }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+
+        }
     }
 
     public static abstract class LPReals extends Nodo {
         public LPReals() {
             super();
         }
+
+        public LPReals preals() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Exp exp() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public static class Mas_PReals extends LPReals {
         private LPReals preals;
-        private String id;
+        private Exp exp;
 
-        public Mas_PReals(LPReals preals, String id) {
+        public Mas_PReals(LPReals preals, Exp exp) {
             super();
             this.preals = preals;
-            this.id = id;
+            this.exp = exp;
+        }
+
+        public LPReals preals() {
+            return preals;
+        }
+
+        public Exp exp() {
+            return exp;
         }
 
         public String toString() {
-            return "mas_preals(" + preals + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+            return "mas_preals(" + preals + "," + exp + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            preals.imprime();
+            System.out.println(",");
+            exp.imprime();
         }
     }
 
     public static class Un_PReal extends LPReals {
-        private String id;
+        private Exp exp;
 
-        public Un_PReal(String id) {
+        public Un_PReal(Exp exp) {
             super();
-            this.id = id;
+            this.exp = exp;
+        }
+
+        public Exp exp() {
+            return exp;
         }
 
         public String toString() {
-            return "un_preal(" + id + "[" + leeFila() + "," + leeCol() + "])";
+            return "un_preal(" + exp + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            exp.imprime();
         }
     }
 
@@ -712,6 +1513,28 @@ public class SintaxisAbstractaTiny {
         public Exp() {
             super();
         }
+
+        public Exp opnd0() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Exp opnd1() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String string() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String num() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String id() {
+            throw new UnsupportedOperationException();
+        }
+
+        public abstract int prioridad();
     }
 
     private static abstract class ExpUni extends Exp {
@@ -720,6 +1543,10 @@ public class SintaxisAbstractaTiny {
         public ExpUni(Exp opnd) {
             super();
             this.opnd = opnd;
+        }
+
+        public Exp opnd0() {
+            return opnd;
         }
     }
 
@@ -732,6 +1559,14 @@ public class SintaxisAbstractaTiny {
             this.opnd0 = opnd0;
             this.opnd1 = opnd1;
         }
+
+        public Exp opnd0() {
+            return opnd0;
+        }
+
+        public Exp opnd1() {
+            return opnd1;
+        }
     }
 
     public static class Asig extends ExpBin {
@@ -739,8 +1574,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 0;
+        }
+
         public String toString() {
             return "asig(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "=", opnd1, 1, 0, leeFila(), leeCol());
         }
     }
 
@@ -749,8 +1598,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "comp(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "==", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -759,8 +1622,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "dist(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "!=", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -769,8 +1646,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "menor(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "<", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -779,8 +1670,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "mayor(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, ">", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -789,8 +1694,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "menorIgual(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "<=", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -799,8 +1718,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 1;
+        }
+
         public String toString() {
             return "mayorIgual(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, ">=", opnd1, 1, 2, leeFila(), leeCol());
         }
     }
 
@@ -809,8 +1742,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 2;
+        }
+
         public String toString() {
             return "suma(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "+", opnd1, 2, 3, leeFila(), leeCol());
         }
     }
 
@@ -819,8 +1766,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 2;
+        }
+
         public String toString() {
             return "resta(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "-", opnd1, 3, 3, leeFila(), leeCol());
         }
     }
 
@@ -829,8 +1790,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 3;
+        }
+
         public String toString() {
             return "and(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "and", opnd1, 4, 3, leeFila(), leeCol());
         }
     }
 
@@ -839,8 +1814,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 3;
+        }
+
         public String toString() {
             return "or(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "or", opnd1, 4, 4, leeFila(), leeCol());
         }
     }
 
@@ -849,8 +1838,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 4;
+        }
+
         public String toString() {
             return "mul(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "*", opnd1, 4, 5, leeFila(), leeCol());
         }
     }
 
@@ -859,8 +1862,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 4;
+        }
+
         public String toString() {
             return "div(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "/", opnd1, 4, 5, leeFila(), leeCol());
         }
     }
 
@@ -869,8 +1886,22 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 4;
+        }
+
         public String toString() {
             return "porcentaje(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0, "%", opnd1, 4, 5, leeFila(), leeCol());
         }
     }
 
@@ -879,8 +1910,24 @@ public class SintaxisAbstractaTiny {
             super(opnd);
         }
 
+        @Override
+        public int prioridad() {
+            return 5;
+        }
+
         public String toString() {
             return "negativo(" + opnd + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("-$f:" + leeFila() + ",c:" + leeCol() + "$");
+            imprimeOpnd(opnd, 5);
+
         }
     }
 
@@ -889,8 +1936,23 @@ public class SintaxisAbstractaTiny {
             super(opnd);
         }
 
+        @Override
+        public int prioridad() {
+            return 5;
+        }
+
         public String toString() {
             return "negado(" + opnd + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<not>$f:" + leeFila() + ",c:" + leeCol() + "$");
+            imprimeOpnd(opnd, 5);
         }
     }
 
@@ -899,8 +1961,25 @@ public class SintaxisAbstractaTiny {
             super(opnd0, opnd1);
         }
 
+        @Override
+        public int prioridad() {
+            return 6;
+        }
+
         public String toString() {
             return "index(" + opnd0 + "," + opnd1 + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeOpnd(opnd0, 6);
+            System.out.println("[$f:" + leeFila() + ",c:" + leeCol() + "$");
+            imprimeOpnd(opnd1, 0);
+            System.out.println("]");
         }
     }
 
@@ -914,8 +1993,32 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public Exp opnd0() {
+            return opnd;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        @Override
+        public int prioridad() {
+            return 6;
+        }
+
         public String toString() {
             return "acceso(" + opnd + "," + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeOpnd(opnd, 6);
+            System.out.println(".");
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -924,8 +2027,23 @@ public class SintaxisAbstractaTiny {
             super(opnd);
         }
 
+        @Override
+        public int prioridad() {
+            return 6;
+        }
+
         public String toString() {
             return "indireccion(" + opnd + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            imprimeOpnd(opnd, 6);
+            System.out.println("^$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -937,8 +2055,26 @@ public class SintaxisAbstractaTiny {
             this.num = num;
         }
 
+        public String num() {
+            return num;
+        }
+
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "lit_ent(" + num + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println(num + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -950,8 +2086,26 @@ public class SintaxisAbstractaTiny {
             this.num = num;
         }
 
+        public String num() {
+            return num;
+        }
+
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "lit_real(" + num + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println(num + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -960,8 +2114,22 @@ public class SintaxisAbstractaTiny {
             super();
         }
 
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "true([" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<true>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -970,8 +2138,22 @@ public class SintaxisAbstractaTiny {
             super();
         }
 
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "false([" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<false>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -983,8 +2165,26 @@ public class SintaxisAbstractaTiny {
             this.string = string;
         }
 
+        public String string() {
+            return string;
+        }
+
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "iden(" + string + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println(string + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -996,8 +2196,26 @@ public class SintaxisAbstractaTiny {
             this.id = id;
         }
 
+        public String id() {
+            return id;
+        }
+
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "iden(" + id + "[" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -1006,8 +2224,22 @@ public class SintaxisAbstractaTiny {
             super();
         }
 
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+
         public String toString() {
             return "null([" + leeFila() + "," + leeCol() + "])";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<null>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
     }
 
@@ -1052,7 +2284,7 @@ public class SintaxisAbstractaTiny {
         return new No_PForms();
     }
 
-    public LPForms mas_pfroms(LPForms pforms, PForm pform) {
+    public LPForms mas_pforms(LPForms pforms, PForm pform) {
         return new Mas_PForms(pforms, pform);
     }
 
@@ -1152,7 +2384,7 @@ public class SintaxisAbstractaTiny {
         return new I_Write(exp);
     }
 
-    public Intr i_ln() {
+    public Intr i_nl() {
         return new I_NL();
     }
 
@@ -1188,12 +2420,12 @@ public class SintaxisAbstractaTiny {
         return new No_PReals();
     }
 
-    public LPReals mas_preals(LPReals preals, String id) {
-        return new Mas_PReals(preals, id);
+    public LPReals mas_preals(LPReals preals, Exp exp) {
+        return new Mas_PReals(preals, exp);
     }
 
-    public LPReals un_preals(String id) {
-        return new Un_PReal(id);
+    public LPReals un_preals(Exp exp) {
+        return new Un_PReal(exp);
     }
 
     public Exp e_asig(Exp opnd0, Exp opnd1) {
@@ -1261,7 +2493,7 @@ public class SintaxisAbstractaTiny {
     }
 
     public Exp e_indexado(Exp opnd0, Exp opnd1) {
-        return new Index(opnd0, opnd0);
+        return new Index(opnd0, opnd1);
     }
 
     public Exp e_campo(Exp opnd, String id) {
