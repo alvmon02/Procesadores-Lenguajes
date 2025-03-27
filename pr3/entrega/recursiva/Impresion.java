@@ -1,4 +1,4 @@
-package pro_recursiva;
+package recursiva;
 
 import asint.SintaxisAbstractaTiny;
 
