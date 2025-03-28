@@ -13,9 +13,8 @@ public class DomJudge {
 	public static void main(String[] args) throws Exception {
 
 		Reader input = new InputStreamReader((System.in));
-		
-		if (input.read()==97) {	//Reconocer a 
-			
+
+		if (input.read() == 97) { // Reconocer a
 
 			try {
 				AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
@@ -33,16 +32,15 @@ public class DomJudge {
 				prog.procesa(new visitante.Impresion());
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
-			} catch (ErrorSintactico | UnsupportedOperationException e) {
+			} catch (ErrorSintactico e) {
 				System.out.println("ERROR_SINTACTICO");
 			}
-		} else {	//si no es a(en su defecto, es decir, d)
+		} else { // si no es a(en su defecto, es decir, d)
 
 			try {
 				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(input);
 				System.out.println("CONSTRUCCION AST DESCENDENTE");
 				Prog prog = asint.analiza();
-
 				System.out.println("IMPRESION RECURSIVA");
 				new recursiva.Impresion().imprime(prog);
 
@@ -53,7 +51,7 @@ public class DomJudge {
 				prog.procesa(new visitante.Impresion());
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
-			} catch (ParseException | UnsupportedOperationException e) {
+			} catch (ParseException e) {
 				System.out.println("ERROR_SINTACTICO");
 			}
 		}

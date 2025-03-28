@@ -249,7 +249,7 @@ public class Evaluador extends SintaxisAbstractaTiny {
             imprime("-", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd0(), 5);
         } else if (claseDe(exp, Negado.class)) {
-            System.out.println("<not>");
+            imprime("<not>", exp.leeFila(), exp.leeCol());
             imprime(exp.opnd0(), 5);
         } else if (claseDe(exp, Index.class)) {
             imprime(exp.opnd0());

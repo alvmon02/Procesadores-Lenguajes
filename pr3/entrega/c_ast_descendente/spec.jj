@@ -579,10 +579,10 @@ PARSER_END(ConstructorASTsTiny)
     { Token id; }
     {
       id = <t_true>
-        { return sem.e_true(); }
+        { return (Exp)sem.e_true().ponFila(id.beginLine).ponCol(id.beginColumn); }
       | 
       id = <t_false>
-        { return sem.e_false(); }
+        { return (Exp)sem.e_false().ponFila(id.beginLine).ponCol(id.beginColumn); }
     }
 
   Exp e8(): 
