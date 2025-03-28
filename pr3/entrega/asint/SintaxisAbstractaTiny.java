@@ -4,12 +4,12 @@ public class SintaxisAbstractaTiny {
 
     private static void imprimeOpnd(Exp opnd, int np) {
         if (opnd.prioridad() < np) {
-            System.out.print("(");
+            System.out.println("(");
         }
         ;
         opnd.imprime();
         if (opnd.prioridad() < np) {
-            System.out.print(")");
+            System.out.println(")");
         }
         ;
     }
