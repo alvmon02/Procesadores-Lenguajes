@@ -1806,7 +1806,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0, "and", opnd1, 4, 3, leeFila(), leeCol());
+            imprimeExpBin(opnd0, "<and>", opnd1, 4, 3, leeFila(), leeCol());
         }
     }
 
@@ -1830,7 +1830,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0, "or", opnd1, 4, 4, leeFila(), leeCol());
+            imprimeExpBin(opnd0, "<or>", opnd1, 4, 4, leeFila(), leeCol());
         }
     }
 
