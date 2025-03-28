@@ -1,0 +1,37 @@
+CONSTRUCCION AST DESCENDENTE
+{
+@
+<true>
+<and>
+<false>
+;
+@
+<true>
+<or>
+x
+}
+<EOF>
+IMPRESION RECURSIVA
+{
+@
+<true>$f:-1,c:-1$
+;
+@
+<true>$f:-1,c:-1$
+}
+IMPRESION INTERPRETE
+{
+@
+<true>$f:-1,c:-1$
+;
+@
+<true>$f:-1,c:-1$
+}
+IMPRESION VISITANTE
+{
+@
+<true>$f:-1,c:-1$
+;
+@
+<true>$f:-1,c:-1$
+}
