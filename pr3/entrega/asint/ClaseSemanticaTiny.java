@@ -35,6 +35,7 @@ public class ClaseSemanticaTiny extends SintaxisAbstractaTiny {
             case "-":
                 return e_negativo(opnd);
             case "not":
+            case "<not>":
                 return e_negado(opnd);
             default:
                 throw new UnsupportedOperationException("Bad op");
