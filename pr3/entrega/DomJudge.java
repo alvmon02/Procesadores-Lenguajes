@@ -1,6 +1,8 @@
 import asint.SintaxisAbstractaTiny.Prog;
 import c_ast_ascendente.AnalizadorLexicoTiny;
 import c_ast_ascendente.GestionErroresTiny.*;
+import c_ast_descendente.ParseException;
+import c_ast_descendente.TokenMgrError;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -14,7 +16,6 @@ public class DomJudge {
 		
 		if (input.read()==97) {	//Reconocer a 
 			
-			input.read();		//Eliminar LF, para que el primer elemento a leer sea parte del programa
 
 			try {
 				AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
@@ -32,11 +33,10 @@ public class DomJudge {
 				prog.procesa(new visitante.Impresion());
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
-			} catch (ErrorSintactico e) {
+			} catch (ErrorSintactico | UnsupportedOperationException e) {
 				System.out.println("ERROR_SINTACTICO");
 			}
 		} else {	//si no es a(en su defecto, es decir, d)
-			input.read();		//Eliminar LF, para que el primer elemento a leer sea parte del programa
 
 			try {
 				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(input);
@@ -51,9 +51,9 @@ public class DomJudge {
 
 				System.out.println("IMPRESION VISITANTE");
 				prog.procesa(new visitante.Impresion());
-			} catch (ErrorLexico e) {
+			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
-			} catch (ErrorSintactico e) {
+			} catch (ParseException | UnsupportedOperationException e) {
 				System.out.println("ERROR_SINTACTICO");
 			}
 		}
