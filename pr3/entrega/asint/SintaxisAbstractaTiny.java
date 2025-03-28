@@ -1431,7 +1431,8 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-
+            System.out.println("(");
+            System.out.println(")");
         }
     }
 
