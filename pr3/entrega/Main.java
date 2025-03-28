@@ -2,24 +2,18 @@
 import asint.SintaxisAbstractaTiny.Prog;
 import c_ast_ascendente.AnalizadorLexicoTiny;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import asint.SintaxisAbstractaTiny.Prog;
-import c_ast_ascendente.AnalizadorLexicoTiny;
 import c_ast_ascendente.GestionErroresTiny.*;
 import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.io.ByteArrayOutputStream;
 
 
