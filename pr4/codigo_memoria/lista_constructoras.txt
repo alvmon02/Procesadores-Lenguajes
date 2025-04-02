@@ -1,0 +1,143 @@
+prog(decs, intrs)
+
+si_decs(decs)
+
+no_decs()
+
+mas_decs(decs, dec)
+
+una_dec(dec)
+
+dec_var(tipo, id)
+
+dec_tipo(tipo, id)
+
+dec_proc(id, pforms, prog)
+
+si_pforms(pfroms)
+
+no_pforms()
+
+mas_pforms(pforms, pform)
+
+una_pform(pform)
+
+pform(tipo, ref, id)
+
+si_ref()
+
+no_ref()
+
+t_iden(id)
+
+t_string()
+
+t_int()
+
+t_bool()
+
+t_real()
+
+t_array(tipo, ent)
+
+t_punter(tipo)
+
+t_struct(camposs)
+
+mas_cmp_s(camposs, campos)
+
+un_cmp_s(campos)
+
+cmp_s(tipo, id)
+
+si_intrs(intrs)
+
+no_intrs()
+
+mas_intrs(intrs, intr)
+
+una_intr(intr)
+
+i_eval(exp)
+
+i_if(exp, prog, ielse)
+
+i_while(exp, prog)
+
+i_read(exp)
+
+i_write(exp)
+
+i_nl()
+
+i_new(exp)
+
+i_delete(exp)
+
+i_call(id, preals)
+
+i_prog(prog)
+
+si_else(prog)
+
+no_else()
+
+si_preals(preals)
+
+no_preals()
+
+mas_preals(preals, exp)
+
+un_preals(exp)
+
+e_asig(opnd0, opnd1)
+
+e_comp(opnd0, opnd1)
+
+e_dist(opnd0, opnd1)
+
+e_lt(opnd0, opnd1)
+
+e_gt(opnd0, opnd1)
+
+e_leq(opnd0, opnd1)
+
+e_geq(opnd0, opnd1)
+
+e_suma(opnd0, opnd1)
+
+e_resta(opnd0, opnd1)
+
+e_and(opnd0, opnd1)
+
+e_or(opnd0, opnd1)
+
+e_mul(opnd0, opnd1)
+
+e_div(opnd0, opnd1)
+
+e_porcentaje(opnd0, opnd1)
+
+e_negativo(opnd)
+
+e_negado(opnd)
+
+e_indexado(opnd0, opnd1)
+
+e_campo(opnd, id)
+
+e_puntero(opnd)
+
+e_lit_ent(num)
+
+e_lit_real(num)
+
+e_true()
+
+e_false()
+
+e_string(string)
+
+e_iden(id)
+
+e_null()
