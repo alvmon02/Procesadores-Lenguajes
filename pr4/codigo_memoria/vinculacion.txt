@@ -1,0 +1,274 @@
+var ts // La tabla de símbolos
+var noop = null
+
+main(proc):
+    ts = creaTS()
+    vincula(proc)
+
+contiene_inserta(id):
+    if contiene(ts,Id) then
+        error
+    else
+        inserta(ts,Id,$)
+    end if
+
+vinculaId(id):
+    $.vinculo = vinculoDe(ts,Id)
+    if $.vinculo == ⊥ then
+        error
+    end if
+
+vincula(prog(decs, intrs)):
+    abreAmbito(ts)
+    recolectaDecs(decs)
+    vincula(intrs)
+    cierraAmbito(ts)
+
+recolectaDecs(si_decs(decs)):
+    recolectaDecs(decs)
+
+recolectaDecs(no_decs()):
+    noop
+
+recolectaDecs(mas_decs(decs, dec)):
+    recolectaDecs(decs)
+    recolectaDec(dec)
+    
+recolectaDecs(una_dec(dec)):
+    recolectaDec(dec)
+
+recolectaDec(dec_var(tipo, id)):
+    vincula(tipo)
+    contiene_inserta(id)
+
+recolectaDec(dec_tipo(tipo, id)):
+    vincula(tipo)
+    contiene_inserta(id)
+
+
+recolectaDec(dec_proc(id, pforms, prog)):
+    contiene_inserta(id)
+    abreAmbito(ts)
+    recolectaPForms(pforms)
+    vincula(prog)
+    cierraAmbito(ts)
+
+
+recolectaPForms(si_pforms(pfroms)):
+    recolectaPForms(pforms)
+
+recolectaPForms(no_pforms()):
+    noop
+
+recolectaPForms(mas_pforms(pforms, pform)):
+    recolectaPForms(pfroms)
+    recolectaPForm(pform)
+
+recolectaPForms(una_pform(pform)):
+    recolectaPForm(pform)
+
+recolectaPForm(pform(tipo, ref, id)):
+    vincula(tipo)
+    contiene_inserta(id)
+
+si_ref() // No afecta
+
+no_ref() // No afecta
+
+vincula(t_iden(id)):
+    vinculaId(id)
+
+vincula(t_string()):
+    noop
+
+vincula(t_int()):
+    noop
+
+vincula(t_bool()):
+    noop
+
+vincula(t_real()):
+    noop
+
+vincula(t_array(tipo, ent)):
+    vincula(tipo)
+
+vincula(t_punter(tipo)):
+    // TODO Hay que mirar como funciona lo de los punteros, si hay que hacer dos pasadas o qué
+
+vincula(t_struct(camposs)):
+    abreAmbito(ts)
+    recolectaCamposS(camposs)
+    cierraAmbito(ts)
+
+recolectaCamposS(mas_cmp_s(camposs, campos)):
+    recolectaCamposS(camposs)
+    recolectaCampoS(campos)
+    
+recolectaCamposS(un_cmp_s(campos)):
+    recolectaCampoS(campos)
+
+recolectaCampoS(cmp_s(tipo, id)):
+    vincula(tipo)
+    contiene_inserta(id)
+
+vincula(si_intrs(intrs)):
+    vincula(intrs)
+
+vincula(no_intrs()):
+    noop
+
+vincula(mas_intrs(intrs, intr)):
+    vincula(intrs)
+    vincula(intr)
+
+vincula(una_intr(intr)):
+    vincula(intr)
+
+vincula(i_eval(exp)):
+    vincula(exp)
+
+vincula(i_if(exp, prog, ielse)):
+    vincula(exp)
+    vincula(prog)
+    vincula(ielse)
+
+vincula(i_while(exp, prog)):
+    vincula(exp)
+    vincula(prog)
+
+vincula(i_read(exp)):
+    vincula(exp)
+
+vincula(i_write(exp)):
+    vincula(exp)
+
+vincula(i_nl()):
+    noop
+
+vincula(i_new(exp)):
+    vincula(exp)
+
+vincula(i_delete(exp)):
+    vincula(exp)
+
+vincula(i_call(id, preals)):
+    vinculaId(id)
+    vincula(preals)
+
+vincula(i_prog(prog)):
+    vincula(prog)
+
+vincula(si_else(prog)):
+    vincula(prog)
+
+vincula(no_else()):
+    noop
+
+vincula(si_preals(preals)):
+    vincula(preals)
+
+vincula(no_preals()):
+    noop
+
+vincula(mas_preals(preals, exp)):
+    vincula(preals)
+    vincula(exp)
+
+vincula(un_preals(exp)):
+    vincula(exp)
+
+vincula(e_asig(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_comp(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_dist(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_lt(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_gt(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_leq(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_geq(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_suma(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_resta(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_and(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_or(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_mul(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_div(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_porcentaje(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_negativo(opnd)):
+    vincula(opnd)
+
+vincula(e_negado(opnd)):
+    vincula(opnd)
+
+vincula(e_indexado(opnd0, opnd1)):
+    vincula(opnd0)
+    vincula(opnd1)
+
+vincula(e_campo(opnd, id)):
+    vincula(opnd)
+    // Aqui no habria que hacer vincula, no? porque lo haria comprobando tipos?
+
+vincula(e_puntero(opnd)):
+    // TODO aqui hay que revisar lo de los punteros
+    vincula(opnd)
+
+vincula(e_lit_ent(num)):
+    noop
+
+vincula(e_lit_real(num)):
+    noop
+
+vincula(e_true()):
+    noop
+
+vincula(e_false()):
+    noop
+
+vincula(e_string(string)):
+    noop
+
+vincula(e_iden(id)):
+    vinculaId(id)
+
+vincula(e_null()):
+    noop
