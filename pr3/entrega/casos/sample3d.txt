@@ -555,12 +555,18 @@ nombres$f:24,c:12$
 cont$f:24,c:20$
 ;
 <while>
-nombres$f:25,c:14$
+(nombres$f:25,c:14$
 .
 cont$f:25,c:22$
 <$f:25,c:27$
 0$f:25,c:29$
-{
+)<or>$f:25,c:32$
+(nombres$f:25,c:36$
+.
+cont$f:25,c:44$
+>$f:25,c:49$
+50$f:25,c:51$
+){
 <write>
 "Introduce el número de nombres a ordenar (max 50): "$f:26,c:16$
 ;
@@ -670,7 +676,7 @@ fin$f:57,c:13$
 @
 fin$f:59,c:11$
 =$f:59,c:15$
-<false>$f:-1,c:-1$
+<false>$f:59,c:17$
 ;
 @
 padre$f:60,c:11$
@@ -745,7 +751,7 @@ act$f:72,c:16$
 @
 fin$f:73,c:20$
 =$f:73,c:24$
-<true>$f:-1,c:-1$
+<true>$f:73,c:26$
 }
 <else>
 {
@@ -765,7 +771,7 @@ i$f:76,c:50$
 @
 fin$f:77,c:21$
 =$f:77,c:25$
-<true>$f:-1,c:-1$
+<true>$f:77,c:27$
 }
 }
 ;
@@ -1038,11 +1044,21 @@ nombres$f:24,c:12$
 cont$f:24,c:20$
 ;
 <while>
+(
 nombres$f:25,c:14$
 .
 cont$f:25,c:22$
 <$f:25,c:27$
 0$f:25,c:29$
+)
+<or>$f:25,c:32$
+(
+nombres$f:25,c:36$
+.
+cont$f:25,c:44$
+>$f:25,c:49$
+50$f:25,c:51$
+)
 {
 <write>
 "Introduce el número de nombres a ordenar (max 50): "$f:26,c:16$
@@ -1153,7 +1169,7 @@ fin$f:57,c:13$
 @
 fin$f:59,c:11$
 =$f:59,c:15$
-<false>$f:-1,c:-1$
+<false>$f:59,c:17$
 ;
 @
 padre$f:60,c:11$
@@ -1228,7 +1244,7 @@ act$f:72,c:16$
 @
 fin$f:73,c:20$
 =$f:73,c:24$
-<true>$f:-1,c:-1$
+<true>$f:73,c:26$
 }
 <else>
 {
@@ -1248,7 +1264,7 @@ i$f:76,c:50$
 @
 fin$f:77,c:21$
 =$f:77,c:25$
-<true>$f:-1,c:-1$
+<true>$f:77,c:27$
 }
 }
 ;
@@ -1521,12 +1537,18 @@ nombres$f:24,c:12$
 cont$f:24,c:20$
 ;
 <while>
-nombres$f:25,c:14$
+(nombres$f:25,c:14$
 .
 cont$f:25,c:22$
 <$f:25,c:27$
 0$f:25,c:29$
-{
+)<or>$f:25,c:32$
+(nombres$f:25,c:36$
+.
+cont$f:25,c:44$
+>$f:25,c:49$
+50$f:25,c:51$
+){
 <write>
 "Introduce el número de nombres a ordenar (max 50): "$f:26,c:16$
 ;
@@ -1636,7 +1658,7 @@ fin$f:57,c:13$
 @
 fin$f:59,c:11$
 =$f:59,c:15$
-<false>$f:-1,c:-1$
+<false>$f:59,c:17$
 ;
 @
 padre$f:60,c:11$
@@ -1711,7 +1733,7 @@ act$f:72,c:16$
 @
 fin$f:73,c:20$
 =$f:73,c:24$
-<true>$f:-1,c:-1$
+<true>$f:73,c:26$
 }
 <else>
 {
@@ -1731,7 +1753,7 @@ i$f:76,c:50$
 @
 fin$f:77,c:21$
 =$f:77,c:25$
-<true>$f:-1,c:-1$
+<true>$f:77,c:27$
 }
 }
 ;
