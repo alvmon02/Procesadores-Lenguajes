@@ -493,7 +493,7 @@ PARSER_END(ConstructorASTsTiny)
     { Exp exp0, exp1; } 
     {
       exp0 = e4() exp1 = fe3(exp0)
-        { return exp0; }
+        { return exp1; }
     }
 
   Exp fe3(Exp exph): 
@@ -502,9 +502,9 @@ PARSER_END(ConstructorASTsTiny)
       op = <and> exp = e3()
         { return (Exp)sem.e_and(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn); }
       | 
-      op = <or> exp = e4() 
+      op = <or> exp = e4()
         { return (Exp)sem.e_or(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn); }
-      | 
+      |
         { return exph; }
     }
 
@@ -579,10 +579,10 @@ PARSER_END(ConstructorASTsTiny)
     { Token id; }
     {
       id = <t_true>
-        { return sem.e_true(); }
+        { return (Exp)sem.e_true().ponFila(id.beginLine).ponCol(id.beginColumn); }
       | 
       id = <t_false>
-        { return sem.e_false(); }
+        { return (Exp)sem.e_false().ponFila(id.beginLine).ponCol(id.beginColumn); }
     }
 
   Exp e8(): 
