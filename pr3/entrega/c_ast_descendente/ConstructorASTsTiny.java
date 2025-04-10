@@ -1001,7 +1001,7 @@ Exp exp0, exp1; Token op;
 Exp exp0, exp1;
       exp0 = e4();
       exp1 = fe3(exp0);
-{if ("" != null) return exp0;}
+{if ("" != null) return exp1;}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("e3");
@@ -1202,12 +1202,12 @@ Token id;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case t_true:{
         id = jj_consume_token(t_true);
-{if ("" != null) return sem.e_true();}
+{if ("" != null) return (Exp)sem.e_true().ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
         }
       case t_false:{
         id = jj_consume_token(t_false);
-{if ("" != null) return sem.e_false();}
+{if ("" != null) return (Exp)sem.e_false().ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
         }
       default:
