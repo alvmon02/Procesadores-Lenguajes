@@ -1,0 +1,139 @@
+var conjunto
+
+pretipado(prog(decs, intrs)):
+    pretipado(decs)
+
+pretipado(si_decs(decs)):
+    pretipado(decs)
+
+pretipado(no_decs()):
+    noop
+
+pretipado(mas_decs(decs, dec)):
+    pretipado(decs)
+    pretipado(dec)
+
+pretipado(una_dec(dec)):
+    pretipado(dec)
+
+pretipado(dec_var(tipo, id)):
+    pretipado(tipo)
+
+pretipado(dec_tipo(tipo, id)):
+    pretipado(tipo)
+
+pretipado(dec_proc(id, pforms, prog)):
+    pretipado(pforms)
+    pretipado(prog)
+
+pretipado(si_pforms(pfroms)):
+    pretipado(pforms)
+
+pretipado(no_pforms()):
+    noop
+
+pretipado(mas_pforms(pforms, pform)):
+    pretipado(pforms)
+    pretipado(pform)
+
+pretipado(una_pform(pform)):
+    pretipado(pform)
+
+pretipado(pform(tipo, ref, id)):
+    pretipado(tipo)
+
+// si_ref() no aplica
+
+// no_ref() no aplica
+
+pretipado(t_iden(id)):
+    if $.vinculo != dec_tipo(_, _) then
+        error
+    end if
+
+pretipado(t_string()):
+    noop
+
+pretipado(t_int()):
+    noop
+
+pretipado(t_bool()):
+    noop
+
+pretipado(t_real()):
+    noop
+
+pretipado(t_array(tipo, ent)):
+    pretipado(tipo)
+    if int(ent) <= 0 then // El tamaño de un array debe ser mayor que 0
+        error
+    end if
+
+pretipado(t_punter(tipo)):
+    pretipado(tipo)
+
+pretipado(t_struct(camposs)):
+    conjunto = creaconjunto()
+    pretipado(camposs)
+
+pretipado(mas_cmp_s(camposs, campos)):
+    pretipado(camposs)
+    pretipado(campos)
+
+pretipado(un_cmp_s(campos)):
+    pretipado(campos)
+
+pretipado(cmp_s(tipo, id)):
+    pretipado(tipo)
+    if conjunto.contiene(id) then // El campo ya existe
+        error
+    else
+        conjunto.inserta(id) // Inserta el campo en el conjunto
+    end if
+
+// si_intrs(intrs) no aplica
+// no_intrs() no aplica
+// mas_intrs(intrs, intr) no aplica
+// una_intr(intr) no aplica
+// i_eval(exp) no aplica
+// i_if(exp, prog, ielse) no aplica
+// i_while(exp, prog) no aplica
+// i_read(exp) no aplica
+// i_write(exp) no aplica
+// i_nl() no aplica
+// i_new(exp) no aplica
+// i_delete(exp) no aplica
+// i_call(id, preals) no aplica
+// i_prog(prog) no aplica
+// si_else(prog) no aplica
+// no_else() no aplica
+// si_preals(preals) no aplica
+// no_preals() no aplica
+// mas_preals(preals, exp) no aplica
+// un_preals(exp) no aplica
+// e_asig(opnd0, opnd1) no aplica
+// e_comp(opnd0, opnd1) no aplica
+// e_dist(opnd0, opnd1) no aplica
+// e_lt(opnd0, opnd1) no aplica
+// e_gt(opnd0, opnd1) no aplica
+// e_leq(opnd0, opnd1) no aplica
+// e_geq(opnd0, opnd1) no aplica
+// e_suma(opnd0, opnd1) no aplica
+// e_resta(opnd0, opnd1) no aplica
+// e_and(opnd0, opnd1) no aplica
+// e_or(opnd0, opnd1) no aplica
+// e_mul(opnd0, opnd1) no aplica
+// e_div(opnd0, opnd1) no aplica
+// e_porcentaje(opnd0, opnd1) no aplica
+// e_negativo(opnd) no aplica
+// e_negado(opnd) no aplica
+// e_indexado(opnd0, opnd1) no aplica
+// e_campo(opnd, id) no aplica
+// e_puntero(opnd) no aplica
+// e_lit_ent(num) no aplica
+// e_lit_real(num) no aplica
+// e_true() no aplica
+// e_false() no aplica
+// e_string(string) no aplica
+// e_iden(id) no aplica
+// e_null() no aplica
