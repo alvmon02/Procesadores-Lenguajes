@@ -1,0 +1,210 @@
+ambos_ok(t0, t1):
+    if t0 == ok && t1 == ok then
+        return ok
+    else
+        return error
+    end if
+    
+tipado(prog(decs, intrs)):
+    tipado(decs)
+    tipado(intrs)
+    $.tipo = ambos_ok(decs.tipo, intrs.tipo)
+
+tipado(si_decs(decs)):
+    tipado(decs)
+    $.tipo = decs.tipo
+
+tipado(no_decs()):
+    $.tipo = ok
+
+tipado(mas_decs(decs, dec)):
+    tipado(decs)
+    tipado(dec)
+    $.tipo = ambos_ok(decs.tipo, dec.tipo)
+
+tipado(una_dec(dec)):
+    tipado(dec)
+    $.tipo = dec.tipo
+    
+tipado(dec_var(tipo, id)):
+    $.tipo = ok
+
+tipado(dec_tipo(tipo, id)):
+    $.tipo = ok
+
+tipado(dec_proc(id, pforms, prog)):
+    tipado(prog)
+
+// si_pforms(pfroms) no aplica
+    
+// no_pforms() no aplica
+
+// mas_pforms(pforms, pform) no aplica
+
+// una_pform(pform) no aplica
+
+// pform(tipo, ref, id) no aplica
+
+// si_ref() no aplica
+
+// no_ref() no aplica
+
+// t_iden(id) no aplica
+
+// t_string() no aplica
+
+// t_int() no aplica
+
+// t_bool() no aplica
+
+// t_real() no aplica
+
+// t_array(tipo, ent) no aplica
+
+// t_punter(tipo) no aplica
+
+// t_struct(camposs) no aplica
+
+// mas_cmp_s(camposs, campos) no aplica
+
+// un_cmp_s(campos) no aplica
+
+// cmp_s(tipo, id) no aplica
+
+tipado(si_intrs(intrs)):
+
+
+tipado(no_intrs()):
+
+
+tipado(mas_intrs(intrs, intr)):
+
+
+tipado(una_intr(intr)):
+
+
+tipado(i_eval(exp)):
+
+
+tipado(i_if(exp, prog, ielse)):
+
+
+tipado(i_while(exp, prog)):
+
+
+tipado(i_read(exp)):
+
+
+tipado(i_write(exp)):
+
+
+tipado(i_nl()):
+
+
+tipado(i_new(exp)):
+
+
+tipado(i_delete(exp)):
+
+
+tipado(i_call(id, preals)):
+
+
+tipado(i_prog(prog)):
+
+
+tipado(si_else(prog)):
+
+
+tipado(no_else()):
+
+
+tipado(si_preals(preals)):
+
+
+tipado(no_preals()):
+
+
+tipado(mas_preals(preals, exp)):
+
+
+tipado(un_preals(exp)):
+
+
+tipado(e_asig(opnd0, opnd1)):
+
+
+tipado(e_comp(opnd0, opnd1)):
+
+
+tipado(e_dist(opnd0, opnd1)):
+
+
+tipado(e_lt(opnd0, opnd1)):
+
+
+tipado(e_gt(opnd0, opnd1)):
+
+
+tipado(e_leq(opnd0, opnd1)):
+
+
+tipado(e_geq(opnd0, opnd1)):
+
+
+tipado(e_suma(opnd0, opnd1)):
+
+
+tipado(e_resta(opnd0, opnd1)):
+
+
+tipado(e_and(opnd0, opnd1)):
+
+
+tipado(e_or(opnd0, opnd1)):
+
+
+tipado(e_mul(opnd0, opnd1)):
+
+
+tipado(e_div(opnd0, opnd1)):
+
+
+tipado(e_porcentaje(opnd0, opnd1)):
+
+
+tipado(e_negativo(opnd)):
+
+
+tipado(e_negado(opnd)):
+
+
+tipado(e_indexado(opnd0, opnd1)):
+
+
+tipado(e_campo(opnd, id)):
+
+
+tipado(e_puntero(opnd)):
+
+
+tipado(e_lit_ent(num)):
+
+
+tipado(e_lit_real(num)):
+
+
+tipado(e_true()):
+
+
+tipado(e_false()):
+
+
+tipado(e_string(string)):
+
+
+tipado(e_iden(id)):
+
+
+tipado(e_null()):
+
