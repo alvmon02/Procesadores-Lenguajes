@@ -25,34 +25,49 @@ vincula(prog(decs, intrs)):
     cierraAmbito(ts)
 
 recolectaDecs(si_decs(decs)):
-    recolectaDecs(decs)
+    recolectaDecs1(decs)
+    recolectaDecs2(decs)
 
 recolectaDecs(no_decs()):
     noop
 
-recolectaDecs(mas_decs(decs, dec)):
-    recolectaDecs(decs)
-    recolectaDec(dec)
+recolectaDecs1(mas_decs(decs, dec)):
+    recolectaDecs1(decs)
+    recolectaDec1(dec)
     
-recolectaDecs(una_dec(dec)):
-    recolectaDec(dec)
+recolectaDecs2(mas_decs(decs, dec)):
+    recolectaDecs2(decs)
+    recolectaDec2(dec)
 
-recolectaDec(dec_var(tipo, id)):
-    vincula(tipo)
+recolectaDecs1(una_dec(dec)):
+    recolectaDec1(dec)
+
+recolectaDecs2(una_dec(dec)):
+    recolectaDec2(dec)
+
+recolectaDec1(dec_var(tipo, id)):
+    vincula1(tipo)
     contiene_inserta(id)
 
-recolectaDec(dec_tipo(tipo, id)):
-    vincula(tipo)
+recolectaDec2(dec_var(tipo, id)):
+    vincula2(tipo)
+
+recolectaDec1(dec_tipo(tipo, id)):
+    vincula1(tipo)
     contiene_inserta(id)
 
+recolectaDec2(dec_tipo(tipo, id)):
+    vincula2(tipo)
 
-recolectaDec(dec_proc(id, pforms, prog)):
+recolectaDec1(dec_proc(id, pforms, prog)):
     contiene_inserta(id)
     abreAmbito(ts)
     recolectaPForms(pforms)
     vincula(prog)
     cierraAmbito(ts)
 
+recolectaDec2(dec_proc(id, pforms, prog)):
+    noop
 
 recolectaPForms(si_pforms(pfroms)):
     recolectaPForms(pforms)
@@ -71,46 +86,64 @@ recolectaPForm(pform(tipo, ref, id)):
     vincula(tipo)
     contiene_inserta(id)
 
-si_ref() // No afecta
+// si_ref() No afecta
 
-no_ref() // No afecta
+// no_ref() No afecta
 
-vincula(t_iden(id)):
+vincula1(t_iden(id)):
     vinculaId(id)
 
-vincula(t_string()):
+vincula2(t_iden(id)):
     noop
 
-vincula(t_int()):
+vincula1(t_string()):
     noop
 
-vincula(t_bool()):
+vincula2(t_string()):
     noop
 
-vincula(t_real()):
+vincula1(t_int()):
     noop
 
-vincula(t_array(tipo, ent)):
-    vincula(tipo)
+vincula2(t_int()):
+    noop
 
-vincula(t_punter(tipo)):
-    // TODO Hay que mirar como funciona lo de los punteros, si hay que hacer dos pasadas o qué
+vincula1(t_bool()):
+    noop
+
+vincula2(t_bool()):
+    noop
+
+vincula1(t_real()):
+    noop
+
+vincula2(t_real()):
+    noop
+
+vincula1(t_array(tipo, ent)):
+    vincula1(tipo)
+
+vincula2(t_array(tipo, ent)):
+    vincula2(tipo)
+
+vincula1(t_punter(tipo)):
+    if tipo != t_iden(_) then
+        vincula1(tipo)
+    end if
+
+vincula2(t_punter(tipo)):
+    if tipo == t_iden(_) then
+        vincula1(tipo)
+    else
+        vincula2(tipo)
+    end if
 
 vincula(t_struct(camposs)):
-    abreAmbito(ts)
-    recolectaCamposS(camposs)
-    cierraAmbito(ts)
+    noop // Se hace en el pretipado
 
-recolectaCamposS(mas_cmp_s(camposs, campos)):
-    recolectaCamposS(camposs)
-    recolectaCampoS(campos)
-    
-recolectaCamposS(un_cmp_s(campos)):
-    recolectaCampoS(campos)
-
-recolectaCampoS(cmp_s(tipo, id)):
-    vincula(tipo)
-    contiene_inserta(id)
+// mas_cmp_s(camposs, campos) no aplica
+// un_cmp_s(campos) no aplica
+// cmp_s(tipo, id) no aplica
 
 vincula(si_intrs(intrs)):
     vincula(intrs)
@@ -249,7 +282,6 @@ vincula(e_campo(opnd, id)):
     // Aqui no habria que hacer vincula, no? porque lo haria comprobando tipos?
 
 vincula(e_puntero(opnd)):
-    // TODO aqui hay que revisar lo de los punteros
     vincula(opnd)
 
 vincula(e_lit_ent(num)):
