@@ -29,6 +29,8 @@ public class SintaxisAbstractaTiny {
 
         private int col;
 
+        private Nodo vinculo = null;
+
         public Nodo ponFila(int fila) {
             this.fila = fila;
             return this;
@@ -36,6 +38,11 @@ public class SintaxisAbstractaTiny {
 
         public Nodo ponCol(int col) {
             this.col = col;
+            return this;
+        }
+
+        public Nodo ponVinculo(Nodo vinculo) {
+            this.vinculo = vinculo;
             return this;
         }
 
@@ -47,12 +54,23 @@ public class SintaxisAbstractaTiny {
             return col;
         }
 
+        public Nodo leeVinculo() {
+            return this.vinculo;
+        }
+
         public abstract void procesa(Procesamiento p);
+
+        public abstract void procesa2(Procesamiento p);
 
         public abstract void imprime();
     }
 
     public static class Prog extends Nodo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private DecsOpt decs;
         private IntrsOpt intrs;
 
@@ -98,6 +116,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Si_Decs extends DecsOpt {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LDecs decs;
 
         public Si_Decs(LDecs decs) {
@@ -125,6 +148,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class No_Decs extends DecsOpt {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public No_Decs() {
             super();
         }
@@ -158,6 +186,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mas_Decs extends LDecs {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LDecs decs;
         private Dec dec;
 
@@ -192,6 +225,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Una_Dec extends LDecs {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Dec dec;
 
         public Una_Dec(Dec dec) {
@@ -240,6 +278,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Dec_Var extends Dec {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Tipo tipo;
         private String id;
 
@@ -273,6 +316,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Dec_Tipo extends Dec {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Tipo tipo;
         private String id;
 
@@ -307,6 +355,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Dec_Proc extends Dec {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String id;
         private PForms pforms;
         private Prog prog;
@@ -359,6 +412,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Si_PForms extends PForms {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LPForms pforms;
 
         public Si_PForms(LPForms pforms) {
@@ -385,6 +443,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class No_PForms extends PForms {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public No_PForms() {
             super();
         }
@@ -418,6 +481,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mas_PForms extends LPForms {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LPForms pforms;
         private PForm pform;
 
@@ -452,6 +520,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Una_PForm extends LPForms {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private PForm pform;
 
         public Una_PForm(PForm pform) {
@@ -478,6 +551,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class PForm extends Nodo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Tipo tipo;
         private Ref ref;
         private String id;
@@ -524,6 +602,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Si_Ref extends Ref {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Si_Ref() {
             super();
         }
@@ -543,6 +626,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class No_Ref extends Ref {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public No_Ref() {
             super();
         }
@@ -584,6 +672,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Iden extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String id;
 
         public T_Iden(String id) {
@@ -610,6 +703,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_String extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public T_String() {
             super();
         }
@@ -629,6 +727,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Int extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public T_Int() {
             super();
         }
@@ -648,6 +751,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Bool extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public T_Bool() {
             super();
         }
@@ -667,6 +775,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Real extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public T_Real() {
             super();
         }
@@ -686,6 +799,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Array extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Tipo tipo;
         private String ent;
 
@@ -719,6 +837,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Puntero extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Tipo tipo;
 
         public T_Puntero(Tipo tipo) {
@@ -746,6 +869,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class T_Struct extends Tipo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private CamposS camposS;
 
         public T_Struct(CamposS camposS) {
@@ -789,6 +917,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mas_Cmp_S extends CamposS {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private CamposS camposS;
         private CampoS campoS;
 
@@ -822,6 +955,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Un_Cmp_S extends CamposS {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private CampoS campoS;
 
         public Un_Cmp_S(CampoS campoS) {
@@ -847,6 +985,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class CampoS extends Nodo {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Tipo tipo;
         private String id;
 
@@ -889,6 +1032,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Si_Intrs extends IntrsOpt {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LIntrs intrs;
 
         public Si_Intrs(LIntrs intrs) {
@@ -915,6 +1063,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class No_Intrs extends IntrsOpt {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public No_Intrs() {
             super();
         }
@@ -948,6 +1101,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mas_Intrs extends LIntrs {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LIntrs intrs;
         private Intr intr;
 
@@ -982,6 +1140,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Una_Intr extends LIntrs {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Intr intr;
 
         public Una_Intr(Intr intr) {
@@ -1034,6 +1197,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_Eval extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
 
         public I_Eval(Exp exp) {
@@ -1061,6 +1229,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_If extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
         private Prog prog;
         private I_Else i_else;
@@ -1102,6 +1275,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_While extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
         private Prog prog;
 
@@ -1136,6 +1314,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_Read extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
 
         public I_Read(Exp exp) {
@@ -1163,6 +1346,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_Write extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
 
         public I_Write(Exp exp) {
@@ -1190,6 +1378,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_NL extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public I_NL() {
             super();
         }
@@ -1209,6 +1402,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_New extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
 
         public I_New(Exp exp) {
@@ -1236,6 +1434,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_Delete extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
 
         public I_Delete(Exp exp) {
@@ -1263,6 +1466,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_Call extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String id;
         private PReals preals;
 
@@ -1297,6 +1505,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class I_Prog extends Intr {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Prog prog;
 
         public I_Prog(Prog prog) {
@@ -1333,6 +1546,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Si_Else extends I_Else {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Prog prog;
 
         public Si_Else(Prog prog) {
@@ -1360,6 +1578,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class No_Else extends I_Else {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public No_Else() {
             super();
         }
@@ -1389,6 +1612,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Si_PReals extends PReals {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LPReals preals;
 
         public Si_PReals(LPReals preals) {
@@ -1417,6 +1645,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class No_PReals extends PReals {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public No_PReals() {
             super();
         }
@@ -1451,6 +1684,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mas_PReals extends LPReals {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private LPReals preals;
         private Exp exp;
 
@@ -1485,6 +1723,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Un_PReal extends LPReals {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp exp;
 
         public Un_PReal(Exp exp) {
@@ -1571,6 +1814,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Asig extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Asig(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1595,6 +1843,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Comp extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Comp(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1619,6 +1872,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Dist extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Dist(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1643,6 +1901,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Menor extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Menor(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1667,6 +1930,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mayor extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Mayor(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1691,6 +1959,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class MenorIgual extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public MenorIgual(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1715,6 +1988,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class MayorIgual extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public MayorIgual(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1739,6 +2017,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Suma extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Suma(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1763,6 +2046,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Resta extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Resta(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1787,6 +2075,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class And extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public And(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1811,6 +2104,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Or extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Or(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1835,6 +2133,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Mul extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Mul(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1859,6 +2162,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Div extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Div(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1883,6 +2191,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Porcentaje extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Porcentaje(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1907,6 +2220,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Negativo extends ExpUni {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Negativo(Exp opnd) {
             super(opnd);
         }
@@ -1933,6 +2251,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Negado extends ExpUni {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Negado(Exp opnd) {
             super(opnd);
         }
@@ -1958,6 +2281,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Index extends ExpBin {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Index(Exp opnd0, Exp opnd1) {
             super(opnd0, opnd1);
         }
@@ -1985,6 +2313,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Acceso extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private Exp opnd;
         private String id;
 
@@ -2024,6 +2357,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Indireccion extends ExpUni {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Indireccion(Exp opnd) {
             super(opnd);
         }
@@ -2049,6 +2387,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Lit_ent extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String num;
 
         public Lit_ent(String num) {
@@ -2080,6 +2423,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Lit_real extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String num;
 
         public Lit_real(String num) {
@@ -2111,6 +2459,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class True extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public True() {
             super();
         }
@@ -2135,6 +2488,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class False extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public False() {
             super();
         }
@@ -2159,6 +2517,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Cadena extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String string;
 
         public Cadena(String string) {
@@ -2190,6 +2553,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Iden extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         private String id;
 
         public Iden(String id) {
@@ -2221,6 +2589,11 @@ public class SintaxisAbstractaTiny {
     }
 
     public static class Null extends Exp {
+
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+
         public Null() {
             super();
         }
