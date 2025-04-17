@@ -72,139 +72,249 @@ tipado(dec_proc(id, pforms, prog)):
 // cmp_s(tipo, id) no aplica
 
 tipado(si_intrs(intrs)):
-
+    tipado(intrs)
+    $.tipo = intrs.tipo
 
 tipado(no_intrs()):
-
+    $.tipo = ok
 
 tipado(mas_intrs(intrs, intr)):
-
+    tipado(intrs)
+    tipado(intr)
+    $.tipo = ambos_ok(intrs.tipo, intr.tipo)
 
 tipado(una_intr(intr)):
-
+    tipado(intr)
+    $.tipo = intr.tipo
 
 tipado(i_eval(exp)):
-
+    tipado(exp)
+    if exp.tipo == error then
+        $.tipo = error
+    else
+        $.tipo = ok
+    end if
 
 tipado(i_if(exp, prog, ielse)):
-
+    tipado(exp)
+    tipado(prog)
+    tipado(ielse)
+    if exp.tipo == BOOL && prog.tipo == ok && prog.tipo == ok then
+        $.tipo = ok
+    else
+        $.tipo = error
+    end if
 
 tipado(i_while(exp, prog)):
-
+    tipado(exp)
+    tipado(prog)
+    if exp.tipo == BOOL && prog.tipo == ok then
+        $.tipo = ok
+    else
+        $.tipo = error
+    end if
 
 tipado(i_read(exp)):
-
+    tipado(exp)
+    if (exp.tipo == INT || exp.tipo == REAL || exp.tipo == STRING) && exp == e_iden(_) then
+        $.tipo = ok
+    else
+        $.tipo = error
+    end if
 
 tipado(i_write(exp)):
-
+    tipado(exp)
+    if exp.tipo == INT || exp.tipo == REAL || exp.tipo == BOOL || exp.tipo == STRING then
+        $.tipo = ok
+    else
+        $.tipo = error
+    end if
 
 tipado(i_nl()):
-
+    $.tipo = ok
 
 tipado(i_new(exp)):
-
+    tipado(exp)
+    if exp.tipo == PUNT then
+        $.tipo = ok
+    else
+        $.tipo = error
+    end if
 
 tipado(i_delete(exp)):
-
+    tipado(exp)
+    if exp.tipo == PUNT then
+        $.tipo = ok
+    else
+        $.tipo = error
+    end if
 
 tipado(i_call(id, preals)):
-
+    
+    if // TODO comprobar que los parametros reales coinciden con los formales de la declaracion del procedimiento
 
 tipado(i_prog(prog)):
-
+    tipado(prog)
+    $.tipo = prog.tipo
 
 tipado(si_else(prog)):
-
+    tipado(prog)
+    $.tipo = prog.tipo
 
 tipado(no_else()):
-
+    $.tipo = ok
 
 tipado(si_preals(preals)):
-
+    // TODO
 
 tipado(no_preals()):
-
+    // TODO
 
 tipado(mas_preals(preals, exp)):
-
+    // TODO
 
 tipado(un_preals(exp)):
-
+    // TODO
 
 tipado(e_asig(opnd0, opnd1)):
+    tipado(opnd0)
+    tipado(opnd1)
+    if (exp == e_iden(_) || exp == e_campo(_, _) || exp == e_indexado(_, _) || exp == e_puntero(_)) && compatibles(opnd0.tipo, opnd1.tipo) then
+        $.tipo = opnd0.tipo
+    else
+        $.tipo = error
+    end if
 
+tipado_comp(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if ((t0 == PUNT || t0 == NULL) && (t1 == PUNT || t1 == NULL)) || (t0 == STRING && t1 == STRING) || (t0 == BOOL && t1 == BOOL) || ((t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL)) then
+        $.tipo = BOOL
+    else
+        $.tipo = error
+    end if
+
+tipado_comp_ord(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if (t0 == STRING && t1 == STRING) || (t0 == BOOL && t1 == BOOL) || ((t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL)) then
+        $.tipo = BOOL
+    else
+        $.tipo = error
+    end if
 
 tipado(e_comp(opnd0, opnd1)):
-
+    tipado_comp(opnd0, opnd1)
 
 tipado(e_dist(opnd0, opnd1)):
-
+    tipado_comp(opnd0, opnd1)
 
 tipado(e_lt(opnd0, opnd1)):
-
+    tipado_comp_ord(opnd0, opnd1)
 
 tipado(e_gt(opnd0, opnd1)):
-
+    tipado_comp_ord(opnd0, opnd1)
 
 tipado(e_leq(opnd0, opnd1)):
-
+    tipado_comp_ord(opnd0, opnd1)
 
 tipado(e_geq(opnd0, opnd1)):
+    tipado_comp_ord(opnd0, opnd1)
 
+tipado_arit(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if (t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL) then
+        $.tipo = (t0 == REAL || t1 == REAL) ? REAL : INT
+    else
+        $.tipo = error
+    end if
 
 tipado(e_suma(opnd0, opnd1)):
-
+    tipado_arit(opnd0, opnd1)
 
 tipado(e_resta(opnd0, opnd1)):
+    tipado_arit(opnd0, opnd1)
 
+tipado_and_or(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if t0 == BOOL && t1 == BOOL then
+        $.tipo = BOOL
+    else
+        $.tipo = error
+    end if
 
 tipado(e_and(opnd0, opnd1)):
-
+    tipado_and_or(opnd0, opnd1)
 
 tipado(e_or(opnd0, opnd1)):
-
+    tipado_and_or(opnd0, opnd1)
 
 tipado(e_mul(opnd0, opnd1)):
-
+    tipado_arit(opnd0, opnd1)
 
 tipado(e_div(opnd0, opnd1)):
-
+    tipado_arit(opnd0, opnd1)
 
 tipado(e_porcentaje(opnd0, opnd1)):
-
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if t0 == INT && t1 == INT then
+        $.tipo = INT
+    else
+        $.tipo = error
+    end if
 
 tipado(e_negativo(opnd)):
-
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t == INT || t == REAL then
+        $.tipo = t
+    else
+        $.tipo = error
+    end if
 
 tipado(e_negado(opnd)):
-
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t == BOOL then
+        $.tipo = BOOL
+    else
+        $.tipo = error
+    end if
 
 tipado(e_indexado(opnd0, opnd1)):
-
+    // TODO
 
 tipado(e_campo(opnd, id)):
-
+    // TODO
 
 tipado(e_puntero(opnd)):
-
+    $.tipo = PUNT
 
 tipado(e_lit_ent(num)):
-
+    $.tipo = INT
 
 tipado(e_lit_real(num)):
-
+    $.tipo = REAL
 
 tipado(e_true()):
-
+    $.tipo = BOOL
 
 tipado(e_false()):
-
+    $.tipo = BOOL
 
 tipado(e_string(string)):
-
+    $.tipo = STRING
 
 tipado(e_iden(id)):
 
-
 tipado(e_null()):
-
+    $.tipo = NULL
+// TODO revisar
