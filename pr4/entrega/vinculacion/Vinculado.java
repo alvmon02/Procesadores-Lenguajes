@@ -66,7 +66,9 @@ public class Vinculado extends ProcesamientoDef {
         if (this.tablaSimbolos.contiene(id)) {
             errorProcesamientos.add(ErrorVinculacion.errorDuplicado(nodo.leeFila(), nodo.leeCol(), id));
         }
-        this.tablaSimbolos.inserta(id, nodo);
+        else {
+            this.tablaSimbolos.inserta(id, nodo);
+        }
     }
 
     private void vinculaId(String id, Nodo nodo) {
@@ -80,6 +82,11 @@ public class Vinculado extends ProcesamientoDef {
 
     public Vinculado() {
         this.tablaSimbolos = new TablaSimbolos();
+    }
+
+    public Vinculado vincula(Prog prog) {
+        procesa(prog);
+        return this;
     }
 
     @Override

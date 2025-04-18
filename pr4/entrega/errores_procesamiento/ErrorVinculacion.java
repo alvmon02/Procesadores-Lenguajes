@@ -35,7 +35,7 @@ public class ErrorVinculacion extends ErrorProcesamiento {
     }
 
     public String toStringJuez() {
-        return "Errores_vinculacion fila:" + fila + " col" + columna;
+        return "Errores_vinculacion fila:" + fila + " col:" + columna;
     }
 
     public String toStringHumano() {

@@ -7,6 +7,8 @@ import java.io.Reader;
 import c_ast_ascendente.GestionErroresTiny.*;
 import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
+import errores_procesamiento.ErrorProcesamiento;
+import vinculacion.Vinculado;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,17 +48,14 @@ public class Main {
 					try {
 						AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
 						c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
-						System.out.println("CONSTRUCCION AST ASCENDENTE");
-						Prog prog = (Prog) asint.debug_parse().value;
+						Prog prog = (Prog) asint.parse().value;
 
-						System.out.println("IMPRESION RECURSIVA");
-						new recursiva.Impresion().imprime(prog);
-
-						System.out.println("IMPRESION INTERPRETE");
-						prog.imprime();
-
-						System.out.println("IMPRESION VISITANTE");
-						prog.procesa(new visitante.Impresion());
+						Vinculado vinculado = new Vinculado();
+						if (vinculado.vincula(prog).hayErrores()) {
+							for (ErrorProcesamiento e : vinculado.errores()) {
+								System.out.println(e.toStringJuez());
+							}
+						}
 					} catch (ErrorLexico e) {
 						System.out.println("ERROR_LEXICO");
 					} catch (ErrorSintactico e) {
@@ -67,17 +66,15 @@ public class Main {
 					try {
 						c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(
 								input);
-						System.out.println("CONSTRUCCION AST DESCENDENTE");
+								asint.disable_tracing();
 						Prog prog = asint.analiza();
 
-						System.out.println("IMPRESION RECURSIVA");
-						new recursiva.Impresion().imprime(prog);
-
-						System.out.println("IMPRESION INTERPRETE");
-						prog.imprime();
-
-						System.out.println("IMPRESION VISITANTE");
-						prog.procesa(new visitante.Impresion());
+						Vinculado vinculado = new Vinculado();
+						if (vinculado.vincula(prog).hayErrores()) {
+							for (ErrorProcesamiento e : vinculado.errores()) {
+								System.out.println(e.toStringJuez());
+							}
+						}
 					} catch (TokenMgrError e) {
 						System.out.println("ERROR_LEXICO");
 					} catch (ParseException e) {
