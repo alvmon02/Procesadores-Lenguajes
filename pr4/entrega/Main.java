@@ -13,10 +13,8 @@ import vinculacion.Vinculado;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.ByteArrayOutputStream;
 
 public class Main {
 
@@ -44,43 +42,7 @@ public class Main {
 				Reader input = new InputStreamReader(new FileInputStream(directorioPath + "/" + archivo));
 				PrintStream output = new PrintStream(new FileOutputStream(directorioPath + "/" + outputName));
 				System.setOut(output);
-				if (input.read() == 97) { // Reconocer a
-					try {
-						AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
-						c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
-						Prog prog = (Prog) asint.parse().value;
-
-						Vinculado vinculado = new Vinculado();
-						if (vinculado.vincula(prog).hayErrores()) {
-							for (ErrorProcesamiento e : vinculado.errores()) {
-								System.out.println(e.toStringJuez());
-							}
-						}
-					} catch (ErrorLexico e) {
-						System.out.println("ERROR_LEXICO");
-					} catch (ErrorSintactico e) {
-						System.out.println("ERROR_SINTACTICO");
-					}
-				} else { // si no es a(en su defecto, es decir, d)
-
-					try {
-						c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(
-								input);
-								asint.disable_tracing();
-						Prog prog = asint.analiza();
-
-						Vinculado vinculado = new Vinculado();
-						if (vinculado.vincula(prog).hayErrores()) {
-							for (ErrorProcesamiento e : vinculado.errores()) {
-								System.out.println(e.toStringJuez());
-							}
-						}
-					} catch (TokenMgrError e) {
-						System.out.println("ERROR_LEXICO");
-					} catch (ParseException e) {
-						System.out.println("ERROR_SINTACTICO");
-					}
-				}
+				ejecturarPrograma(input);
 				output.close();
 			}
 		} else {
@@ -90,24 +52,24 @@ public class Main {
 	}
 
 	public static void main_archivo(String[] args) throws FileNotFoundException, IOException, Exception {
-		PrintStream salida = System.out;
 		Reader input = new InputStreamReader(new FileInputStream(args[0]));
-		if (input.read() == 97) { // Reconocer a
+		ejecturarPrograma(input);
+	}
 
+	private static void ejecturarPrograma(Reader input) throws FileNotFoundException, IOException, Exception {
+		if (input.read() == 97) { // Reconocer a
 			try {
 				AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
 				c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
-				System.out.println("CONSTRUCCION AST ASCENDENTE");
-				Prog prog = (Prog) asint.debug_parse().value;
+				Prog prog = (Prog) asint.parse().value;
 
-				System.out.println("IMPRESION RECURSIVA");
-				new recursiva.Impresion().imprime(prog);
-
-				System.out.println("IMPRESION INTERPRETE");
-				prog.imprime();
-
-				System.out.println("IMPRESION VISITANTE");
-				prog.procesa(new visitante.Impresion());
+				Vinculado vinculado = new Vinculado();
+				if (vinculado.vincula(prog).hayErrores()) {
+					for (ErrorProcesamiento e : vinculado.errores()) {
+						System.out.println(e.toStringJuez());
+					}
+					return;
+				}
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ErrorSintactico e) {
@@ -116,18 +78,18 @@ public class Main {
 		} else { // si no es a(en su defecto, es decir, d)
 
 			try {
-				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(input);
-				System.out.println("CONSTRUCCION AST DESCENDENTE");
+				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(
+						input);
+				asint.disable_tracing();
 				Prog prog = asint.analiza();
 
-				System.out.println("IMPRESION RECURSIVA");
-				new recursiva.Impresion().imprime(prog);
-
-				System.out.println("IMPRESION INTERPRETE");
-				prog.imprime();
-
-				System.out.println("IMPRESION VISITANTE");
-				prog.procesa(new visitante.Impresion());
+				Vinculado vinculado = new Vinculado();
+				if (vinculado.vincula(prog).hayErrores()) {
+					for (ErrorProcesamiento e : vinculado.errores()) {
+						System.out.println(e.toStringJuez());
+					}
+					return;
+				}
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ParseException e) {
@@ -135,31 +97,4 @@ public class Main {
 			}
 		}
 	}
-
-	private static class NullPrintStream extends PrintStream {
-
-		public NullPrintStream() {
-			super(new NullByteArrayOutputStream());
-		}
-
-		private static class NullByteArrayOutputStream extends ByteArrayOutputStream {
-
-			@Override
-			public void write(int b) {
-				// do nothing
-			}
-
-			@Override
-			public void write(byte[] b, int off, int len) {
-				// do nothing
-			}
-
-			@Override
-			public void writeTo(OutputStream out) throws IOException {
-				// do nothing
-			}
-		}
-
-	}
-
 }
