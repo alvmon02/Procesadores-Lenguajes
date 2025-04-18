@@ -54,7 +54,7 @@ public class SintaxisAbstractaTiny {
             return col;
         }
 
-        public Nodo leeVinculo() {
+        public Nodo vinculo() {
             return this.vinculo;
         }
 
