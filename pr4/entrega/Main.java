@@ -8,6 +8,7 @@ import c_ast_ascendente.GestionErroresTiny.*;
 import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
 import errores_procesamiento.ErrorProcesamiento;
+import pretipado.Pretipado;
 import vinculacion.Vinculado;
 
 import java.io.File;
@@ -70,6 +71,13 @@ public class Main {
 					}
 					return;
 				}
+				Pretipado pretipado = new Pretipado();
+				if (pretipado.pretipa(prog).hayErrores()) {
+					for (ErrorProcesamiento e : pretipado.errores()) {
+						System.out.println(e.toStringJuez());
+					}
+					return;
+				}
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ErrorSintactico e) {
@@ -86,6 +94,13 @@ public class Main {
 				Vinculado vinculado = new Vinculado();
 				if (vinculado.vincula(prog).hayErrores()) {
 					for (ErrorProcesamiento e : vinculado.errores()) {
+						System.out.println(e.toStringJuez());
+					}
+					return;
+				}
+				Pretipado pretipado = new Pretipado();
+				if (pretipado.pretipa(prog).hayErrores()) {
+					for (ErrorProcesamiento e : pretipado.errores()) {
 						System.out.println(e.toStringJuez());
 					}
 					return;

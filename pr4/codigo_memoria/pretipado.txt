@@ -2,6 +2,7 @@ var conjunto
 
 pretipado(prog(decs, intrs)):
     pretipado(decs)
+    pretipado(intrs)
 
 pretipado(si_decs(decs)):
     pretipado(decs)
@@ -91,22 +92,56 @@ pretipado(cmp_s(tipo, id)):
         conjunto.inserta(id) // Inserta el campo en el conjunto
     end if
 
-// si_intrs(intrs) no aplica
-// no_intrs() no aplica
-// mas_intrs(intrs, intr) no aplica
-// una_intr(intr) no aplica
-// i_eval(exp) no aplica
-// i_if(exp, prog, ielse) no aplica
-// i_while(exp, prog) no aplica
-// i_read(exp) no aplica
-// i_write(exp) no aplica
-// i_nl() no aplica
-// i_new(exp) no aplica
-// i_delete(exp) no aplica
-// i_call(id, preals) no aplica
-// i_prog(prog) no aplica
-// si_else(prog) no aplica
-// no_else() no aplica
+pretipado(si_intrs(intrs)):
+    pretipado(intrs)
+
+pretipado(no_intrs()):
+    noop
+
+pretipado(mas_intrs(intrs, intr)):
+    pretipado(intrs)
+    pretipado(intr)
+
+pretipado(una_intr(intr)):
+    pretipado(intr)
+
+pretipado(i_eval(exp)):
+    noop
+
+pretipado(i_if(exp, prog, ielse)):
+    pretipado(prog)
+    pretipado(ielse)
+
+pretipado(i_while(exp, prog)): 
+    pretipado(prog)
+
+pretipado(i_read(exp)):
+    noop
+
+pretipado(i_write(exp)): 
+    noop
+
+pretipado(i_nl()): 
+    noop
+
+pretipado(i_new(exp)): 
+    noop
+
+pretipado(i_delete(exp)): 
+    noop
+
+pretipado(i_call(id, preals)):
+    noop
+
+pretipado(i_prog(prog)):
+    pretipado(prog)
+
+pretipado(si_else(prog)):
+    pretipado(prog)
+
+pretipado(no_else()):
+    noop
+
 // si_preals(preals) no aplica
 // no_preals() no aplica
 // mas_preals(preals, exp) no aplica

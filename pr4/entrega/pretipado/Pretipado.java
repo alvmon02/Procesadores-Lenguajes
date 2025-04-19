@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 public class Pretipado extends ProcesamientoDef {
 
-    private Set<String> variablesDeclaradas;
+    private Stack<Set<String>> variablesDeclaradas;
 
     private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }
@@ -24,14 +26,20 @@ public class Pretipado extends ProcesamientoDef {
 
     public Pretipado() {
         errorProcesamientos = new ArrayList<>();
+        variablesDeclaradas = new Stack<>();
     }
 
     private void abreAmbito() {
-        variablesDeclaradas = new HashSet<>();
+        variablesDeclaradas.add(new HashSet<>());
     }
 
     private void cierraAmbito() {
-        variablesDeclaradas = null;
+        variablesDeclaradas.pop();
+    }
+
+    public Pretipado pretipa(Prog prog) {
+        procesa(prog);
+        return this;
     }
 
     @SuppressWarnings("rawtypes")
@@ -42,6 +50,7 @@ public class Pretipado extends ProcesamientoDef {
     @Override
     public void procesa(Prog prog) {
         prog.decs().procesa(this);
+        prog.intrs().procesa(this);
     }
 
     @Override
@@ -101,15 +110,17 @@ public class Pretipado extends ProcesamientoDef {
     public void procesa(T_Iden tIden) {
         if (!claseDe(tIden.vinculo(), Dec_Tipo.class)) {
             errorProcesamientos.add(
-                    errores_procesamiento.ErrorPretipado.errorTipoNoDeclarado(tIden.leeFila(), tIden.leeCol(), tIden.id()));
+                    errores_procesamiento.ErrorPretipado.errorTipoNoDeclarado(tIden.leeFila(), tIden.leeCol(),
+                            tIden.id()));
         }
     }
 
     @Override
     public void procesa(T_Array tArray) {
         tArray.tipo().procesa(this);
-        if (Integer.parseInt(tArray.ent()) <= 0) {
-            errorProcesamientos.add(errores_procesamiento.ErrorPretipado.errorDimensionNegativa(tArray.leeFila(), tArray.leeCol()));
+        if (Integer.parseInt(tArray.ent()) < 0) {
+            errorProcesamientos.add(
+                    errores_procesamiento.ErrorPretipado.errorDimensionNegativa(tArray.leeFila(), tArray.leeCol()));
         }
     }
 
@@ -139,10 +150,48 @@ public class Pretipado extends ProcesamientoDef {
     @Override
     public void procesa(CampoS campoS) {
         campoS.tipo().procesa(this);
-        if (variablesDeclaradas.contains(campoS.id())) {
-            errorProcesamientos.add(errores_procesamiento.ErrorPretipado.errorCampoDuplicado(campoS.leeFila(), campoS.leeCol(), campoS.id()));
+        if (variablesDeclaradas.peek().contains(campoS.id())) {
+            errorProcesamientos.add(errores_procesamiento.ErrorPretipado.errorCampoDuplicado(campoS.leeFila(),
+                    campoS.leeCol(), campoS.id()));
         } else {
-            variablesDeclaradas.add(campoS.id());
+            variablesDeclaradas.peek().add(campoS.id());
         }
+    }
+
+    @Override
+    public void procesa(Si_Intrs si_Intrs) {
+        si_Intrs.intrs().procesa(this);
+    }
+
+    @Override
+    public void procesa(Mas_Intrs mas_Intrs) {
+        mas_Intrs.intrs().procesa(this);
+        mas_Intrs.intr().procesa(this);
+    }
+
+    @Override
+    public void procesa(Una_Intr una_Intr) {
+        una_Intr.intr().procesa(this);
+    }
+
+    @Override
+    public void procesa(I_If i_If) {
+        i_If.prog().procesa(this);
+        i_If.i_else().procesa(this);
+    }
+
+    @Override
+    public void procesa(I_While i_While) {
+        i_While.prog().procesa(this);
+    }
+    
+    @Override
+    public void procesa(I_Prog i_Prog) {
+        i_Prog.prog().procesa(this);    
+    }
+
+    @Override
+    public void procesa(Si_Else si_Else) {
+        si_Else.prog().procesa(this);
     }
 }

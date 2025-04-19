@@ -10,7 +10,7 @@ import java.util.Stack;
 import java.util.ArrayList;
 
 public class Vinculado extends ProcesamientoDef {
-
+    
     private class TablaSimbolos {
         private Stack<HashMap<String, Nodo>> ambitos = new Stack<>();
 
@@ -195,6 +195,27 @@ public class Vinculado extends ProcesamientoDef {
     }
 
     @Override
+    public void procesa(T_Struct tStruct) {
+        tStruct.camposS().procesa(this);
+    }
+
+    @Override
+    public void procesa(Mas_Cmp_S mas_Cmp_S) {
+        mas_Cmp_S.campoS().procesa(this);
+        mas_Cmp_S.camposS().procesa(this);
+    }
+
+    @Override
+    public void procesa(Un_Cmp_S un_Cmp_S) {
+        un_Cmp_S.campoS().procesa(this);
+    }
+
+    @Override
+    public void procesa(CampoS campoS) {
+        campoS.tipo().procesa(this);
+    }
+
+    @Override
     public void procesa(T_Puntero tPuntero) {
         if (!claseDe(tPuntero.tipo(), T_Iden.class)) {
             tPuntero.tipo().procesa(this);
@@ -267,7 +288,6 @@ public class Vinculado extends ProcesamientoDef {
     @Override
     public void procesa(I_Call i_Call) {
         vinculaId(i_Call.id(), i_Call);
-        ;
         i_Call.preals().procesa(this);
     }
 

@@ -139,11 +139,17 @@ vincula2(t_punter(tipo)):
     end if
 
 vincula(t_struct(camposs)):
-    noop // Se hace en el pretipado
+    vincula(camposs)
 
-// mas_cmp_s(camposs, campos) no aplica
-// un_cmp_s(campos) no aplica
-// cmp_s(tipo, id) no aplica
+vincula(mas_cmp_s(camposs, campos)):
+    vincula(camposs)
+    vincula(campos)
+
+vincula(un_cmp_s(campos)):
+    vincula(campos)
+
+vincula(cmp_s(tipo, id)):
+    vincula(tipo)
 
 vincula(si_intrs(intrs)):
     vincula(intrs)
