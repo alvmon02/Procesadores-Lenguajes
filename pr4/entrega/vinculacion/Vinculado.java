@@ -5,6 +5,7 @@ import asint.SintaxisAbstractaTiny.*;
 import errores_procesamiento.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 import java.util.ArrayList;
 
@@ -47,18 +48,18 @@ public class Vinculado extends ProcesamientoDef {
     }
 
     private TablaSimbolos tablaSimbolos;
-    private ArrayList<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
-
+    
     @SuppressWarnings("rawtypes")
     private boolean claseDe(Object o, Class c) {
         return o.getClass() == c;
     }
-
+    
+    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }
 
-    public ArrayList<ErrorProcesamiento> errores() {
+    public List<ErrorProcesamiento> errores() {
         return errorProcesamientos;
     }
 
