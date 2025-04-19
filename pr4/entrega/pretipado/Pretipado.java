@@ -2,13 +2,29 @@ package pretipado;
 
 import asint.*;
 import asint.SintaxisAbstractaTiny.*;
+import errores_procesamiento.ErrorProcesamiento;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Pretipado extends ProcesamientoDef {
 
     private Set<String> variablesDeclaradas;
+
+    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+    public boolean hayErrores() {
+        return errorProcesamientos.size() > 0;
+    }
+
+    public List<ErrorProcesamiento> errores() {
+        return errorProcesamientos;
+    }
+
+    public Pretipado() {
+        errorProcesamientos = new ArrayList<>();
+    }
 
     private void abreAmbito() {
         variablesDeclaradas = new HashSet<>();
@@ -84,7 +100,8 @@ public class Pretipado extends ProcesamientoDef {
     @Override
     public void procesa(T_Iden tIden) {
         if (!claseDe(tIden.vinculo(), Dec_Tipo.class)) {
-            // TODO: lanzar error
+            errorProcesamientos.add(
+                    errores_procesamiento.ErrorPretipado.errorTipoNoDeclarado(tIden.leeFila(), tIden.leeCol(), tIden.id()));
         }
     }
 
@@ -92,7 +109,7 @@ public class Pretipado extends ProcesamientoDef {
     public void procesa(T_Array tArray) {
         tArray.tipo().procesa(this);
         if (Integer.parseInt(tArray.ent()) <= 0) {
-            // TODO: lanzar error
+            errorProcesamientos.add(errores_procesamiento.ErrorPretipado.errorDimensionNegativa(tArray.leeFila(), tArray.leeCol()));
         }
     }
 
@@ -123,7 +140,7 @@ public class Pretipado extends ProcesamientoDef {
     public void procesa(CampoS campoS) {
         campoS.tipo().procesa(this);
         if (variablesDeclaradas.contains(campoS.id())) {
-            // TODO: lanzar error
+            errorProcesamientos.add(errores_procesamiento.ErrorPretipado.errorCampoDuplicado(campoS.leeFila(), campoS.leeCol(), campoS.id()));
         } else {
             variablesDeclaradas.add(campoS.id());
         }
