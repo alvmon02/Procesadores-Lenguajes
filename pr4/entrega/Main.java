@@ -58,58 +58,45 @@ public class Main {
 	}
 
 	private static void ejecturarPrograma(Reader input) throws FileNotFoundException, IOException, Exception {
+		Prog prog = null;
 		if (input.read() == 97) { // Reconocer a
 			try {
 				AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
 				c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
-				Prog prog = (Prog) asint.parse().value;
-
-				Vinculado vinculado = new Vinculado();
-				if (vinculado.vincula(prog).hayErrores()) {
-					for (ErrorProcesamiento e : vinculado.errores()) {
-						System.out.println(e.toStringJuez());
-					}
-					return;
-				}
-				Pretipado pretipado = new Pretipado();
-				if (pretipado.pretipa(prog).hayErrores()) {
-					for (ErrorProcesamiento e : pretipado.errores()) {
-						System.out.println(e.toStringJuez());
-					}
-					return;
-				}
+				prog = (Prog) asint.parse().value;
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ErrorSintactico e) {
 				System.out.println("ERROR_SINTACTICO");
 			}
 		} else { // si no es a(en su defecto, es decir, d)
-
 			try {
 				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(
 						input);
 				asint.disable_tracing();
-				Prog prog = asint.analiza();
+				prog = asint.analiza();
 
-				Vinculado vinculado = new Vinculado();
-				if (vinculado.vincula(prog).hayErrores()) {
-					for (ErrorProcesamiento e : vinculado.errores()) {
-						System.out.println(e.toStringJuez());
-					}
-					return;
-				}
-				Pretipado pretipado = new Pretipado();
-				if (pretipado.pretipa(prog).hayErrores()) {
-					for (ErrorProcesamiento e : pretipado.errores()) {
-						System.out.println(e.toStringJuez());
-					}
-					return;
-				}
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ParseException e) {
 				System.out.println("ERROR_SINTACTICO");
 			}
+		}
+
+		Vinculado vinculado = new Vinculado();
+		if (vinculado.vincula(prog).hayErrores()) {
+			for (ErrorProcesamiento e : vinculado.errores()) {
+				System.out.println(e.toStringJuez());
+			}
+			return;
+		}	
+		
+		Pretipado pretipado = new Pretipado();
+		if (pretipado.pretipa(prog).hayErrores()) {
+			for (ErrorProcesamiento e : pretipado.errores()) {
+				System.out.println(e.toStringJuez());
+			}
+			return;
 		}
 	}
 }
