@@ -4,7 +4,15 @@ ambos_ok(t0, t1):
     else
         return error
     end if
-    
+
+tipo-asig(T0,T1):
+    if T0 == T1 then
+        return ok
+    else
+        aviso-error(T0,T1)
+        return error
+    end if
+
 tipado(prog(decs, intrs)):
     tipado(decs)
     tipado(intrs)
@@ -150,8 +158,45 @@ tipado(i_delete(exp)):
     end if
 
 tipado(i_call(id, preals)):
+    v = vinculoDe(ts, id)
+    if (v == ⊥ || v != dec_proc(_,_,_) ) then 
+        $.tipo = error
+    else
+        $.tipo = ok
+        tipado(preals, v)
+    end if
+
+tipado(si_preals(preals, v)):
+    if (int(v.pforms) != int(preals) || not compatibles_preal_pform(v.pforms, preals)) then 
+        $.tipo = error
+    else
+        $.tipo = ok
+    end if
+
+    //TODO para todos aquellos parámetros formales PFj de la forma &v (parámetros por variable), el correspondiente parámetro real Ej debe ser un designador.
+
+tipado(no_preals()):
+    $.tipo = ok
+
+compatibles_preal_pform(preals, preal, pforms, pform) :
+    compatibles_preal_pform(preals, pforms)
+    compatibles_preal_pform(preal, pform)
+
+compatibles_preal_pform(preal, pform):
+    t0, t1 = ref!(preal.tipo), ref!(pform.tipo)
+    if tipo-asig(t0, t1) == ok then // falta hacer tipo-asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
+        return ok
+    else
+        return error
+    end if
+
+tipado(mas_preals(preals, exp)):
+    // TODO creo que no es necesario pq se tratan en paralelo reales y formales
+
+tipado(un_preals(exp)):
+    // TODO lo mismo que arriba
+
     
-    if // TODO comprobar que los parametros reales coinciden con los formales de la declaracion del procedimiento
 
 tipado(i_prog(prog)):
     tipado(prog)
@@ -164,17 +209,6 @@ tipado(si_else(prog)):
 tipado(no_else()):
     $.tipo = ok
 
-tipado(si_preals(preals)):
-    // TODO
-
-tipado(no_preals()):
-    // TODO
-
-tipado(mas_preals(preals, exp)):
-    // TODO
-
-tipado(un_preals(exp)):
-    // TODO
 
 tipado(e_asig(opnd0, opnd1)):
     tipado(opnd0)
@@ -290,10 +324,21 @@ tipado(e_negado(opnd)):
     end if
 
 tipado(e_indexado(opnd0, opnd1)):
-    // TODO
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if t0 == t_array && t1 == INT then
+        $.tipo = t0.tipo
+    else
+        $.tipo = error
+    end if
+    
+
 
 tipado(e_campo(opnd, id)):
-    // TODO
+    t0 = ref!(opnd.tipo)
+    v = vinculoDe(ts, id)
+    // TODO ver si el campo estaba declarado
 
 tipado(e_puntero(opnd)):
     $.tipo = PUNT
