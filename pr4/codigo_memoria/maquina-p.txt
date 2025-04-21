@@ -1,0 +1,55 @@
+-----repertorio instrucciones-----
+
+apila-int(n) -> apila en la cima el número n
+apila-dir(d) -> apila en la cima el contenido de la dirección d
+desapila-dir(d) -> desapila la cima y lo guarda en la dirección d
+
+-- Tratar con objetos compuestos --
+apila-ind -> desapila la cima, la interpreta como dirección y apila el contenido de esa dirección
+desapila-ind -> desapila la cima (lo interpreta como un valor), desapila la subdima (lo interpreta como direccion) y guarda el valor en la dirección
+copia(n) -> se desapila la cima y la subcima, se interpreta como un rango de direcciones y se copia lo que haya entre ellas n veces en el "array" de la memoria
+
+-- Tratar con estructuras de control while, if.. --
+ir-a(d) -> salto incondicional (se salta a la dirección d)
+ir-v(d) -> salto condicional (desapila la cima, si es booleano y es cierto la ejecución sigue a la instr d, si no es cierto se sigue la ejecución normal)
+ir-f(d) -> salto condicional (desapila la cima, si es booleano y es falso la ejecución sigue a la instr d, si es cierto se sigue la ejecución normal)
+
+
+-- Tratar con memoria dinamica --
+alloc(n) ->  Reserva n celdas consecutivas en la memoria dinámica, y apila la dirección de comienzo en
+la pila de evaluación
+
+dealloc(n) -> Desapila una dirección d de la pila de evaluación, y considera como libres n celdas
+consecutivas en la memoria dinámica, que comienzan en la dirección d.
+
+
+-- Tratar con registros de activación (llamadas a procedimientos) --
+
+activa(n,t,d) -> Reserva espacio en el segmento de pila de registros de activación
+    para ejecutar un procedimiento que tiene nivel de anidamiento n y tamaño de datos
+    locales t. Así mismo, almacena en la zona de control de dicho registro d como
+    dirección de retorno. También almacena en dicha zona de control el valor del display
+    de nivel n. Por último, apila en la pila de evaluación la dirección de comienzo de los
+    datos en el registro creado.
+
+apilad(n) -> Apila en la pila de evaluación el valor del display de nivel n
+
+desapilad(n) -> Desapila una dirección d de la pila de evaluación en el display de nivel n.
+
+desactiva(n,t) -> Libera el espacio ocupado por el registro de activación actual,
+    restaurando adecuadamente el estado de la máquina. n indica el nivel de anidamiento
+    del procedimiento asociado; t el tamaño de los datos locales. De esta forma, la
+    instrucción: (i) apila en la pila de evaluación la dirección de retorno; (ii) restaura el
+    valor del display de nivel n al antiguo valor guardado en el registro; (iii) decrementa el
+    puntero de pila de registros de activación en el tamaño ocupado por el registro.
+
+dup -> Consulta el valor v de la cima de la pila de evaluación, y apila de nuevo dicho valor (es decir, duplica la cima de la pila de evaluación)
+
+ir-ind -> Desapila una dirección d de la pila de evaluación, y realiza un salto incondicional a dicha dirección.
+
+stop ->Detiene la máquina.
+
+suma -> desapila la cima y la subcima, los suma y lo apila
+resta -> desapila la cima y la subcima, los resta y lo apila
+mul -> desapila la cima y la subcima, los multiplica y lo apila
+div -> desapila la cima y la subcima, los divide y lo apila
