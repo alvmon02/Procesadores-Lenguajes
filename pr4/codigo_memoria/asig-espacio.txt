@@ -1,8 +1,17 @@
-var dir
+var dir // primera dirección libre
+var nivel = 0
+var max_dir = 0 // máxima dirección ocupada
+
+
+inc_dir(inc):
+    dir += inc
+    if dir > max_dir then
+        max_dir = dir
 
 asig-espacio(prog(decs, intrs)):
     asig-espacio(decs)
     asig-espacio(intrs)
+
 
 asig-espacio(si_decs(decs)):
     asig-espacio1(decs)
@@ -27,8 +36,10 @@ asig-espacio2(una_dec(dec)):
 
 asig-espacio1(dec_var(tipo, id)):
     $.dir = dir
+    $nivel = nivel
     asig-tam1(tipo)
-    dir+= tipo.tam
+    inc_dir(tipo.tam) //var se actualiza a la siguiente dirección libre y si se pasa de max_dir se actualiza tmb
+    
 
 asig-espacio2(dec_var(tipo, id)):
     asig-tam2(tipo)
@@ -41,10 +52,19 @@ asig-espacio2(dec_tipo(tipo, id)):
     asig-tam2(tipo)
 
 asig-espacio1(dec_proc(id, pforms, prog)):
-    $.dir = dir
+    dir_ant = dir       // guardamos la direccion de inicio y la max_dir
+    max_dir_ant = max_dir
+    nivel += 1
+    $nivel = nivel
+    dir = 0            // ambos se fijan a 0 porque las direcciones en el ámbito de un procedimiento son relativas a su registro de activación
+    max_dir = 0
     asig-espacio(pforms)
     asig-espacio(prog)
-    dir+= pforms.tam + prog.tam
+    $tam = max_dir
+    dir = dir_ant
+    max_dir = max_dir_ant
+    nivel -= 1
+
 
 asig-espacio2(dec_proc(id, pforms, prog)):
     asig-espacio(pforms)
