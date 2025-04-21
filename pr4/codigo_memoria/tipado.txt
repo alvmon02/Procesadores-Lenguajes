@@ -1,16 +1,16 @@
 ambos_ok(t0, t1):
-    if t0 == ok && t1 == ok then
-        return ok
+    if t0 == OK && t1 == OK then
+        return OK
     else
-        return error
+        return ERROR
     end if
 
-tipo-asig(T0,T1):
+tipo_asig(T0,T1):
     if T0 == T1 then
-        return ok
+        return OK
     else
-        aviso-error(T0,T1)
-        return error
+        aviso_error(T0,T1)
+        return ERROR
     end if
 
 tipado(prog(decs, intrs)):
@@ -23,7 +23,7 @@ tipado(si_decs(decs)):
     $.tipo = decs.tipo
 
 tipado(no_decs()):
-    $.tipo = ok
+    $.tipo = OK
 
 tipado(mas_decs(decs, dec)):
     tipado(decs)
@@ -35,10 +35,10 @@ tipado(una_dec(dec)):
     $.tipo = dec.tipo
     
 tipado(dec_var(tipo, id)):
-    $.tipo = ok
+    $.tipo = OK
 
 tipado(dec_tipo(tipo, id)):
-    $.tipo = ok
+    $.tipo = OK
 
 tipado(dec_proc(id, pforms, prog)):
     tipado(prog)
@@ -84,7 +84,7 @@ tipado(si_intrs(intrs)):
     $.tipo = intrs.tipo
 
 tipado(no_intrs()):
-    $.tipo = ok
+    $.tipo = OK
 
 tipado(mas_intrs(intrs, intr)):
     tipado(intrs)
@@ -100,15 +100,15 @@ tipado(i_eval(exp)):
     if exp.tipo == error then
         $.tipo = error
     else
-        $.tipo = ok
+        $.tipo = OK
     end if
 
 tipado(i_if(exp, prog, ielse)):
     tipado(exp)
     tipado(prog)
     tipado(ielse)
-    if exp.tipo == BOOL && prog.tipo == ok && prog.tipo == ok then
-        $.tipo = ok
+    if exp.tipo == BOOL && prog.tipo == OK && prog.tipo == OK then
+        $.tipo = OK
     else
         $.tipo = error
     end if
@@ -116,67 +116,67 @@ tipado(i_if(exp, prog, ielse)):
 tipado(i_while(exp, prog)):
     tipado(exp)
     tipado(prog)
-    if exp.tipo == BOOL && prog.tipo == ok then
-        $.tipo = ok
+    if exp.tipo == BOOL && prog.tipo == OK then
+        $.tipo = OK
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(i_read(exp)):
     tipado(exp)
     if (exp.tipo == INT || exp.tipo == REAL || exp.tipo == STRING) && exp == e_iden(_) then
-        $.tipo = ok
+        $.tipo = OK
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(i_write(exp)):
     tipado(exp)
     if exp.tipo == INT || exp.tipo == REAL || exp.tipo == BOOL || exp.tipo == STRING then
-        $.tipo = ok
+        $.tipo = OK
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(i_nl()):
-    $.tipo = ok
+    $.tipo = OK
 
 tipado(i_new(exp)):
     tipado(exp)
     if exp.tipo == PUNT then
-        $.tipo = ok
+        $.tipo = OK
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(i_delete(exp)):
     tipado(exp)
     if exp.tipo == PUNT then
-        $.tipo = ok
+        $.tipo = OK
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(i_call(id, preals)):
     v = vinculoDe(ts, id)
     if (v == ⊥ || v != dec_proc(_,_,_) ) then 
-        $.tipo = error
+        $.tipo = ERROR
     else
-        $.tipo = ok
+        $.tipo = OK
         tipado(preals, v)
     end if
 
 tipado(si_preals(preals, v)):
     if (int(v.pforms) != int(preals) || not compatibles_preal_pform(v.pforms, preals)) then 
-        $.tipo = error
+        $.tipo = ERROR
     else
-        $.tipo = ok
+        $.tipo = OK
     end if
 
     //TODO para todos aquellos parámetros formales PFj de la forma &v (parámetros por variable), el correspondiente parámetro real Ej debe ser un designador.
 
 tipado(no_preals()):
-    $.tipo = ok
+    $.tipo = OK
 
 compatibles_preal_pform(preals, preal, pforms, pform) :
     compatibles_preal_pform(preals, pforms)
@@ -184,10 +184,10 @@ compatibles_preal_pform(preals, preal, pforms, pform) :
 
 compatibles_preal_pform(preal, pform):
     t0, t1 = ref!(preal.tipo), ref!(pform.tipo)
-    if tipo-asig(t0, t1) == ok then // falta hacer tipo-asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
-        return ok
+    if tipo_asig(t0, t1) == OK then // falta hacer tipo_asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
+        return OK
     else
-        return error
+        return ERROR
     end if
 
 tipado(mas_preals(preals, exp)):
@@ -207,7 +207,7 @@ tipado(si_else(prog)):
     $.tipo = prog.tipo
 
 tipado(no_else()):
-    $.tipo = ok
+    $.tipo = OK
 
 
 tipado(e_asig(opnd0, opnd1)):
@@ -216,7 +216,7 @@ tipado(e_asig(opnd0, opnd1)):
     if (exp == e_iden(_) || exp == e_campo(_, _) || exp == e_indexado(_, _) || exp == e_puntero(_)) && compatibles(opnd0.tipo, opnd1.tipo) then
         $.tipo = opnd0.tipo
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado_comp(opnd0, opnd1):
@@ -226,7 +226,7 @@ tipado_comp(opnd0, opnd1):
     if ((t0 == PUNT || t0 == NULL) && (t1 == PUNT || t1 == NULL)) || (t0 == STRING && t1 == STRING) || (t0 == BOOL && t1 == BOOL) || ((t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL)) then
         $.tipo = BOOL
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado_comp_ord(opnd0, opnd1):
@@ -236,7 +236,7 @@ tipado_comp_ord(opnd0, opnd1):
     if (t0 == STRING && t1 == STRING) || (t0 == BOOL && t1 == BOOL) || ((t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL)) then
         $.tipo = BOOL
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(e_comp(opnd0, opnd1)):
@@ -264,7 +264,7 @@ tipado_arit(opnd0, opnd1):
     if (t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL) then
         $.tipo = (t0 == REAL || t1 == REAL) ? REAL : INT
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(e_suma(opnd0, opnd1)):
@@ -280,7 +280,7 @@ tipado_and_or(opnd0, opnd1):
     if t0 == BOOL && t1 == BOOL then
         $.tipo = BOOL
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(e_and(opnd0, opnd1)):
@@ -302,7 +302,7 @@ tipado(e_porcentaje(opnd0, opnd1)):
     if t0 == INT && t1 == INT then
         $.tipo = INT
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(e_negativo(opnd)):
@@ -311,7 +311,7 @@ tipado(e_negativo(opnd)):
     if t == INT || t == REAL then
         $.tipo = t
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(e_negado(opnd)):
@@ -320,7 +320,7 @@ tipado(e_negado(opnd)):
     if t == BOOL then
         $.tipo = BOOL
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(e_indexado(opnd0, opnd1)):
@@ -330,7 +330,7 @@ tipado(e_indexado(opnd0, opnd1)):
     if t0 == t_array && t1 == INT then
         $.tipo = t0.tipo
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
     
 
@@ -359,6 +359,7 @@ tipado(e_string(string)):
     $.tipo = STRING
 
 tipado(e_iden(id)):
+    // TODO
 
 tipado(e_null()):
     $.tipo = NULL
