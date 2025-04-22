@@ -1,3 +1,15 @@
+/*
+    Los posibles tipos son:
+    - INT
+    - REAL
+    - BOOL
+    - STRING
+    - PUNT
+    - NULL
+    - ARRAY
+    - STRUCT
+*/
+
 ambos_ok(t0, t1):
     if t0 == OK && t1 == OK then
         return OK
@@ -5,11 +17,11 @@ ambos_ok(t0, t1):
         return ERROR
     end if
 
-tipo_asig(T0,T1):
-    if T0 == T1 then
+tipo_asig(t0, t1):
+    if t0 == t1 then
         return OK
     else
-        aviso_error(T0,T1)
+        aviso_error(t0, t1)
         return ERROR
     end if
 
