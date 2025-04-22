@@ -12,6 +12,23 @@
     - ERROR
 */
 
+// TODO: revisar los tipos bases en los punteros y arrays. El como hacer que pueda acceder al tipo del anterior nivel, en caso de que haya punteros o arrays anidados.
+
+busquedaCampo(idCampo, mas_cmp_s(camposs, cmp_s(tipo, id))):
+    if idCampo == id then
+        return tipo
+    else
+        return busquedaCampo(id, camposs)
+    end if
+
+busquedaCampo(idCampo, un_cmp_s(cmp_s(tipo, id))):
+    if idCampo == id then
+        return tipo
+    else
+        error("Campo no definido en el struct")
+        return ERROR
+    end if
+
 ambos_ok(t0, t1):
     if t0 == OK && t1 == OK then
         return OK
@@ -19,12 +36,18 @@ ambos_ok(t0, t1):
         return ERROR
     end if
 
+    // Ver que sean tipos compatibles no iguales
 tipo_asig(t0, t1):
     if t0 == t1 then
         return OK
     else
         aviso_error(t0, t1)
         return ERROR
+    end if
+
+aviso_error(t0, t1):
+    if t0 != ERROR && t1 != ERROR then
+        error("Error de tipo")
     end if
 
 tipado(prog(decs, intrs)):
@@ -72,10 +95,10 @@ tipado(dec_proc(id, pforms, prog)):
 // no_ref() no aplica
 
 tipado(t_iden(id)):
-    if vinculoDe(ts, id).tipo == ⊥ then // Mirar que haga falta, creo que sobre todo en caso de que sea un puntero a un tipo definido despues si que habria que dejarlo
-        tipado(vinculoDe(ts, id)) 
+    if $.vinculo.tipo == ⊥ then // Mirar que haga falta, creo que sobre todo en caso de que sea un puntero a un tipo definido despues si que habria que dejarlo
+        tipado($.vinculo) 
     end if
-    $.tipo = vinculoDe(ts, id).tipo
+    $.tipo = $.vinculo.tipo
 
 tipado(t_string()):
     $.tipo = STRING
@@ -91,10 +114,12 @@ tipado(t_real()):
 
 tipado(t_array(tipo, ent)):
     tipado(tipo)
+    $.tipo_base = tipo.tipo
     $.tipo = ARRAY
 
 tipado(t_punter(tipo)):
     tipado(tipo)
+    $.tipo_base = tipo.tipo 
     $.tipo = PUNT
 
 tipado(t_struct(camposs)):
@@ -130,8 +155,8 @@ tipado(una_intr(intr)):
 
 tipado(i_eval(exp)):
     tipado(exp)
-    if exp.tipo == error then
-        $.tipo = error
+    if exp.tipo == ERROR then
+        $.tipo = ERROR
     else
         $.tipo = OK
     end if
@@ -143,7 +168,7 @@ tipado(i_if(exp, prog, ielse)):
     if exp.tipo == BOOL && prog.tipo == OK && prog.tipo == OK then
         $.tipo = OK
     else
-        $.tipo = error
+        $.tipo = ERROR
     end if
 
 tipado(i_while(exp, prog)):
@@ -190,46 +215,67 @@ tipado(i_delete(exp)):
         $.tipo = ERROR
     end if
 
+
+    // TODO revisar el call
 tipado(i_call(id, preals)):
-    v = vinculoDe(ts, id)
-    if (v == ⊥ || v != dec_proc(_,_,_) ) then 
+    v = $.vinculo
+    if (v == ⊥ || v != dec_proc(_,_,_)) then 
         $.tipo = ERROR
     else
-        $.tipo = OK
-        tipado(preals, v)
+        $.tipo = compatibles_preal_pform(v.pforms, preals)
     end if
 
-tipado(si_preals(preals, v)):
-    if (int(v.pforms) != int(preals) || not compatibles_preal_pform(v.pforms, preals)) then 
-        $.tipo = ERROR
+compatibles_preal_pform(no_pforms(), no_preals()):
+    return OK
+
+compatibles_preal_pform(no_pforms(), si_preals(_)):
+    return ERROR
+
+compatibles_preal_pform(si_pforms(_), no_preals()):
+    return ERROR
+
+compatibles_preal_pform(si_pforms(pforms), si_preals(preals)):
+    if (pforms.size() != prealss.size()) then
+        return ERROR
     else
-        $.tipo = OK
+        return compatibles_preal_pform(pforms, preals)
     end if
 
-    //TODO para todos aquellos parámetros formales PFj de la forma &v (parámetros por variable), el correspondiente parámetro real Ej debe ser un designador.
+compatibles_preal_pform(una_pform(_), mas_preals(_, _)):
+    error("No coincide el numero de pforms y preals")
+    return ERROR
 
-tipado(no_preals()):
-    $.tipo = OK
+compatibles_preal_pform(mas_pforms(_, _), una_preals(_)):
+    error("No coincide el numero de pforms y preals")
+    return ERROR
 
-compatibles_preal_pform(preals, preal, pforms, pform) :
-    compatibles_preal_pform(preals, pforms)
-    compatibles_preal_pform(preal, pform)
+compatibles_preal_pform(mas_pforms(pforms, pform), mas_preals(preals, exp)):
+    t0 = compatibles_preal_pform(pforms, preals)
+    t1 = compatibles_preal_pform(pform, exp)
+    return ambos_ok(t0, t1)
 
-compatibles_preal_pform(preal, pform):
-    t0, t1 = ref!(preal.tipo), ref!(pform.tipo)
-    if tipo_asig(t0, t1) == OK then // falta hacer tipo_asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
-        return OK
+compatibles_preal_pform(una_pform(pform), una_preals(exp)):
+    return compatibles_preal_pform(pform, exp)
+
+compatibles_preal_pform(pform(tipo, ref, id), exp):
+    tipado(exp)
+    t0, t1 = ref!(exp.tipo), ref!(tipo)
+    if ref == si_ref() && exp != e_iden(_) then
+        error("Para pasar por referencia, el argumento tiene que ser una variable")
+        return ERROR
+    else if tipo_asig(t0, t1) == OK then // falta hacer tipo_asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
+        if ref == si_ref() && t1 != REAL then 
+            error("El tipo de la variable a la que se le pasa por referencia tiene que coincidir con el tipo del argumento")
+            return ERROR
+        else
+            return OK
+        end if
     else
+        error("El tipo del argumento tiene que ser compatible con el tipo del parametro formal")
         return ERROR
     end if
 
-tipado(mas_preals(preals, exp)):
-    // TODO creo que no es necesario pq se tratan en paralelo reales y formales
-
-tipado(un_preals(exp)):
-    // TODO lo mismo que arriba
-
-    
+tipado()
 
 tipado(i_prog(prog)):
     tipado(prog)
@@ -249,6 +295,7 @@ tipado(e_asig(opnd0, opnd1)):
     if (exp == e_iden(_) || exp == e_campo(_, _) || exp == e_indexado(_, _) || exp == e_puntero(_)) && compatibles(opnd0.tipo, opnd1.tipo) then
         $.tipo = opnd0.tipo
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -259,6 +306,7 @@ tipado_comp(opnd0, opnd1):
     if ((t0 == PUNT || t0 == NULL) && (t1 == PUNT || t1 == NULL)) || (t0 == STRING && t1 == STRING) || (t0 == BOOL && t1 == BOOL) || ((t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL)) then
         $.tipo = BOOL
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -269,6 +317,7 @@ tipado_comp_ord(opnd0, opnd1):
     if (t0 == STRING && t1 == STRING) || (t0 == BOOL && t1 == BOOL) || ((t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL)) then
         $.tipo = BOOL
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -297,6 +346,7 @@ tipado_arit(opnd0, opnd1):
     if (t0 == INT || t0 == REAL) && (t1 == INT || t1 == REAL) then
         $.tipo = (t0 == REAL || t1 == REAL) ? REAL : INT
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -313,6 +363,7 @@ tipado_and_or(opnd0, opnd1):
     if t0 == BOOL && t1 == BOOL then
         $.tipo = BOOL
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -335,6 +386,7 @@ tipado(e_porcentaje(opnd0, opnd1)):
     if t0 == INT && t1 == INT then
         $.tipo = INT
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -344,6 +396,7 @@ tipado(e_negativo(opnd)):
     if t == INT || t == REAL then
         $.tipo = t
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -353,6 +406,7 @@ tipado(e_negado(opnd)):
     if t == BOOL then
         $.tipo = BOOL
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
 
@@ -360,21 +414,32 @@ tipado(e_indexado(opnd0, opnd1)):
     tipado(opnd0)
     tipado(opnd1)
     t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
-    if t0 == t_array && t1 == INT then
-        $.tipo = t0.tipo
+    if t0 == ARRAY && t1 == INT then
+        $.tipo = t0.tipo_base
     else
+        aviso_error(opnd0.tipo, opnd1.tipo)
         $.tipo = ERROR
     end if
-    
-
 
 tipado(e_campo(opnd, id)):
-    t0 = ref!(opnd.tipo)
-    v = vinculoDe(ts, id)
-    // TODO ver si el campo estaba declarado
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t != STRUCT then
+        error("Se esta intentando acceder a un campo de un tipo no estructurado")
+        $.tipo = ERROR
+    else
+        $.tipo = busquedaCampo(id, opnd.campos)
+    end if
 
 tipado(e_puntero(opnd)):
-    $.tipo = PUNT
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t == PUNT then
+        $.tipo = opnd.tipo_base
+    else
+        error("Se esta intentando desreferenciar un puntero a un tipo no puntero")
+        $.tipo = ERROR
+    end if
 
 tipado(e_lit_ent(num)):
     $.tipo = INT
@@ -392,7 +457,12 @@ tipado(e_string(string)):
     $.tipo = STRING
 
 tipado(e_iden(id)):
-    // TODO
+    if $.vinculo != dec_var(_, _) then
+        error("No es una variable")
+        $.tipo = ERROR
+    else
+        $.tipo = $.vinculo.tipo
+    end if
 
 tipado(e_null()):
     $.tipo = NULL
