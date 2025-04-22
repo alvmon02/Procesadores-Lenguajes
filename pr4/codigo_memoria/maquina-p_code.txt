@@ -1,0 +1,415 @@
+var sub_pendientes = pila-vacia()
+
+
+gen-code(prog(decs, intrs))
+    recolecta-subs(decs)
+    gen-code(intrs)
+    emit stop()
+
+    while not es-vacia(sub_pendientes)
+        sub = cima(sub_pendientes)
+        desapila(sub_pendientes)
+        let sub = dec_proc(id, param, decs, Is) in 
+            emit desapilad(sub.nivel)
+            recolecta_subs(Decs)
+            gen-code(Is)
+            emit desactiva(sub.nivel, sub.tam)
+            emit ir-ind()
+        end let
+    end while
+
+
+recolecta-decs(si_decs(decs)):
+    recolecta_decs(decs)
+
+recolecta-decs(no_decs())
+    noop
+
+recolects-decs(mas_decs(decs, dec))
+    recolecta_decs(decs)
+    recolecta_decs(dec)
+
+recolecta-decs(una_dec(dec))
+    recolecta_decs(dec)
+
+recolecta-decs(dec_var(tipo, id))
+    noop
+
+recolecta-decs(dec_tipo(tipo, id))
+    noop
+
+recolecta-decs(dec_proc(id, pforms, prog))
+    apila(subpendientes, $)
+
+gen-code(si_pforms(pforms))
+    gen-code(pforms)
+
+gen-code(no_pforms())
+    noop
+
+gen-code(mas_pforms(pforms, pform))
+    gen-code(pforms)
+    gen-code(pform)
+
+gen-code(una_pform(pform))
+    gen-code(pform)
+
+gen-code(pform(tipo, ref, id))
+    if not ref:
+        emit dir(id)
+    else:
+        emit fetch(dir(id))
+
+
+
+t_iden(id)
+t_string()
+t_int()
+t_bool()
+t_real()
+t_array(tipo, ent)
+t_punter(tipo)
+t_struct(camposs)
+mas_cmp_s(camposs, campos)
+un_cmp_s(campos)
+cmp_s(tipo, id)
+si_intrs(intrs)
+no_intrs()
+mas_intrs(intrs, intr)
+una_intr(intr)
+si_else(prog)
+no_else()
+si_preals(preals)
+no_preals()
+mas_preals(preals, exp)
+un_preals(exp)
+e_asig(opnd0, opnd1)
+
+
+gen_code(i_eval(exp)):
+    r = gen_code(exp)
+
+gen_code(i_read(exp))
+    r = gen_code(exp)
+    //Leer un valor apropiado v de la entrada estándar, dependiendo del tipo de E.
+    store(r, v)
+
+gen_code(i_write(exp)):
+    r = gen-code(exp)
+    if es-designador(exp):
+        v = fetch(r)
+    else:
+        v = r
+    //Mostrar v por salida estandar
+
+gen_code(i_new(exp)):
+    r = gen-code(exp)
+    store(r, alloc(exp.tipo))
+
+gen_code(i_delete(exp)):
+    r = gen_code(exp)
+    if r == -1:
+        error
+    else:
+        dealloc(r, exp.tipo)
+
+gen_code(i_if(exp, prog, ielse)):
+    r = gen_code(exp)
+    if es-designador(exp):
+        v = fetch(r)
+    else:
+        v = r
+    if v == true:
+        gen_code(prog)
+    else:
+        if ielse == no_else():
+            noop
+        else:
+            gen_code(ielse)
+
+
+gen_code(i_while(exp, prog)):
+    r = gen_code(exp)
+    if es-designador(exp):
+        v = fetch(r)
+    else:
+        v = r
+    if v == true:
+        gen_code(prog)
+        gen_code(i_while(exp, prog))
+    else:
+        noop
+
+
+i_nl()
+i_call(id, preals)
+i_prog(prog)
+
+gen_code(e_porcentaje(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit porcentaje
+
+e_negativo(opnd)
+e_negado(opnd)
+e_indexado(opnd0, opnd1)
+e_campo(opnd, id)
+e_puntero(opnd)
+
+
+gen-code(e_comp(opnd0, opnd1))   
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit comp
+    
+gen-code(e_dist(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit dist
+
+gen_code(e_lt(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit lt
+
+gen-code(e_gt(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit gt
+
+gen_code(e_leq(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit leq
+
+gen_code(e_geq(opnd0, opnd1))
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit geq
+
+gen_code(e_and(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit and
+
+gen_code(e_or(opnd0, opnd1)):
+    r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+    emit or
+gen_code(e_suma(opnd0, opnd1)):
+ r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+
+    t0 = opnd0.tipo
+    t1 = opnd1.tipo
+
+    v0' = v0
+    if t0 == int:
+        v0' = int-to-real(v0)
+    
+    v1' = v1
+    if t1 == int:
+        v1' = int-to-real(v1)
+
+    emit suma
+
+gen_code(e_resta(opnd0, opnd1)):
+ r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+
+    t0 = opnd0.tipo
+    t1 = opnd1.tipo
+
+    v0' = v0
+    if t0 == int:
+        v0' = int-to-real(v0)
+    
+    v1' = v1
+    if t1 == int:
+        v1' = int-to-real(v1)
+
+    emit resta
+
+gen_code(e_mul(opnd0, opnd1)):
+ r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+
+    t0 = opnd0.tipo
+    t1 = opnd1.tipo
+
+    v0' = v0
+    if t0 == int:
+        v0' = int-to-real(v0)
+    
+    v1' = v1
+    if t1 == int:
+        v1' = int-to-real(v1)
+
+    emit mul
+
+gen_code(e_div(opnd0, opnd1)):
+ r0 = gen-code(opnd0)
+    r1 = gen-code(opnd1)
+
+    if es-designador(opnd0):
+        v0 = fetch(r0)
+    else: 
+        v0 = r0
+
+    if es-designador(opnd1):
+        v1 = fetch(r1)
+    else:
+        v1 = r1
+
+    t0 = opnd0.tipo
+    t1 = opnd1.tipo
+
+    v0' = v0
+    if t0 == int:
+        v0' = int-to-real(v0)
+    
+    v1' = v1
+    if t1 == int:
+        v1' = int-to-real(v1)
+
+    emit div
+
+gen-code(e_lit_ent(num))
+    emit apila-int(num)
+
+gen-code(e_lit_real(num))
+    emit apila-real(num)
+
+gen-code(e_true())
+    emit apila-bool(true)
+
+gen-code(e_false())
+    emit apila-bool(false)
+
+gen-code(e_string(string))
+    emit apila-string(string)
+
+gen-code(e_null())
+    emit apila.int(-1)
+
+e_iden(id)
