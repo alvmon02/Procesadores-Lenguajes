@@ -434,4 +434,9 @@ public class ProcesamientoDef implements Procesamiento {
 
     public void procesa2(Null exp) {
     }
+
+    @SuppressWarnings("rawtypes")
+    protected boolean claseDe(Object o, Class c) {
+        return o.getClass() == c;
+    }
 }

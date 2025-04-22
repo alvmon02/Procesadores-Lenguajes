@@ -48,13 +48,8 @@ public class Vinculado extends ProcesamientoDef {
     }
 
     private TablaSimbolos tablaSimbolos;
-    
-    @SuppressWarnings("rawtypes")
-    private boolean claseDe(Object o, Class c) {
-        return o.getClass() == c;
-    }
-    
     private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+    
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }

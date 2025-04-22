@@ -42,11 +42,6 @@ public class Pretipado extends ProcesamientoDef {
         return this;
     }
 
-    @SuppressWarnings("rawtypes")
-    private boolean claseDe(Object o, Class c) {
-        return o.getClass() == c;
-    }
-
     @Override
     public void procesa(Prog prog) {
         prog.decs().procesa(this);
