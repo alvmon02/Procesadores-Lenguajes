@@ -2,6 +2,19 @@ package asint;
 
 public class SintaxisAbstractaTiny {
 
+    public enum TipoBase {
+        INT, 
+        REAL, 
+        BOOL, 
+        STRING, 
+        PUNT, 
+        NULL, 
+        ARRAY, 
+        STRUCT, 
+        OK, 
+        ERROR
+    }
+
     private static void imprimeOpnd(Exp opnd, int np) {
         if (opnd.prioridad() < np) {
             System.out.println("(");
@@ -25,6 +38,8 @@ public class SintaxisAbstractaTiny {
             fila = col = -1;
         }
 
+        private TipoBase tipoNodo;
+
         private int fila;
 
         private int col;
@@ -44,6 +59,15 @@ public class SintaxisAbstractaTiny {
         public Nodo ponVinculo(Nodo vinculo) {
             this.vinculo = vinculo;
             return this;
+        }
+
+        public Nodo ponTipoBase(TipoBase tipoNodo) {
+            this.tipoNodo = tipoNodo;
+            return this;
+        }
+
+        public TipoBase tipoNodo() {
+            return tipoNodo;
         }
 
         public int leeFila() {
