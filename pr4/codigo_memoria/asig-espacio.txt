@@ -1,4 +1,4 @@
-var dir // primera dirección libre
+var dir = 0 // primera dirección libre
 var nivel = 0
 var max_dir = 0 // máxima dirección ocupada
 
