@@ -8,6 +8,8 @@
     - NULL
     - ARRAY
     - STRUCT
+    - OK
+    - ERROR
 */
 
 ambos_ok(t0, t1):
@@ -69,27 +71,46 @@ tipado(dec_proc(id, pforms, prog)):
 
 // no_ref() no aplica
 
-// t_iden(id) no aplica
+tipado(t_iden(id)):
+    if vinculoDe(ts, id).tipo == ⊥ then // Mirar que haga falta, creo que sobre todo en caso de que sea un puntero a un tipo definido despues si que habria que dejarlo
+        tipado(vinculoDe(ts, id)) 
+    end if
+    $.tipo = vinculoDe(ts, id).tipo
 
-// t_string() no aplica
+tipado(t_string()):
+    $.tipo = STRING
 
-// t_int() no aplica
+tipado(t_int()):
+    $.tipo = INT
 
-// t_bool() no aplica
+tipado(t_bool()):
+    $.tipo = BOOL
 
-// t_real() no aplica
+tipado(t_real()):
+    $.tipo = REAL
 
-// t_array(tipo, ent) no aplica
+tipado(t_array(tipo, ent)):
+    tipado(tipo)
+    $.tipo = ARRAY
 
-// t_punter(tipo) no aplica
+tipado(t_punter(tipo)):
+    tipado(tipo)
+    $.tipo = PUNT
 
-// t_struct(camposs) no aplica
+tipado(t_struct(camposs)):
+    tipado(camposs)
+    $.tipo = STRUCT
 
-// mas_cmp_s(camposs, campos) no aplica
+tipado(mas_cmp_s(camposs, campos)):
+    tipado(camposs)
+    tipado(campos)
 
-// un_cmp_s(campos) no aplica
+tipado(un_cmp_s(campos)):
+    tipado(campos)
 
-// cmp_s(tipo, id) no aplica
+tipado(cmp_s(tipo, id)):
+    tipado(tipo)
+    $.tipo = tipo.tipo
 
 tipado(si_intrs(intrs)):
     tipado(intrs)
