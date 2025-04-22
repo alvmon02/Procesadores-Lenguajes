@@ -165,7 +165,7 @@ tipado(i_if(exp, prog, ielse)):
     tipado(exp)
     tipado(prog)
     tipado(ielse)
-    if exp.tipo == BOOL && prog.tipo == OK && prog.tipo == OK then
+    if exp.tipo == BOOL && prog.tipo == OK && ielse.tipo == OK then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -274,8 +274,6 @@ compatibles_preal_pform(pform(tipo, ref, id), exp):
         error("El tipo del argumento tiene que ser compatible con el tipo del parametro formal")
         return ERROR
     end if
-
-tipado()
 
 tipado(i_prog(prog)):
     tipado(prog)
