@@ -4,7 +4,7 @@ public class ErrorVinculacion extends ErrorProcesamiento {
     TipoErrorVinculacion tipo;
     String id;
 
-    public enum TipoErrorVinculacion {
+    private enum TipoErrorVinculacion {
         ERROR_NO_DECLARADO("identificador no declarado"),
         ERROR_DUPLICADO("declaracion duplicada"),;
 

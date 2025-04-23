@@ -4,7 +4,7 @@ public class ErrorPretipado extends ErrorProcesamiento {
     TipoErrorPretipado tipo;
     String id;
 
-    public enum TipoErrorPretipado {
+    private enum TipoErrorPretipado {
         ERROR_DIMENSION_NEGATIVA("la dimension no puede ser negativa"),
         ERROR_TIPO_NO_DECLARADO("no esta declarado como un tipo"),
         ERROR_CAMPO_DUPLICADO("campo duplicado"),;
