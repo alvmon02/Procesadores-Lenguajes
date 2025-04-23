@@ -302,8 +302,57 @@ public class Tipado extends ProcesamientoDef {
 
     @Override
     public void procesa(I_Call i_Call) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        if (claseDe(i_Call.vinculo(), Dec_Proc.class)) {
+            i_Call.ponTipoBase(compatibles_preals_pforms(((Dec_Proc) i_Call.vinculo()).pforms(), i_Call.preals(),
+                    i_Call.leeFila(), i_Call.leeCol()));
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNoSubprograma(i_Call.leeFila(), i_Call.leeCol(), i_Call.id()));
+            i_Call.ponTipoBase(TipoBase.ERROR);
+        }
+    }
+
+    private TipoBase compatibles_preals_pforms(PForms pforms, PReals preals, int fila, int col) {
+        if (claseDe(pforms, No_PForms.class) && claseDe(preals, No_PReals.class)) {
+            return TipoBase.OK;
+        } else if (claseDe(pforms, Si_PForms.class) && claseDe(preals, Si_PReals.class)) {
+            return compatibles_preals_pforms(pforms.pforms(), preals.preals(), fila, col);
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNParamDist(fila, col));
+            return TipoBase.ERROR;
+        }
+
+    }
+
+    private TipoBase compatibles_preals_pforms(LPForms pforms, LPReals preals, int fila, int col) {
+        if (claseDe(pforms, Mas_Cmp_S.class) && claseDe(preals, Mas_PReals.class)) {
+            TipoBase t0 = compatibles_preals_pforms(pforms.pforms(), preals.preals(), fila, col);
+            TipoBase t1 = compatibles_preals_pforms(pforms.pform(), preals.exp(), fila, col);
+            return ambos_ok(t0, t1);
+        } else if (claseDe(pforms, Un_Cmp_S.class) && claseDe(preals, Un_PReal.class)) {
+            TipoBase t1 = compatibles_preals_pforms(pforms.pform(), preals.exp(), fila, col);
+            return t1;
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNParamDist(preals.leeFila(), preals.leeCol()));
+            return TipoBase.ERROR;
+        }
+    }
+
+    private TipoBase compatibles_preals_pforms(PForm pform, Exp exp, int fila, int col) {
+        exp.procesa(this);
+        if (claseDe(pform.ref(), Si_Ref.class) && pform.tipoNodo() == TipoBase.REAL
+                && exp.tipoNodo() != TipoBase.REAL) {
+            errorProcesamientos.add(ErrorTipado.errorTipoReal(exp.leeFila(), exp.leeCol()));
+            return TipoBase.ERROR;
+        }
+        if (!TipoBase.compatibles(pform.tipoNodo(), exp.tipoNodo())) {
+            errorProcesamientos.add(ErrorTipado.errorTipoIncompatiblePFormal(exp.leeFila(), exp.leeCol()));
+            return TipoBase.ERROR;
+        }
+        if (claseDe(pform.ref(), Si_Ref.class) && asignable(exp)) {
+            errorProcesamientos.add(ErrorTipado.errorEsperabaDesignador(exp.leeFila(), exp.leeCol()));
+            return TipoBase.ERROR;
+        }
+        return TipoBase.OK;
     }
 
     @Override
