@@ -1,18 +1,112 @@
 package asint;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class SintaxisAbstractaTiny {
 
     public enum TipoBase {
-        INT, 
-        REAL, 
-        BOOL, 
-        STRING, 
-        PUNT, 
-        NULL, 
-        ARRAY, 
-        STRUCT, 
-        OK, 
-        ERROR
+        INT,
+        REAL,
+        BOOL,
+        STRING,
+        PUNT,
+        NULL,
+        ARRAY,
+        STRUCT(new ArrayList<>()),
+        OK,
+        ERROR;
+
+        private class campoStruct {
+            String id;
+            TipoBase tipo;
+
+            campoStruct(String id, TipoBase tipo) {
+                this.id = id;
+                this.tipo = tipo;
+            }
+        }
+
+        private TipoBase base = null;
+        private List<campoStruct> campos = null;
+
+        TipoBase() {
+            this.base = null;
+        }
+
+        TipoBase(List<campoStruct> campos) {
+            this.campos = campos;
+        }
+
+        public TipoBase setBase(TipoBase base) {
+            if (this == ARRAY || this == PUNT) {
+                this.base = base;
+                return this;
+            } else {
+                throw new UnsupportedOperationException("Base can only be set for ARRAY or PUNT");
+            }
+        }
+
+        public TipoBase getBase() {
+            if (this == ARRAY || this == PUNT) {
+                return base;
+            } else {
+                throw new UnsupportedOperationException("Base can only be set for ARRAY or PUNT");
+            }
+        }
+
+        public TipoBase addBase(String string, TipoBase base) {
+            if (this == STRUCT) {
+                this.campos.add(new campoStruct(string, base));
+                return this;
+            } else {
+                throw new UnsupportedOperationException("Base can only be added for STRUCT");
+            }
+        }
+
+        public static boolean compatibles(TipoBase t0, TipoBase t1) {
+            if (t0 == INT && t1 == INT) {
+                return true;
+            } else if (t0 == REAL && (t1 == INT || t1 == REAL)) {
+                return true;
+            } else if (t0 == BOOL && t1 == BOOL) {
+                return true;
+            } else if (t0 == STRING && t1 == STRING) {
+                return true;
+            } else if (t0 == ARRAY && t1 == ARRAY) {
+                // TODO revisar que no tengan que tener el mismo tamaño, aunque creo que no
+                return compatibles(t0.getBase(), t1.getBase());
+            } else if (t0 == STRUCT && t1 == STRUCT) {
+                if (t0.campos.size() != t1.campos.size()) {
+                    return false;
+                }
+                for (int i = 0; i < t0.campos.size(); i++) {
+                    if (compatibles(t0.campos.get(i).tipo, t1.campos.get(i).tipo)) {
+                        return false;
+                    }
+                }
+                return true;
+            } else if (t0 == PUNT && t1 == PUNT) {
+                return compatibles(t0.getBase(), t1.getBase());
+            } else if (t0 == PUNT && t1 == NULL) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public TipoBase busquedaCampo(String idCampo) {
+            if (this != STRUCT) {
+                throw new UnsupportedOperationException("Campo can only be searched in STRUCT");
+            }
+            for (campoStruct campo : campos) {
+                if (campo.id.equals(idCampo)) {
+                    return campo.tipo;
+                }
+            }
+            return ERROR;
+        }
+
     }
 
     private static void imprimeOpnd(Exp opnd, int np) {
