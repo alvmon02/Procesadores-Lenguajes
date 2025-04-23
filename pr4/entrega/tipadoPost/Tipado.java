@@ -5,26 +5,12 @@ import asint.SintaxisAbstractaTiny.*;
 
 public class Tipado extends ProcesamientoDef {
 
-    private TipoBase busquedaCampo(String idCampo, CamposS camposs) {
-        if (idCampo.equals(camposs.campoS().id()))
-            return camposs.campoS().tipoNodo();
-        else if (claseDe(camposs, Mas_Cmp_S.class)) {
-            return busquedaCampo(idCampo, camposs.camposS());
-        } else {
-            return TipoBase.ERROR; // TODO Almacenar error por campo no definido
-        }
-    }
-
     private TipoBase ambos_ok(TipoBase t0, TipoBase t1) {
         if (t0 != TipoBase.OK && t1 != TipoBase.OK) {
             return TipoBase.OK;
         } else {
             return TipoBase.ERROR;
         }
-    }
-
-    private TipoBase compatibles(TipoBase t0, TipoBase t1) {
-        return null; // TODO Implementar compatibilidad de tipos
     }
 
     private void aviso_error(TipoBase t0, TipoBase t1) {
@@ -55,13 +41,22 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Mas_Decs decs) {
         decs.ldecs().procesa(this);
         decs.dec().procesa(this);
-        decs.ponTipoBase(ambos_ok(decs.ldecs().tipoNodo(), decs.dec().tipoNodo()));
+        if (decs.ldecs().tipoNodo() == TipoBase.ERROR || decs.dec().tipoNodo() == TipoBase.ERROR) {
+            decs.ponTipoBase(TipoBase.ERROR);
+        }
+        else {
+            decs.ponTipoBase(TipoBase.OK);
+        }
     }
 
     @Override
     public void procesa(Una_Dec dec) {
         dec.dec().procesa(this);
-        dec.ponTipoBase(dec.dec().tipoNodo());
+        if (dec.dec().tipoNodo() == TipoBase.ERROR) {
+            dec.ponTipoBase(TipoBase.ERROR);
+        } else {
+            dec.ponTipoBase(TipoBase.OK);
+        }
     }
 
     @Override
@@ -71,7 +66,7 @@ public class Tipado extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(Dec_Tipo dec_Tipo) {
+    public void procesa(Dec_Tipo dec_Tipo) { 
         dec_Tipo.tipo().procesa(this);
         dec_Tipo.ponTipoBase(dec_Tipo.tipo().tipoNodo());
     }
@@ -144,15 +139,17 @@ public class Tipado extends ProcesamientoDef {
     @Override
     public void procesa(T_Array tArray) {
         tArray.tipo().procesa(this);
-        // TODO mirar lo del tipo base
-        tArray.ponTipoBase(tArray.tipo().tipoNodo());
+        TipoBase tipo = TipoBase.ARRAY;
+        tipo.setBase(tArray.tipo().tipoNodo());
+        tArray.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(T_Puntero tPuntero) {
         tPuntero.tipo().procesa(this);
-        // TODO mirar lo del tipo base
-        tPuntero.ponTipoBase(tPuntero.tipo().tipoNodo());
+        TipoBase tipo = TipoBase.PUNT;
+        tipo.setBase(tPuntero.tipo().tipoNodo());
+        tPuntero.ponTipoBase(tipo);
     }
 
     @Override
@@ -324,12 +321,11 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Asig exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase tipo;
         if (!asignable(exp.opnd0())) {
             // TODO Almacenar error de que solo se puede asignar a una variable
             exp.ponTipoBase(TipoBase.ERROR);
-        } else if ((tipo = compatibles(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo())) != TipoBase.ERROR) {
-            exp.ponTipoBase(tipo);
+        } else if (TipoBase.compatibles(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo())) {
+            exp.ponTipoBase(TipoBase.OK);
         }
         else {
             aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo());
@@ -512,7 +508,7 @@ public class Tipado extends ProcesamientoDef {
         TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
         
         if (t0 == TipoBase.ARRAY && t1 == TipoBase.INT) {
-            exp.ponTipoBase(exp.opnd0().tipoNodo());
+            exp.ponTipoBase(t0.getBase());
         }
         else {
             if (t0 != TipoBase.ERROR && t1 != TipoBase.ERROR) {
@@ -525,14 +521,13 @@ public class Tipado extends ProcesamientoDef {
     @Override
     public void procesa(Acceso exp) {
         exp.opnd0().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo();
+        TipoBase tipo = exp.opnd0().tipoNodo();
         
-        if (t0 == TipoBase.STRUCT) {
-            // TODO revisar esto bien por si acaso salta excepcion si no es un T_Struct a lo que apunta la variable
-            exp.ponTipoBase(busquedaCampo(exp.id(), ((T_Struct)exp.vinculo()).camposS()));
+        if (tipo == TipoBase.STRUCT) {
+            exp.ponTipoBase(tipo.busquedaCampo(exp.id()));
         }
         else {
-            if (t0 != TipoBase.ERROR) {
+            if (tipo != TipoBase.ERROR) {
                 // TODO Almacenar error
             }
             exp.ponTipoBase(TipoBase.ERROR);
@@ -544,8 +539,7 @@ public class Tipado extends ProcesamientoDef {
         exp.opnd0().procesa(this);
         TipoBase tipo = exp.opnd0().tipoNodo();
         if (tipo == TipoBase.PUNT) {
-            // TODO habrá que devolver el tipo al que apunta el puntero
-            exp.ponTipoBase(null);
+            exp.ponTipoBase(tipo.getBase());
         }
         else {
             if (tipo != TipoBase.ERROR) {
