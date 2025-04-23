@@ -1,9 +1,23 @@
 package tipadoPost;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
+import errores_procesamiento.*;
 
 public class Tipado extends ProcesamientoDef {
+
+    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+
+    public boolean hayErrores() {
+        return errorProcesamientos.size() > 0;
+    }
+
+    public List<ErrorProcesamiento> errores() {
+        return errorProcesamientos;
+    }
 
     private TipoBase ambos_ok(TipoBase t0, TipoBase t1) {
         if (t0 != TipoBase.OK && t1 != TipoBase.OK) {
@@ -13,9 +27,9 @@ public class Tipado extends ProcesamientoDef {
         }
     }
 
-    private void aviso_error(TipoBase t0, TipoBase t1) {
+    private void aviso_error(TipoBase t0, TipoBase t1, ErrorTipado error) {
         if (t0 != TipoBase.ERROR && t1 != TipoBase.ERROR) {
-            // TODO Almacenar error por tipos incompatibles
+            errorProcesamientos.add(error);
         }
     }
 
@@ -43,8 +57,7 @@ public class Tipado extends ProcesamientoDef {
         decs.dec().procesa(this);
         if (decs.ldecs().tipoNodo() == TipoBase.ERROR || decs.dec().tipoNodo() == TipoBase.ERROR) {
             decs.ponTipoBase(TipoBase.ERROR);
-        }
-        else {
+        } else {
             decs.ponTipoBase(TipoBase.OK);
         }
     }
@@ -66,7 +79,7 @@ public class Tipado extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(Dec_Tipo dec_Tipo) { 
+    public void procesa(Dec_Tipo dec_Tipo) {
         dec_Tipo.tipo().procesa(this);
         dec_Tipo.ponTipoBase(dec_Tipo.tipo().tipoNodo());
     }
@@ -213,7 +226,7 @@ public class Tipado extends ProcesamientoDef {
         i_If.prog().procesa(this);
         i_If.i_else().procesa(this);
         if (i_If.exp().tipoNodo() != TipoBase.BOOL) {
-            // TODO Almacenar error por tipo de expresion no booleana
+            errorProcesamientos.add(ErrorTipado.errorBooleana(i_If.exp().leeFila(), i_If.exp().leeCol()));
             i_If.ponTipoBase(TipoBase.ERROR);
         } else {
             i_If.ponTipoBase(ambos_ok(i_If.i_else().tipoNodo(), i_If.prog().tipoNodo()));
@@ -225,7 +238,7 @@ public class Tipado extends ProcesamientoDef {
         i_While.exp().procesa(this);
         i_While.prog().procesa(this);
         if (i_While.exp().tipoNodo() != TipoBase.BOOL) {
-            // TODO Almacenar error por tipo de expresion no booleana
+            errorProcesamientos.add(ErrorTipado.errorBooleana(i_While.exp().leeFila(), i_While.exp().leeCol()));
             i_While.ponTipoBase(TipoBase.ERROR);
         } else {
             i_While.ponTipoBase(i_While.prog().tipoNodo());
@@ -237,11 +250,10 @@ public class Tipado extends ProcesamientoDef {
         i_Read.exp().procesa(this);
         TipoBase tipo = i_Read.exp().tipoNodo();
         if (claseDe(i_Read.exp(), Iden.class)) {
-            // TODO Almacenar error porque solo se puede leer en una variable
+            errorProcesamientos.add(ErrorTipado.errorDesignadorEsperado(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
             i_Read.ponTipoBase(TipoBase.ERROR);
         } else if (tipo != TipoBase.INT && tipo != TipoBase.REAL && tipo != TipoBase.STRING) {
-            // TODO Almacenar error de que solo se puede leer un en una variable de tipo
-            // entero, real o string
+            errorProcesamientos.add(ErrorTipado.errorNoLegible(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
             i_Read.ponTipoBase(TipoBase.ERROR);
         } else {
             i_Read.ponTipoBase(TipoBase.OK);
@@ -253,8 +265,7 @@ public class Tipado extends ProcesamientoDef {
         i_Write.exp().procesa(this);
         TipoBase tipo = i_Write.exp().tipoNodo();
         if (tipo != TipoBase.INT && tipo != TipoBase.REAL && tipo != TipoBase.STRING) {
-            // TODO Almacenar error de que solo se puede leer un en una variable de tipo
-            // entero, real o string
+            errorProcesamientos.add(ErrorTipado.errorNoImprimible(i_Write.exp().leeFila(), i_Write.exp().leeCol()));
             i_Write.ponTipoBase(TipoBase.ERROR);
         } else {
             i_Write.ponTipoBase(TipoBase.OK);
@@ -270,8 +281,7 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
         if (i_New.exp().tipoNodo() != TipoBase.PUNT) {
-            // TODO Almacenar error de que solo se puede leer un en una variable de tipo
-            // entero, real o string
+            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_New.exp().leeFila(), i_New.exp().leeCol()));
             i_New.ponTipoBase(TipoBase.ERROR);
         } else {
             i_New.ponTipoBase(TipoBase.OK);
@@ -282,7 +292,7 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         if (i_Delete.exp().tipoNodo() != TipoBase.PUNT) {
-            // TODO Almacenar error de que solo se puede leer un en una variable de tipo
+            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_Delete.exp().leeFila(), i_Delete.exp().leeCol()));
             // entero, real o string
             i_Delete.ponTipoBase(TipoBase.ERROR);
         } else {
@@ -314,7 +324,8 @@ public class Tipado extends ProcesamientoDef {
     }
 
     private boolean asignable(Nodo exp) {
-        return (claseDe(exp, Iden.class) || claseDe(exp, Acceso.class) || claseDe(exp, Index.class) || claseDe(exp, Indireccion.class));
+        return (claseDe(exp, Iden.class) || claseDe(exp, Acceso.class) || claseDe(exp, Index.class)
+                || claseDe(exp, Indireccion.class));
     }
 
     @Override
@@ -322,138 +333,138 @@ public class Tipado extends ProcesamientoDef {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
         if (!asignable(exp.opnd0())) {
-            // TODO Almacenar error de que solo se puede asignar a una variable
+            errorProcesamientos.add(ErrorTipado.errorDesignadorIzq(exp.opnd0().leeFila(), exp.opnd0().leeCol()));
             exp.ponTipoBase(TipoBase.ERROR);
         } else if (TipoBase.compatibles(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo())) {
             exp.ponTipoBase(TipoBase.OK);
-        }
-        else {
-            aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo());
+        } else {
+            aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo(),
+                    ErrorTipado.errorTiposIncompatiblesAsig(exp.leeFila(),
+                            exp.leeCol()));
             exp.ponTipoBase(TipoBase.ERROR);
         }
     }
 
-    private TipoBase tipado_comp(Exp opnd0, Exp opnd1) {
-        opnd0.procesa(this);
-        opnd1.procesa(this);
-        TipoBase t0 = opnd0.tipoNodo(), t1 = opnd1.tipoNodo();
-        if (((t0 == TipoBase.PUNT || t0 == TipoBase.NULL) && (t1 == TipoBase.PUNT || t1 == TipoBase.NULL)) || (t0 == TipoBase.STRING && t1 == TipoBase.STRING) || (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL) || ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL))) {
+    private TipoBase tipado_comp(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if (((t0 == TipoBase.PUNT || t0 == TipoBase.NULL) && (t1 == TipoBase.PUNT || t1 == TipoBase.NULL))
+                || (t0 == TipoBase.STRING && t1 == TipoBase.STRING) || (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL)
+                || ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL))) {
             return TipoBase.OK;
-        }
-        else {
-            aviso_error(opnd0.tipoNodo(), opnd1.tipoNodo());
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
         }
         return TipoBase.ERROR;
     }
 
-    private TipoBase tipado_comp_ord(Exp opnd0, Exp opnd1) {
-        opnd0.procesa(this);
-        opnd1.procesa(this);
-        TipoBase t0 = opnd0.tipoNodo(), t1 = opnd1.tipoNodo();
-        if ((t0 == TipoBase.STRING && t1 == TipoBase.STRING) || (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL) || ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL))) {
+    private TipoBase tipado_comp_ord(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if ((t0 == TipoBase.STRING && t1 == TipoBase.STRING) || (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL)
+                || ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL))) {
             return TipoBase.OK;
-        }
-        else {
-            aviso_error(opnd0.tipoNodo(), opnd1.tipoNodo());
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
         }
         return TipoBase.ERROR;
     }
 
-    private TipoBase tipado_arit(Exp opnd0, Exp opnd1) {
-        opnd0.procesa(this);
-        opnd1.procesa(this);
-        TipoBase t0 = opnd0.tipoNodo(), t1 = opnd1.tipoNodo();
+    private TipoBase tipado_arit(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
         if (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL) {
             return TipoBase.BOOL;
-        }
-        else {
-            aviso_error(opnd0.tipoNodo(), opnd1.tipoNodo());
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
         }
         return TipoBase.ERROR;
     }
 
-    private TipoBase tipado_and_or(Exp opnd0, Exp opnd1) {
-        opnd0.procesa(this);
-        opnd1.procesa(this);
-        TipoBase t0 = opnd0.tipoNodo(), t1 = opnd1.tipoNodo();
+    private TipoBase tipado_and_or(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
         if ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL)) {
             return (t0 == TipoBase.REAL || t1 == TipoBase.REAL) ? TipoBase.REAL : TipoBase.INT;
-        }
-        else {
-            aviso_error(opnd0.tipoNodo(), opnd1.tipoNodo());
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
         }
         return TipoBase.ERROR;
     }
 
     @Override
     public void procesa(Comp exp) {
-        TipoBase tipo = tipado_comp(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_comp(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Dist exp) {
-        TipoBase tipo = tipado_comp(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_comp(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Menor exp) {
-        TipoBase tipo = tipado_comp_ord(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_comp_ord(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Mayor exp) {
-        TipoBase tipo = tipado_comp_ord(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_comp_ord(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(MenorIgual exp) {
-        TipoBase tipo = tipado_comp_ord(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_comp_ord(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(MayorIgual exp) {
-        TipoBase tipo = tipado_comp_ord(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_comp_ord(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Suma exp) {
-        TipoBase tipo = tipado_arit(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_arit(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Resta exp) {
-        TipoBase tipo = tipado_arit(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_arit(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(And exp) {
-        TipoBase tipo = tipado_and_or(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_and_or(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Or exp) {
-        TipoBase tipo = tipado_and_or(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_and_or(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Mul exp) {
-        TipoBase tipo = tipado_arit(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_arit(exp);
         exp.ponTipoBase(tipo);
     }
 
     @Override
     public void procesa(Div exp) {
-        TipoBase tipo = tipado_arit(exp.opnd0(), exp.opnd1());
+        TipoBase tipo = tipado_arit(exp);
         exp.ponTipoBase(tipo);
     }
 
@@ -464,9 +475,10 @@ public class Tipado extends ProcesamientoDef {
         TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
         if (t0 == TipoBase.INT && t1 == TipoBase.INT) {
             exp.ponTipoBase(TipoBase.INT);
-        }
-        else {
-            aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo());
+        } else {
+            aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo(),
+                    ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(),
+                            exp.leeCol()));
             exp.ponTipoBase(TipoBase.ERROR);
         }
     }
@@ -477,10 +489,9 @@ public class Tipado extends ProcesamientoDef {
         TipoBase tipo = exp.opnd0().tipoNodo();
         if (tipo == TipoBase.INT || tipo == TipoBase.REAL) {
             exp.ponTipoBase(tipo);
-        }
-        else {
+        } else {
             if (tipo != TipoBase.ERROR) {
-                // TODO Almacenar error por tipo de expresion no numerica
+                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol()));
             }
             exp.ponTipoBase(TipoBase.ERROR);
         }
@@ -492,10 +503,9 @@ public class Tipado extends ProcesamientoDef {
         TipoBase tipo = exp.opnd0().tipoNodo();
         if (tipo == TipoBase.BOOL) {
             exp.ponTipoBase(tipo);
-        }
-        else {
+        } else {
             if (tipo != TipoBase.ERROR) {
-                // TODO Almacenar error por tipo de expresion no booleana
+                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol()));
             }
             exp.ponTipoBase(TipoBase.ERROR);
         }
@@ -506,13 +516,12 @@ public class Tipado extends ProcesamientoDef {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
         TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
-        
+
         if (t0 == TipoBase.ARRAY && t1 == TipoBase.INT) {
             exp.ponTipoBase(t0.getBase());
-        }
-        else {
+        } else {
             if (t0 != TipoBase.ERROR && t1 != TipoBase.ERROR) {
-                // TODO Almacenar error
+                errorProcesamientos.add(ErrorTipado.errorTiposIncompatiblesIndx(exp.leeFila(), exp.leeCol()));
             }
             exp.ponTipoBase(TipoBase.ERROR);
         }
@@ -522,13 +531,16 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Acceso exp) {
         exp.opnd0().procesa(this);
         TipoBase tipo = exp.opnd0().tipoNodo();
-        
+
         if (tipo == TipoBase.STRUCT) {
-            exp.ponTipoBase(tipo.busquedaCampo(exp.id()));
-        }
-        else {
+            TipoBase tCampo = tipo.busquedaCampo(exp.id());
+            if (tCampo == TipoBase.ERROR) {
+                errorProcesamientos.add(ErrorTipado.errorCampoInexistente(exp.leeFila(), exp.leeCol(), exp.id()));
+            }
+            exp.ponTipoBase(tCampo);
+        } else {
             if (tipo != TipoBase.ERROR) {
-                // TODO Almacenar error
+                errorProcesamientos.add(ErrorTipado.errorAccesoNoReg(exp.leeFila(), exp.leeCol()));
             }
             exp.ponTipoBase(TipoBase.ERROR);
         }
@@ -540,10 +552,9 @@ public class Tipado extends ProcesamientoDef {
         TipoBase tipo = exp.opnd0().tipoNodo();
         if (tipo == TipoBase.PUNT) {
             exp.ponTipoBase(tipo.getBase());
-        }
-        else {
+        } else {
             if (tipo != TipoBase.ERROR) {
-                // TODO Almacenar error por tipo de expresion no puntero
+                errorProcesamientos.add(ErrorTipado.errorTipoPuntero(exp.leeFila(), exp.leeCol()));
             }
             exp.ponTipoBase(TipoBase.ERROR);
         }
@@ -578,9 +589,8 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Iden exp) {
         if (claseDe(exp.vinculo(), Dec_Var.class)) {
             exp.ponTipoBase(exp.vinculo().tipoNodo());
-        }
-        else {
-            // TODO tiene que ser una variable declarada
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNoVariable(exp.leeFila(), exp.leeCol(), exp.id()));
             exp.ponTipoBase(TipoBase.ERROR);
         }
     }
