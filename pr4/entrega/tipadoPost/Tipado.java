@@ -1,7 +1,7 @@
 package tipadoPost;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.TreeSet;
 
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
@@ -9,13 +9,18 @@ import errores_procesamiento.*;
 
 public class Tipado extends ProcesamientoDef {
 
-    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+    public Tipado tipar(Prog prog) {
+        prog.procesa(this);
+        return this;
+    }
+
+    private TreeSet<ErrorProcesamiento> errorProcesamientos = new TreeSet<>();
 
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }
 
-    public List<ErrorProcesamiento> errores() {
+    public Collection<ErrorProcesamiento> errores() {
         return errorProcesamientos;
     }
 
@@ -636,7 +641,7 @@ public class Tipado extends ProcesamientoDef {
 
     @Override
     public void procesa(Iden exp) {
-        if (claseDe(exp.vinculo(), Dec_Var.class)) {
+        if (claseDe(exp.vinculo(), Dec_Var.class) || claseDe(exp.vinculo(), PForm.class)) {
             exp.ponTipoBase(exp.vinculo().tipoNodo());
         } else {
             errorProcesamientos.add(ErrorTipado.errorNoVariable(exp.leeFila(), exp.leeCol(), exp.id()));
@@ -648,5 +653,4 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Null exp) {
         exp.ponTipoBase(TipoBase.NULL);
     }
-
 }
