@@ -4,9 +4,9 @@ import asint.*;
 import asint.SintaxisAbstractaTiny.*;
 import errores_procesamiento.ErrorProcesamiento;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+import java.util.TreeSet;
 import java.util.Set;
 import java.util.Stack;
 
@@ -14,18 +14,18 @@ public class Pretipado extends ProcesamientoDef {
 
     private Stack<Set<String>> variablesDeclaradas;
 
-    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+    private TreeSet<ErrorProcesamiento> errorProcesamientos;
 
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }
 
-    public List<ErrorProcesamiento> errores() {
+    public Collection<ErrorProcesamiento> errores() {
         return errorProcesamientos;
     }
 
     public Pretipado() {
-        errorProcesamientos = new ArrayList<>();
+        errorProcesamientos = new TreeSet<>();
         variablesDeclaradas = new Stack<>();
     }
 
@@ -179,10 +179,10 @@ public class Pretipado extends ProcesamientoDef {
     public void procesa(I_While i_While) {
         i_While.prog().procesa(this);
     }
-    
+
     @Override
     public void procesa(I_Prog i_Prog) {
-        i_Prog.prog().procesa(this);    
+        i_Prog.prog().procesa(this);
     }
 
     @Override

@@ -5,9 +5,9 @@ import asint.SintaxisAbstractaTiny.*;
 import errores_procesamiento.*;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.TreeSet;
 import java.util.Stack;
-import java.util.ArrayList;
+import java.util.Collection;
 
 public class Vinculado extends ProcesamientoDef {
     
@@ -48,13 +48,13 @@ public class Vinculado extends ProcesamientoDef {
     }
 
     private TablaSimbolos tablaSimbolos;
-    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
+    private TreeSet<ErrorProcesamiento> errorProcesamientos = new TreeSet<>();
     
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }
 
-    public List<ErrorProcesamiento> errores() {
+    public Collection<ErrorProcesamiento> errores() {
         return errorProcesamientos;
     }
 
