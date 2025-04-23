@@ -28,8 +28,8 @@ Errores_vinculacion fila:53 col:32
 Errores_vinculacion fila:54 col:7
 Errores_vinculacion fila:54 col:22
 Errores_vinculacion fila:55 col:6
+Errores_vinculacion fila:57 col:4
 Errores_vinculacion fila:60 col:7
 Errores_vinculacion fila:61 col:12
 Errores_vinculacion fila:62 col:8
 Errores_vinculacion fila:62 col:39
-Errores_vinculacion fila:57 col:4
