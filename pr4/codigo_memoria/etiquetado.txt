@@ -1,0 +1,183 @@
+var sub_pendientes=pila_vacia()
+var etq_final
+
+etiquetado(prog(decs,intrs)):
+	$.prim=etq_final
+	recolecta_subs(decs)
+	etiquetado(intrs)
+	etq_final++
+	while ¬ es-vacia(sub_pendientes)
+		sub=cima(sub_pendientes)
+		desapila(sub_pendientes)
+		let sub= dec_proc(id,pforms,prog) in
+			sub.prim=etq_final
+			etq_final++
+			recolecta_subs(pforms)
+			etiquetado(prog)
+			etq_total+=2
+			sub.sig=etq_final
+		end let
+	end while
+	$.sig=etq_final
+
+//etiquetado(si_decs(decs)) ?
+
+//etiquetado(no_decs(decs)) ?
+
+etiquetado(mas_decs(decs,dec)):
+	$.prim=etq_final
+	etiquetado(decs)
+	etiquetado(dec)
+	$.sig=etq_final
+
+etiquetado(una_dec(dec)):
+	$.prim=etq_final
+	etiquetado(dec)
+	$.sig=etq_final
+
+etiquetado-acc-id(dec_var(tipo, id)):
+	if $.nivel=0 then
+		etq_final++
+	else
+		etiquetado-acc-var($)
+	end if
+
+//dec_tipo(tipo, id) ?
+
+//dec_proc(id, pforms, prog) ?
+
+//si_pforms(pfroms) ?
+
+//no_pforms() ?
+
+etiquetado(mas_pforms(pforms,pform))
+	$.prim=etq_final
+	etiquetado(pforms)
+	etiquetado(pform)
+	$.sig=etq_final
+
+etiquetado(una_pform(pform)):
+	$.prim=etq_final
+	etiquetado(pform)
+	$.sig=etq_final
+
+//pform(tipo, ref, id)?
+
+//si_ref() ?
+
+//no_ref() ?
+
+etiquetado(t_iden(id)):
+	$.prim=etq_final
+	etiquetado-acc-id(id.vinculo)
+	$.sig=etq_final
+	
+//t_string() ?
+//t_int() ?
+//t_bool() ?
+//t_real() ?
+//t_array(tipo, ent) ?
+//t_punter(tipo) ?
+//t_struct(camposs) ?
+
+etiquetado(mas_cmp_s(camposs,campos)):
+	$.prim=etq_final
+	etiquetado(camposs)
+	etiquetado(campos)
+	$.sig=etq_final
+
+etiquetado(un_cmp_s(campos)):
+	$.prim=etq_final
+	etiquetado(campos)
+	$.sig=etq_final
+
+//cmp_s(tipo, id)
+
+//si_intrs(intrs) ?
+
+//no_intrs() ?
+
+etiquetado(mas_intrs(intrs,intr)):
+	$.prim=etq_final
+	etiquetado(intrs)
+	etiquetado(intr)
+	$.sig=etq_final
+
+etiquetado(una_intr(intr)):
+	$.prim=etq_final
+	etiquetado(intr)
+	$.sig=etq_final
+
+etiquetado(i_eval(exp)):
+	$.prim=etq_final
+	if es-designador(exp) then
+		etq_final++
+	end if
+	$.sig=etq_final
+
+etiquetado(i_if(exp,prog,i_else)):
+	$.prim=etq_final
+	etiquetado(exp)
+	//etiquetado-acc-val?
+	etq_total++
+	etiquetado(prog)
+	etq_total++
+	etiquetado(i_else)
+	etq_total++
+	$.sig=etq_final
+
+etiquetado(i_while(exp,prog)):
+	$.prim=etq_final
+	etiquetado(exp)
+	//etiquetado-acc-val?
+	etq_total++
+	etiquetado(prog)
+	etq_total++
+	$.sig=etq_final
+
+i_read(exp)
+i_write(exp)
+i_nl()
+i_new(exp)
+i_delete(exp)
+i_call(id, preals)
+i_prog(prog)
+//si_else(prog) ?
+//no_else() ?
+//si_preals(preals) ?
+//no_preals() ?
+
+etiquetado(mas_preals(preals,exp)):
+	$.prim=etq_final
+	etiquetado(preals)
+	etiquetado(exp)
+	$.sig=etq_final
+
+un_preals(exp)
+
+e_asig(opnd0, opnd1)
+e_comp(opnd0, opnd1)
+e_dist(opnd0, opnd1)
+e_lt(opnd0, opnd1)
+e_gt(opnd0, opnd1)
+e_leq(opnd0, opnd1)
+e_geq(opnd0, opnd1)
+e_suma(opnd0, opnd1)
+e_resta(opnd0, opnd1)
+e_and(opnd0, opnd1)
+e_or(opnd0, opnd1)
+e_mul(opnd0, opnd1)
+e_div(opnd0, opnd1)
+e_porcentaje(opnd0, opnd1)
+e_negativo(opnd)
+e_negado(opnd)
+e_indexado(opnd0, opnd1)
+e_campo(opnd, id)
+e_puntero(opnd)
+e_lit_ent(num)
+e_lit_real(num)
+e_true()
+e_false()
+e_string(string)
+e_iden(id)
+e_null()
