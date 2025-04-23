@@ -1,0 +1,344 @@
+var sub_pendientes = pila-vacia()
+
+
+gen-code(prog(decs, intrs))
+    recolecta-subs(decs)
+    gen-code(intrs)
+    emit stop()
+
+    while not es-vacia(sub_pendientes)
+        sub = cima(sub_pendientes)
+        desapila(sub_pendientes)
+        let sub = dec_proc(id, param, decs, Is) in 
+            emit desapilad(sub.nivel)
+            recolecta-subs(Decs)
+            gen-code(Is)
+            emit desactiva(sub.nivel, sub.tam)
+            emit ir-ind()
+        end let
+    end while
+
+
+recolecta-subs(si_decs(decs)):
+    recolecta-subs(decs)
+
+recolecta-subs(no_decs()):
+    noop
+
+recolecta-subs(mas_decs(decs, dec)):
+    recolecta-subs(decs)
+    recolecta-subs(dec)
+
+recolecta-subs(una_dec(dec)):
+    recolecta-subs(dec)
+
+recolecta-subs(dec_var(tipo, id)):
+    noop
+
+recolecta-subs(dec_tipo(tipo, id)):
+    noop
+
+recolecta-subs(dec_proc(id, pforms, prog)):
+    apila(sub_pendientes, dec_proc(id, pforms, prog))
+
+
+
+gen-code(si_pforms(pforms)):
+    gen-code(pforms)
+
+gen-code(no_pforms()):
+    noop
+
+gen-code(mas_pforms(pforms, pform)):
+    gen-code(pforms)
+    gen-code(pform)
+
+gen-code(una_pform(pform)):
+    gen-code(pform)
+
+gen-code(pform(tipo, ref, id)):
+    dir(id) = current_dir
+    if ref == si_ref():
+        current_dir = current_dir + tamaño(t_punter(tipo))
+    else:
+        current_dir = current_dir + tamaño(tipo)
+
+
+
+
+
+
+
+
+
+
+gen-code(si_intrs(intrs)):
+    gen-code(intrs)
+
+gen-code(no_intrs()):
+    noop
+
+gen-code(mas_intrs(intrs, intr)):
+    gen-code(intrs)
+    gen-code(intr)
+
+gen-code(una_intr(intr)):
+    gen-code(intr)
+
+gen-code(i_eval(exp)):
+    gen-code(exp)
+    emit desapila()  
+
+gen-code(i_if(exp, prog, ielse)):
+    
+    gen-code(exp)
+    if es-designador(exp):
+        emit apila-ind
+    
+    if ielse == no_else():
+        emit ir-f($.sig)
+        gen-code(prog)
+    else:
+        emit ir-f($.sig)
+        gen-code(prog)
+        emit ir-a(&.prim)
+        gen-code(ielse.prog)
+
+gen-code(i_while(exp, prog)):
+    gen-code(exp)
+    if es-designador(exp):
+        emit apila-ind
+    
+    emit ir-f($.sig)
+    gen-code(prog)
+    emit ir-a(&.prim)
+
+
+gen-code(i_read(exp)):
+    gen-code(exp) // dirección de lectura se deja en la cima
+    emit read      // lee el valor y se guarda en la cima
+    emit desapila-ind  //guarda la cima en la dirección de la subcima
+
+gen-code(i_write(exp)):
+    gen-code(exp)
+    if es-designador(exp):
+        emit apila-ind // apilamos el valor de la dirección
+    emit write     // escribimos
+
+gen-code(i_nl()):
+    emit nl  // no sé si hay que hacer algo
+
+gen-code(i_new(exp)):
+    gen-code(exp)  //Dirección donde está el puntero
+    emit apila-int(tamaño(exp.tipo))  // no sé muy bn como sacar el tamaño
+    emit alloc     // el tamaño está en la cima, lo cogemos y reservamos ese tamaño de memoria, se apila en cima el comienzo de la memoria reservada
+    emit desapila-ind  // en la cima tenemos el comienzo de la mem dinamica asignada, en la subcima la dir del propio puntero, guardamos en la subcima la cima
+
+gen-code(i_delete(exp)):
+    gen-code(exp)  // Direccion donde está el puntero
+    emit apila-ind  // apilamos el valor apuntado por el puntero
+    emit apila-int(tamaño(exp.tipo)) //apilamos el tamaño del tipo
+    emit dealloc // liberamos la memoria de dicho tamaño
+
+gen-code(i_call(id, preals)):
+    //TODO
+
+
+gen-code(e_asig(opnd0, opnd1)):
+    if not es-designador(opnd0):
+        error("Lado izquierdo de asignación debe ser un designador")
+    
+    v0 = gen-code(opnd0)  //Direccion donde asignar
+    gen-code(opnd1)  // Valor a asignar o direccion si es designador
+    
+    if es-designador(opnd1):
+        if es_tipo_compuesto(opnd0.tipo):
+            // ns como hacerlo pq hay que hacer , copy(r0, r1, tipo0, ) que eso lo que hace es Copia el valor del tipo  que se encuentra
+                almacenado a partir de la dirección d’ en el bloque que comienza a partir de la dirección d. Peero el copy de la maquina p hace otra cosa
+        else:
+            emit apila-ind //pone en la cima el valor apuntado
+    
+    if opnd1.tipo == t_int() and opnd0.tipo == t_real():
+        emit convertir_int_a_real
+    
+    emit desapila-ind
+    
+    //El valor de la expresion es el resultado de evaluar opnd0
+    gen-code(opnd0)
+
+
+
+gen-code(e_comp(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    emit igual  
+
+gen-code(e_dist(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    emit dist
+
+gen-code(e_lt(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    emit menor 
+
+gen-code(e_gt(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0): 
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    emit mayor  
+
+gen-code(e_leq(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    emit menor_igual 
+
+gen-code(e_geq(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    emit mayor_igual 
+
+
+
+gen-code(e_suma(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    if opnd0.tipo == t_real() or opnd1.tipo == t_real():
+        if opnd0.tipo == t_int():
+            emit convertir_subcima_int_a_real
+        if opnd1.tipo == t_int():
+            emit convertir_cima_int_a_real
+    
+    emit suma
+
+gen-code(e_resta(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):    
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    if opnd0.tipo == t_real() or opnd1.tipo == t_real():
+        if opnd0.tipo == t_int():
+            emit convertir_subcima_int_a_real
+        if opnd1.tipo == t_int():
+            emit convertir_cima_int_a_real
+    
+    emit resta
+
+gen-code(e_mul(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+
+    if opnd0.tipo == t_real() or opnd1.tipo == t_real():
+        if opnd0.tipo == t_int():
+            emit convertir_subcima_int_a_real
+        if opnd1.tipo == t_int():
+            emit convertir_cima_int_a_real
+    
+    emit mul
+
+gen-code(e_div(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+
+    if opnd0.tipo == t_real() or opnd1.tipo == t_real():
+        if opnd0.tipo == t_int():
+            emit convertir_subcima_int_a_real
+        if opnd1.tipo == t_int():
+            emit convertir_cima_int_a_real
+    
+    
+    emit div
+
+gen-code(e_porcentaje(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind  //apilamos el valor apuntado por el designador
+
+    emit modulo
+
+
+
+gen-code(e_and(opnd0, opnd1)):
+    
+
+gen-code(e_or(opnd0, opnd1)):
+  
+
+/* Operadores unarios */
+
+gen-code(e_negativo(opnd)):
+    gen-code(opnd)
+    if es-designador(opnd):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    //negarlo (no sé como hacerlo)
+
+gen-code(e_negado(opnd)):
+    gen-code(opnd)
+    if es-designador(opnd):
+        emit apila-ind
+    
+    //negarlo (no sé como hacerlo)
+
