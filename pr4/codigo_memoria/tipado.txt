@@ -80,15 +80,29 @@ tipado(dec_tipo(tipo, id)):
 tipado(dec_proc(id, pforms, prog)):
     tipado(prog)
 
-// si_pforms(pfroms) no aplica
-    
-// no_pforms() no aplica
+tipado(si_pforms(pfroms)):
+    tipado(pforms)
+    $.tipo = pforms.tipo
 
-// mas_pforms(pforms, pform) no aplica
+tipado(no_pforms()):
+    $.tipo = OK
 
-// una_pform(pform) no aplica
+tipado(mas_pforms(pforms, pform)):
+    tipado(pforms)
+    tipado(pform)
+    $.tipo = ambos_ok(pforms.tipo, pform.tipo)
 
-// pform(tipo, ref, id) no aplica
+tipado(una_pform(pform)):
+    tipado(pform)
+    $.tipo = pform.tipo
+
+tipado(pform(tipo, ref, id)):
+    tipado(tipo)
+    if tipo.tipo == ERROR then
+        $.tipo = ERROR
+    else
+        $.tipo = OK
+    end if
 
 // si_ref() no aplica
 
