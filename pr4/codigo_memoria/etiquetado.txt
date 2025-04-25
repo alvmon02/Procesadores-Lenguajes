@@ -35,13 +35,6 @@ etiquetado(una_dec(dec)):
 	etiquetado(dec)
 	$.sig=etq_final
 
-etiquetado-acc-id(dec_var(tipo, id)):
-	if $.nivel=0 then
-		etq_final++
-	else
-		etiquetado-acc-var($)
-	end if
-
 //dec_tipo(tipo, id) ?
 
 //dec_proc(id, pforms, prog) ?
@@ -155,29 +148,145 @@ etiquetado(mas_preals(preals,exp)):
 
 un_preals(exp)
 
-e_asig(opnd0, opnd1)
-e_comp(opnd0, opnd1)
-e_dist(opnd0, opnd1)
-e_lt(opnd0, opnd1)
-e_gt(opnd0, opnd1)
-e_leq(opnd0, opnd1)
-e_geq(opnd0, opnd1)
-e_suma(opnd0, opnd1)
-e_resta(opnd0, opnd1)
-e_and(opnd0, opnd1)
-e_or(opnd0, opnd1)
-e_mul(opnd0, opnd1)
-e_div(opnd0, opnd1)
-e_porcentaje(opnd0, opnd1)
+e_asig(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado(opnd0)
+	etiquetado(opnd1)
+	etq_final++
+	$.sig=etq_final
+
+
+etiquetado(e_comp(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_dist(opnd0, opnd1):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+
+etiquetado(e_lt(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_gt(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_leq(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_geq(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_suma(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_resta(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_and(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_or(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_mul(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_div(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_porcentaje(opnd0, opnd1)):
+	$.prim=etq_final
+	etiquetado-operands(opnd0, opnd1)
+	etq_final++
+	$.sig=etq_final
+
+
 e_negativo(opnd)
 e_negado(opnd)
 e_indexado(opnd0, opnd1)
 e_campo(opnd, id)
 e_puntero(opnd)
-e_lit_ent(num)
-e_lit_real(num)
+
+etiquetado(e_lit_ent(num))
+	$.prim=etq_final
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(e_lit_real(num))
+	$.prim=etq_final
+	etq_final++
+	$.sig=etq_final
+
 e_true()
+	$.prim=etq_final
+	etq_final++
+	$.sig=etq_final
+
 e_false()
+	$.prim=etq_final
+	etq_final++
+	$.sig=etq_final
+
 e_string(string)
-e_iden(id)
+
+etiquetado(e_iden(id)):
+	$.prim=etq_final
+	etq_final++
+	$.sig=etq_final
+
 e_null()
+	$.prim=etq_final
+	etq_final++
+	$.sig=etq_final
+
+//Funciones auxiliares
+
+etiquetado-acc-id(dec_var(tipo, id)):
+	if $.nivel=0 then
+		etq_final++
+	else
+		etiquetado-acc-var($)
+	end if
+
+etiquetado-acc-variable(var
+
+etiquetado-acc-valor(exp):
+	if es-designador(exp) then
+		etq_final++
+	end if
+
