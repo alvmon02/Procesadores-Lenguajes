@@ -1,3 +1,12 @@
+El tipo es: v1
+El tipo es: t1
+El tipo es: t1
+El tipo es: p
+El tipo es: p1
+El tipo es: p2
+El tipo es: v2
+El tipo es: p
+El tipo es: p
 Errores_pretipado fila:5 col:7
 Errores_pretipado fila:9 col:6
 Errores_pretipado fila:10 col:6

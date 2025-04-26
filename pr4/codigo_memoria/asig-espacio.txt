@@ -125,7 +125,7 @@ asig-espacio2(t_array(tipo, ent)):
     noop    // no sé si debería hacer algo aquí
 
 asig-espacio1(t_puntero(tipo)):
-    if tipo != ref(id) then:
+    if tipo != ref(id) then
         asig-espacio1(tipo)
     end if
     $.tam = 1

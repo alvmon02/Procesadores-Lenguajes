@@ -1,0 +1,4 @@
+El tipo es: tNodo1
+El tipo es: tLista1
+El tipo es: tNodo2
+El tipo es: tNodo2

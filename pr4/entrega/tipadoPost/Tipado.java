@@ -1,10 +1,13 @@
 package tipadoPost;
 
 import java.util.Collection;
-import java.util.TreeSet;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
+import asint.TiposBase.*;
 import errores_procesamiento.*;
 
 public class Tipado extends ProcesamientoDef {
@@ -14,7 +17,7 @@ public class Tipado extends ProcesamientoDef {
         return this;
     }
 
-    private TreeSet<ErrorProcesamiento> errorProcesamientos = new TreeSet<>();
+    private List<ErrorProcesamiento> errorProcesamientos = new ArrayList<>();
 
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
@@ -24,16 +27,16 @@ public class Tipado extends ProcesamientoDef {
         return errorProcesamientos;
     }
 
-    private TipoBase ambos_ok(TipoBase t0, TipoBase t1) {
-        if (t0 != TipoBase.OK && t1 != TipoBase.OK) {
-            return TipoBase.OK;
+    private TipoNodo ambos_ok(TipoNodo t0, TipoNodo t1) {
+        if (t0.isOk() && t1.isOk()) {
+            return new tOk();
         } else {
-            return TipoBase.ERROR;
+            return new tError();
         }
     }
 
-    private void aviso_error(TipoBase t0, TipoBase t1, ErrorTipado error) {
-        if (t0 != TipoBase.ERROR && t1 != TipoBase.ERROR) {
+    private void aviso_error(TipoNodo t0, TipoNodo t1, ErrorTipado error) {
+        if (!t0.isError() && !t1.isError()) {
             errorProcesamientos.add(error);
         }
     }
@@ -42,88 +45,96 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Prog prog) {
         prog.decs().procesa(this);
         prog.intrs().procesa(this);
-        prog.ponTipoBase(ambos_ok(prog.decs().tipoNodo(), prog.intrs().tipoNodo()));
+        prog.ponTipoNodo(ambos_ok(prog.decs().tipoNodo(), prog.intrs().tipoNodo()));
     }
 
     @Override
     public void procesa(Si_Decs decs) {
         decs.ldecs().procesa(this);
-        decs.ponTipoBase(decs.ldecs().tipoNodo());
+        decs.ponTipoNodo(decs.ldecs().tipoNodo());
     }
 
     @Override
     public void procesa(No_Decs decs) {
-        decs.ponTipoBase(TipoBase.OK);
+        decs.ponTipoNodo(new tOk());
     }
 
     @Override
     public void procesa(Mas_Decs decs) {
         decs.ldecs().procesa(this);
         decs.dec().procesa(this);
-        if (decs.ldecs().tipoNodo() == TipoBase.ERROR || decs.dec().tipoNodo() == TipoBase.ERROR) {
-            decs.ponTipoBase(TipoBase.ERROR);
+        if (decs.ldecs().tipoNodo().isError() || decs.dec().tipoNodo().isError()) {
+            decs.ponTipoNodo(new tError());
         } else {
-            decs.ponTipoBase(TipoBase.OK);
+            decs.ponTipoNodo(new tOk());
         }
     }
 
     @Override
     public void procesa(Una_Dec dec) {
         dec.dec().procesa(this);
-        if (dec.dec().tipoNodo() == TipoBase.ERROR) {
-            dec.ponTipoBase(TipoBase.ERROR);
+        if (dec.dec().tipoNodo().isError()) {
+            dec.ponTipoNodo(new tError());
         } else {
-            dec.ponTipoBase(TipoBase.OK);
+            dec.ponTipoNodo(new tOk());
         }
     }
 
     @Override
     public void procesa(Dec_Var dec_Var) {
         dec_Var.tipo().procesa(this);
-        dec_Var.ponTipoBase(dec_Var.tipo().tipoNodo());
+        dec_Var.ponTipoNodo(dec_Var.tipo().tipoNodo());
     }
 
     @Override
     public void procesa(Dec_Tipo dec_Tipo) {
         dec_Tipo.tipo().procesa(this);
-        dec_Tipo.ponTipoBase(dec_Tipo.tipo().tipoNodo());
+        dec_Tipo.ponTipoNodo(dec_Tipo.tipo().tipoNodo());
     }
 
     @Override
     public void procesa(Dec_Proc dec_Proc) {
-        dec_Proc.prog().procesa(this);
         dec_Proc.pforms().procesa(this);
-        dec_Proc.ponTipoBase(ambos_ok(dec_Proc.prog().tipoNodo(), dec_Proc.pforms().tipoNodo()));
+        // dec_Proc.prog().procesa(this);
+        dec_Proc.prog().ponTipoNodo(new tOk());
+        dec_Proc.ponTipoNodo(ambos_ok(dec_Proc.prog().tipoNodo(), dec_Proc.pforms().tipoNodo()));
     }
 
     @Override
     public void procesa(Si_PForms si_PForms) {
         si_PForms.pforms().procesa(this);
-        si_PForms.ponTipoBase(si_PForms.pforms().tipoNodo());
+        si_PForms.ponTipoNodo(si_PForms.pforms().tipoNodo());
     }
 
     @Override
     public void procesa(No_PForms no_PForms) {
-        no_PForms.ponTipoBase(TipoBase.OK);
+        no_PForms.ponTipoNodo(new tOk());
     }
 
     @Override
     public void procesa(Mas_PForms mas_PForm) {
         mas_PForm.pforms().procesa(this);
         mas_PForm.pform().procesa(this);
-        mas_PForm.ponTipoBase(ambos_ok(mas_PForm.pforms().tipoNodo(), mas_PForm.pform().tipoNodo()));
+
+        if (mas_PForm.pforms().tipoNodo().isError() || mas_PForm.pform().tipoNodo().isError())
+            mas_PForm.ponTipoNodo(new tError());
+        else
+            mas_PForm.ponTipoNodo(new tOk());
     }
 
     @Override
     public void procesa(Una_PForm una_PForm) {
         una_PForm.pform().procesa(this);
-        una_PForm.ponTipoBase(una_PForm.pform().tipoNodo());
+        if (una_PForm.pform().tipoNodo().isError())
+            una_PForm.ponTipoNodo(new tError());
+        else
+            una_PForm.ponTipoNodo(new tOk());
     }
 
     @Override
     public void procesa(PForm pform) {
         pform.tipo().procesa(this);
-        pform.ponTipoBase(pform.tipo().tipoNodo());
+        pform.ponTipoNodo(pform.tipo().tipoNodo());
     }
 
     @Override
@@ -131,250 +142,265 @@ public class Tipado extends ProcesamientoDef {
         if (tIden.vinculo().tipoNodo() == null) {
             tIden.vinculo().procesa(this);
         }
-        tIden.ponTipoBase(tIden.vinculo().tipoNodo());
+        tIden.ponTipoNodo(tIden.vinculo().tipoNodo());
     }
 
     @Override
     public void procesa(T_String tstring) {
-        tstring.ponTipoBase(TipoBase.STRING);
+        tstring.ponTipoNodo(new tCadena());
     }
 
     @Override
     public void procesa(T_Int tint) {
-        tint.ponTipoBase(TipoBase.INT);
+        tint.ponTipoNodo(new tInt());
     }
 
     @Override
     public void procesa(T_Bool tbool) {
-        tbool.ponTipoBase(TipoBase.BOOL);
+        tbool.ponTipoNodo(new tBool());
     }
 
     @Override
     public void procesa(T_Real treal) {
-        treal.ponTipoBase(TipoBase.REAL);
+        treal.ponTipoNodo(new tReal());
     }
 
     @Override
     public void procesa(T_Array tArray) {
         tArray.tipo().procesa(this);
-        TipoBase tipo = TipoBase.ARRAY;
+        TipoNodo tipo = new tArray(Integer.parseInt(tArray.ent()));
         tipo.setBase(tArray.tipo().tipoNodo());
-        tArray.ponTipoBase(tipo);
+        tArray.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(T_Puntero tPuntero) {
         tPuntero.tipo().procesa(this);
-        TipoBase tipo = TipoBase.PUNT;
+        TipoNodo tipo = new tPunt();
         tipo.setBase(tPuntero.tipo().tipoNodo());
-        tPuntero.ponTipoBase(tipo);
+        tPuntero.ponTipoNodo(tipo);
+    }
+
+    private TipoNodo addCampoStruct(TipoNodo struct, TipoNodo campo, String idCampo) {
+        if (struct.isStruct() && !campo.isError())
+            return struct.addBase(idCampo, campo);
+        else
+            return new tError();
     }
 
     @Override
     public void procesa(T_Struct tStruct) {
         tStruct.camposS().procesa(this);
-        tStruct.ponTipoBase(tStruct.camposS().tipoNodo());
+        tStruct.ponTipoNodo(tStruct.camposS().tipoNodo());
     }
 
     @Override
     public void procesa(Mas_Cmp_S mas_Cmp_S) {
         mas_Cmp_S.camposS().procesa(this);
         mas_Cmp_S.campoS().procesa(this);
-        mas_Cmp_S.ponTipoBase(ambos_ok(mas_Cmp_S.camposS().tipoNodo(), mas_Cmp_S.campoS().tipoNodo()));
+        mas_Cmp_S.ponTipoNodo(
+                addCampoStruct(mas_Cmp_S.camposS().tipoNodo(), mas_Cmp_S.campoS().tipoNodo(), mas_Cmp_S.campoS().id()));
     }
 
     @Override
     public void procesa(Un_Cmp_S un_Cmp_S) {
         un_Cmp_S.campoS().procesa(this);
-        un_Cmp_S.ponTipoBase(un_Cmp_S.campoS().tipoNodo());
+        un_Cmp_S.ponTipoNodo(addCampoStruct(new tStruct(), un_Cmp_S.campoS().tipoNodo(), un_Cmp_S.campoS().id()));
     }
 
     @Override
     public void procesa(CampoS campoS) {
         campoS.tipo().procesa(this);
-        campoS.ponTipoBase(campoS.tipo().tipoNodo());
+        campoS.ponTipoNodo(campoS.tipo().tipoNodo());
     }
 
     @Override
     public void procesa(Si_Intrs si_Intrs) {
         si_Intrs.intrs().procesa(this);
-        si_Intrs.ponTipoBase(si_Intrs.intrs().tipoNodo());
+        si_Intrs.ponTipoNodo(si_Intrs.intrs().tipoNodo());
     }
 
     @Override
     public void procesa(No_Intrs no_Intrs) {
-        no_Intrs.ponTipoBase(TipoBase.OK);
+        no_Intrs.ponTipoNodo(new tOk());
     }
 
     @Override
     public void procesa(Mas_Intrs mas_Intrs) {
         mas_Intrs.intrs().procesa(this);
         mas_Intrs.intr().procesa(this);
-        mas_Intrs.ponTipoBase(ambos_ok(mas_Intrs.intrs().tipoNodo(), mas_Intrs.intr().tipoNodo()));
+        mas_Intrs.ponTipoNodo(ambos_ok(mas_Intrs.intrs().tipoNodo(), mas_Intrs.intr().tipoNodo()));
     }
 
     @Override
     public void procesa(Una_Intr una_Intr) {
         una_Intr.intr().procesa(this);
-        una_Intr.ponTipoBase(una_Intr.intr().tipoNodo());
+        una_Intr.ponTipoNodo(una_Intr.intr().tipoNodo());
     }
 
     @Override
     public void procesa(I_Eval i_Eval) {
         i_Eval.exp().procesa(this);
-        i_Eval.ponTipoBase(i_Eval.exp().tipoNodo() != TipoBase.ERROR ? TipoBase.OK : TipoBase.ERROR);
+        i_Eval.ponTipoNodo(i_Eval.exp().tipoNodo().isError() ? new tError() : new tOk());
     }
 
     @Override
     public void procesa(I_If i_If) {
         i_If.exp().procesa(this);
+        boolean condicionBienFormada = i_If.exp().tipoNodo().isBool();
+
+        if (!condicionBienFormada)
+            errorProcesamientos.add(ErrorTipado.errorBooleana(i_If.exp().leeFila(), i_If.exp().leeCol()));
+
         i_If.prog().procesa(this);
         i_If.i_else().procesa(this);
-        if (i_If.exp().tipoNodo() != TipoBase.BOOL) {
-            errorProcesamientos.add(ErrorTipado.errorBooleana(i_If.exp().leeFila(), i_If.exp().leeCol()));
-            i_If.ponTipoBase(TipoBase.ERROR);
+        if (condicionBienFormada) {
+            i_If.ponTipoNodo(ambos_ok(i_If.i_else().tipoNodo(), i_If.prog().tipoNodo()));
         } else {
-            i_If.ponTipoBase(ambos_ok(i_If.i_else().tipoNodo(), i_If.prog().tipoNodo()));
+            i_If.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(I_While i_While) {
         i_While.exp().procesa(this);
-        i_While.prog().procesa(this);
-        if (i_While.exp().tipoNodo() != TipoBase.BOOL) {
+        boolean condicionBienFormada = i_While.exp().tipoNodo().isBool();
+
+        if (!condicionBienFormada)
             errorProcesamientos.add(ErrorTipado.errorBooleana(i_While.exp().leeFila(), i_While.exp().leeCol()));
-            i_While.ponTipoBase(TipoBase.ERROR);
+
+        i_While.prog().procesa(this);
+        if (condicionBienFormada) {
+            i_While.ponTipoNodo(i_While.prog().tipoNodo());
         } else {
-            i_While.ponTipoBase(i_While.prog().tipoNodo());
+            i_While.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(I_Read i_Read) {
         i_Read.exp().procesa(this);
-        TipoBase tipo = i_Read.exp().tipoNodo();
-        if (claseDe(i_Read.exp(), Iden.class)) {
+        TipoNodo tipo = i_Read.exp().tipoNodo();
+        if (!asignable(i_Read.exp())) {
             errorProcesamientos.add(ErrorTipado.errorDesignadorEsperado(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
-            i_Read.ponTipoBase(TipoBase.ERROR);
-        } else if (tipo != TipoBase.INT && tipo != TipoBase.REAL && tipo != TipoBase.STRING) {
-            errorProcesamientos.add(ErrorTipado.errorNoLegible(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
-            i_Read.ponTipoBase(TipoBase.ERROR);
+            i_Read.ponTipoNodo(new tError());
+        } else if (tipo.isInt() || tipo.isReal() || tipo.isCadena()) {
+            i_Read.ponTipoNodo(new tOk());
         } else {
-            i_Read.ponTipoBase(TipoBase.OK);
+            errorProcesamientos.add(ErrorTipado.errorNoLegible(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
+            i_Read.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(I_Write i_Write) {
         i_Write.exp().procesa(this);
-        TipoBase tipo = i_Write.exp().tipoNodo();
-        if (tipo != TipoBase.INT && tipo != TipoBase.REAL && tipo != TipoBase.STRING) {
-            errorProcesamientos.add(ErrorTipado.errorNoImprimible(i_Write.exp().leeFila(), i_Write.exp().leeCol()));
-            i_Write.ponTipoBase(TipoBase.ERROR);
+        TipoNodo tipo = i_Write.exp().tipoNodo();
+        if (tipo.isInt() || tipo.isReal() || tipo.isCadena() || tipo.isBool()) {
+            i_Write.ponTipoNodo(new tOk());
         } else {
-            i_Write.ponTipoBase(TipoBase.OK);
+            errorProcesamientos.add(ErrorTipado.errorNoImprimible(i_Write.exp().leeFila(), i_Write.exp().leeCol()));
+            i_Write.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(I_NL i_Nl) {
-        i_Nl.ponTipoBase(TipoBase.OK);
+        i_Nl.ponTipoNodo(new tOk());
     }
 
     @Override
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
-        if (i_New.exp().tipoNodo() != TipoBase.PUNT) {
-            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_New.exp().leeFila(), i_New.exp().leeCol()));
-            i_New.ponTipoBase(TipoBase.ERROR);
+        if (i_New.exp().tipoNodo().isPunt()) {
+            i_New.ponTipoNodo(new tOk());
         } else {
-            i_New.ponTipoBase(TipoBase.OK);
+            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_New.exp().leeFila(), i_New.exp().leeCol()));
+            i_New.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
-        if (i_Delete.exp().tipoNodo() != TipoBase.PUNT) {
-            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_Delete.exp().leeFila(), i_Delete.exp().leeCol()));
-            // entero, real o string
-            i_Delete.ponTipoBase(TipoBase.ERROR);
+        if (i_Delete.exp().tipoNodo().isPunt()) {
+            i_Delete.ponTipoNodo(new tOk());
         } else {
-            i_Delete.ponTipoBase(TipoBase.OK);
+            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_Delete.exp().leeFila(), i_Delete.exp().leeCol()));
+            i_Delete.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(I_Call i_Call) {
         if (claseDe(i_Call.vinculo(), Dec_Proc.class)) {
-            i_Call.ponTipoBase(compatibles_preals_pforms(((Dec_Proc) i_Call.vinculo()).pforms(), i_Call.preals(),
+            i_Call.ponTipoNodo(compatibles_preals_pforms(((Dec_Proc) i_Call.vinculo()).pforms(), i_Call.preals(),
                     i_Call.leeFila(), i_Call.leeCol()));
         } else {
             errorProcesamientos.add(ErrorTipado.errorNoSubprograma(i_Call.leeFila(), i_Call.leeCol(), i_Call.id()));
-            i_Call.ponTipoBase(TipoBase.ERROR);
+            i_Call.ponTipoNodo(new tError());
         }
     }
 
-    private TipoBase compatibles_preals_pforms(PForms pforms, PReals preals, int fila, int col) {
+    private TipoNodo compatibles_preals_pforms(PForms pforms, PReals preals, int fila, int col) {
         if (claseDe(pforms, No_PForms.class) && claseDe(preals, No_PReals.class)) {
-            return TipoBase.OK;
+            return new tOk();
         } else if (claseDe(pforms, Si_PForms.class) && claseDe(preals, Si_PReals.class)) {
             return compatibles_preals_pforms(pforms.pforms(), preals.preals(), fila, col);
         } else {
             errorProcesamientos.add(ErrorTipado.errorNParamDist(fila, col));
-            return TipoBase.ERROR;
+            return new tError();
         }
 
     }
 
-    private TipoBase compatibles_preals_pforms(LPForms pforms, LPReals preals, int fila, int col) {
-        if (claseDe(pforms, Mas_Cmp_S.class) && claseDe(preals, Mas_PReals.class)) {
-            TipoBase t0 = compatibles_preals_pforms(pforms.pforms(), preals.preals(), fila, col);
-            TipoBase t1 = compatibles_preals_pforms(pforms.pform(), preals.exp(), fila, col);
+    private TipoNodo compatibles_preals_pforms(LPForms pforms, LPReals preals, int fila, int col) {
+        if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
+            TipoNodo t0 = compatibles_preals_pforms(pforms.pforms(), preals.preals(), fila, col);
+            TipoNodo t1 = compatibles_preals_pforms(pforms.pform(), preals.exp(), fila, col);
             return ambos_ok(t0, t1);
-        } else if (claseDe(pforms, Un_Cmp_S.class) && claseDe(preals, Un_PReal.class)) {
-            TipoBase t1 = compatibles_preals_pforms(pforms.pform(), preals.exp(), fila, col);
+        } else if (claseDe(pforms, Una_PForm.class) && claseDe(preals, Un_PReal.class)) {
+            TipoNodo t1 = compatibles_preals_pforms(pforms.pform(), preals.exp(), fila, col);
             return t1;
         } else {
             errorProcesamientos.add(ErrorTipado.errorNParamDist(preals.leeFila(), preals.leeCol()));
-            return TipoBase.ERROR;
+            return new tError();
         }
     }
 
-    private TipoBase compatibles_preals_pforms(PForm pform, Exp exp, int fila, int col) {
+    private TipoNodo compatibles_preals_pforms(PForm pform, Exp exp, int fila, int col) {
         exp.procesa(this);
-        if (claseDe(pform.ref(), Si_Ref.class) && pform.tipoNodo() == TipoBase.REAL
-                && exp.tipoNodo() != TipoBase.REAL) {
+        if (claseDe(pform.ref(), Si_Ref.class) && pform.tipoNodo().isReal()
+                && !exp.tipoNodo().isReal()) {
             errorProcesamientos.add(ErrorTipado.errorTipoReal(exp.leeFila(), exp.leeCol()));
-            return TipoBase.ERROR;
+            return new tError();
         }
-        if (!TipoBase.compatibles(pform.tipoNodo(), exp.tipoNodo())) {
+        if (!pform.tipoNodo().compatible(exp.tipoNodo())) {
             errorProcesamientos.add(ErrorTipado.errorTipoIncompatiblePFormal(exp.leeFila(), exp.leeCol()));
-            return TipoBase.ERROR;
+            return new tError();
         }
-        if (claseDe(pform.ref(), Si_Ref.class) && asignable(exp)) {
+        if (claseDe(pform.ref(), Si_Ref.class) && !asignable(exp)) {
             errorProcesamientos.add(ErrorTipado.errorEsperabaDesignador(exp.leeFila(), exp.leeCol()));
-            return TipoBase.ERROR;
+            return new tError();
         }
-        return TipoBase.OK;
+        return new tOk();
     }
 
     @Override
     public void procesa(I_Prog i_Prog) {
         i_Prog.prog().procesa(this);
-        i_Prog.ponTipoBase(i_Prog.prog().tipoNodo());
+        i_Prog.ponTipoNodo(i_Prog.prog().tipoNodo());
     }
 
     @Override
     public void procesa(Si_Else si_Else) {
         si_Else.prog().procesa(this);
-        si_Else.ponTipoBase(si_Else.prog().tipoNodo());
+        si_Else.ponTipoNodo(si_Else.prog().tipoNodo());
     }
 
     @Override
     public void procesa(No_Else no_Else) {
-        no_Else.ponTipoBase(TipoBase.OK);
+        no_Else.ponTipoNodo(new tOk());
     }
 
     private boolean asignable(Nodo exp) {
@@ -388,180 +414,191 @@ public class Tipado extends ProcesamientoDef {
         exp.opnd1().procesa(this);
         if (!asignable(exp.opnd0())) {
             errorProcesamientos.add(ErrorTipado.errorDesignadorIzq(exp.opnd0().leeFila(), exp.opnd0().leeCol()));
-            exp.ponTipoBase(TipoBase.ERROR);
-        } else if (TipoBase.compatibles(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo())) {
-            exp.ponTipoBase(TipoBase.OK);
+            exp.ponTipoNodo(new tError());
+        } else if (exp.opnd0().tipoNodo().compatible(exp.opnd1().tipoNodo())) {
+            exp.ponTipoNodo(new tOk());
         } else {
             aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo(),
-                    ErrorTipado.errorTiposIncompatiblesAsig(exp.leeFila(),
-                            exp.leeCol()));
-            exp.ponTipoBase(TipoBase.ERROR);
+                    ErrorTipado.errorTiposIncompatiblesAsig(exp.leeFila(), exp.leeCol(),
+                            exp.opnd0().tipoNodo() == null ? "null" : exp.opnd0().tipoNodo().toString(),
+                            exp.opnd1().tipoNodo() == null ? "null" : exp.opnd1().tipoNodo().toString()));
+            exp.ponTipoNodo(new tError());
         }
     }
 
-    private TipoBase tipado_comp(Exp exp) {
+    private TipoNodo tipado_comp(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
-        if (((t0 == TipoBase.PUNT || t0 == TipoBase.NULL) && (t1 == TipoBase.PUNT || t1 == TipoBase.NULL))
-                || (t0 == TipoBase.STRING && t1 == TipoBase.STRING) || (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL)
-                || ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL))) {
-            return TipoBase.OK;
+        TipoNodo t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if (((t0.isPunt() || t0.isNull()) && (t1.isPunt() || t1.isNull())) || (t0.isCadena() && t1.isCadena())
+                || (t0.isBool() && t1.isBool()) || ((t0.isInt() || t0.isReal()) && (t1.isInt() || t1.isReal()))) {
+            return new tBool();
         } else {
-            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
         }
-        return TipoBase.ERROR;
+        return new tError();
     }
 
-    private TipoBase tipado_comp_ord(Exp exp) {
+    private TipoNodo tipado_comp_ord(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
-        if ((t0 == TipoBase.STRING && t1 == TipoBase.STRING) || (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL)
-                || ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL))) {
-            return TipoBase.OK;
+        TipoNodo t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if ((t0.isCadena() && t1.isCadena()) || (t0.isBool() && t1.isBool())
+                || ((t0.isInt() || t0.isReal()) && (t1.isInt() || t1.isReal()))) {
+            return new tBool();
         } else {
-            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
         }
-        return TipoBase.ERROR;
+        return new tError();
     }
 
-    private TipoBase tipado_arit(Exp exp) {
+    private TipoNodo tipado_arit(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
-        if (t0 == TipoBase.BOOL && t1 == TipoBase.BOOL) {
-            return TipoBase.BOOL;
+        TipoNodo t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if ((t0.isInt() || t0.isReal()) && (t1.isInt() || t1.isReal())) {
+            return (t0.isReal() || t1.isReal()) ? new tReal() : new tInt();
         } else {
-            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
         }
-        return TipoBase.ERROR;
+        return new tError();
     }
 
-    private TipoBase tipado_and_or(Exp exp) {
+    private TipoNodo tipado_and_or(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
-        if ((t0 == TipoBase.INT || t0 == TipoBase.REAL) && (t1 == TipoBase.INT || t1 == TipoBase.REAL)) {
-            return (t0 == TipoBase.REAL || t1 == TipoBase.REAL) ? TipoBase.REAL : TipoBase.INT;
+        TipoNodo t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if (t0.isBool() && t0.isBool()) {
+            return new tBool();
         } else {
-            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol()));
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
         }
-        return TipoBase.ERROR;
+        return new tError();
     }
 
     @Override
     public void procesa(Comp exp) {
-        TipoBase tipo = tipado_comp(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_comp(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Dist exp) {
-        TipoBase tipo = tipado_comp(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_comp(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Menor exp) {
-        TipoBase tipo = tipado_comp_ord(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_comp_ord(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Mayor exp) {
-        TipoBase tipo = tipado_comp_ord(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_comp_ord(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(MenorIgual exp) {
-        TipoBase tipo = tipado_comp_ord(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_comp_ord(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(MayorIgual exp) {
-        TipoBase tipo = tipado_comp_ord(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_comp_ord(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Suma exp) {
-        TipoBase tipo = tipado_arit(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_arit(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Resta exp) {
-        TipoBase tipo = tipado_arit(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_arit(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(And exp) {
-        TipoBase tipo = tipado_and_or(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_and_or(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Or exp) {
-        TipoBase tipo = tipado_and_or(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_and_or(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Mul exp) {
-        TipoBase tipo = tipado_arit(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_arit(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Div exp) {
-        TipoBase tipo = tipado_arit(exp);
-        exp.ponTipoBase(tipo);
+        TipoNodo tipo = tipado_arit(exp);
+        exp.ponTipoNodo(tipo);
     }
 
     @Override
     public void procesa(Porcentaje exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
-        if (t0 == TipoBase.INT && t1 == TipoBase.INT) {
-            exp.ponTipoBase(TipoBase.INT);
+        TipoNodo t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        if (t0.isInt() && t1.isInt()) {
+            exp.ponTipoNodo(new tInt());
         } else {
             aviso_error(exp.opnd0().tipoNodo(), exp.opnd1().tipoNodo(),
-                    ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(),
-                            exp.leeCol()));
-            exp.ponTipoBase(TipoBase.ERROR);
+                    ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                            exp.opnd0().tipoNodo() == null ? "null" : exp.opnd0().tipoNodo().toString(),
+                            exp.opnd1().tipoNodo() == null ? "null" : exp.opnd1().tipoNodo().toString()));
+            exp.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(Negativo exp) {
         exp.opnd0().procesa(this);
-        TipoBase tipo = exp.opnd0().tipoNodo();
-        if (tipo == TipoBase.INT || tipo == TipoBase.REAL) {
-            exp.ponTipoBase(tipo);
+        TipoNodo tipo = exp.opnd0().tipoNodo();
+        if (tipo.isInt() || tipo.isReal()) {
+            exp.ponTipoNodo(tipo);
         } else {
-            if (tipo != TipoBase.ERROR) {
-                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol()));
+            if (!tipo.isError()) {
+                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol(),
+                        tipo == null ? "null" : tipo.toString()));
             }
-            exp.ponTipoBase(TipoBase.ERROR);
+            exp.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(Negado exp) {
         exp.opnd0().procesa(this);
-        TipoBase tipo = exp.opnd0().tipoNodo();
-        if (tipo == TipoBase.BOOL) {
-            exp.ponTipoBase(tipo);
+        TipoNodo tipo = exp.opnd0().tipoNodo();
+        if (tipo.isBool()) {
+            exp.ponTipoNodo(tipo);
         } else {
-            if (tipo != TipoBase.ERROR) {
-                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol()));
+            if (!tipo.isError()) {
+                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol(),
+                        tipo == null ? "null" : tipo.toString()));
             }
-            exp.ponTipoBase(TipoBase.ERROR);
+            exp.ponTipoNodo(new tError());
         }
     }
 
@@ -569,88 +606,90 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Index exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        TipoBase t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
+        TipoNodo t0 = exp.opnd0().tipoNodo(), t1 = exp.opnd1().tipoNodo();
 
-        if (t0 == TipoBase.ARRAY && t1 == TipoBase.INT) {
-            exp.ponTipoBase(t0.getBase());
+        if (t0.isArray() && t1.isInt()) {
+            exp.ponTipoNodo(t0.base());
         } else {
-            if (t0 != TipoBase.ERROR && t1 != TipoBase.ERROR) {
-                errorProcesamientos.add(ErrorTipado.errorTiposIncompatiblesIndx(exp.leeFila(), exp.leeCol()));
+            if (!t0.isError() && !t1.isError()) {
+                errorProcesamientos.add(ErrorTipado.errorTiposIncompatiblesIndx(exp.leeFila(), exp.leeCol(),
+                        (t0 == null ? "null" : t0.toString()) + " " + (t1 == null ? "null" : t1.toString())));
             }
-            exp.ponTipoBase(TipoBase.ERROR);
+            exp.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(Acceso exp) {
         exp.opnd0().procesa(this);
-        TipoBase tipo = exp.opnd0().tipoNodo();
+        TipoNodo tipo = exp.opnd0().tipoNodo();
 
-        if (tipo == TipoBase.STRUCT) {
-            TipoBase tCampo = tipo.busquedaCampo(exp.id());
-            if (tCampo == TipoBase.ERROR) {
+        if (tipo.isStruct()) {
+            TipoNodo tCampo = tipo.busquedaCampo(exp.id());
+            if (tCampo.isError()) {
                 errorProcesamientos.add(ErrorTipado.errorCampoInexistente(exp.leeFila(), exp.leeCol(), exp.id()));
             }
-            exp.ponTipoBase(tCampo);
+            exp.ponTipoNodo(tCampo);
         } else {
-            if (tipo != TipoBase.ERROR) {
-                errorProcesamientos.add(ErrorTipado.errorAccesoNoReg(exp.leeFila(), exp.leeCol()));
+            if (!tipo.isError()) {
+                errorProcesamientos.add(ErrorTipado.errorAccesoNoReg(exp.leeFila(), exp.leeCol(),
+                        (tipo == null ? "null" : tipo.toString()) + " " + exp.opnd0().vinculo().getClass()));
             }
-            exp.ponTipoBase(TipoBase.ERROR);
+            exp.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(Indireccion exp) {
         exp.opnd0().procesa(this);
-        TipoBase tipo = exp.opnd0().tipoNodo();
-        if (tipo == TipoBase.PUNT) {
-            exp.ponTipoBase(tipo.getBase());
+        TipoNodo tipo = exp.opnd0().tipoNodo();
+        if (tipo.isPunt()) {
+            exp.ponTipoNodo(tipo.base());
         } else {
-            if (tipo != TipoBase.ERROR) {
+            if (!tipo.isError()) {
                 errorProcesamientos.add(ErrorTipado.errorTipoPuntero(exp.leeFila(), exp.leeCol()));
             }
-            exp.ponTipoBase(TipoBase.ERROR);
+            exp.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(Lit_ent exp) {
-        exp.ponTipoBase(TipoBase.INT);
+        exp.ponTipoNodo(new tInt());
     }
 
     @Override
     public void procesa(True exp) {
-        exp.ponTipoBase(TipoBase.BOOL);
+        exp.ponTipoNodo(new tBool());
     }
 
     @Override
     public void procesa(False exp) {
-        exp.ponTipoBase(TipoBase.BOOL);
+        exp.ponTipoNodo(new tBool());
     }
 
     @Override
     public void procesa(Lit_real exp) {
-        exp.ponTipoBase(TipoBase.REAL);
+        exp.ponTipoNodo(new tReal());
     }
 
     @Override
     public void procesa(Cadena exp) {
-        exp.ponTipoBase(TipoBase.STRING);
+        exp.ponTipoNodo(new tCadena());
     }
 
     @Override
     public void procesa(Iden exp) {
         if (claseDe(exp.vinculo(), Dec_Var.class) || claseDe(exp.vinculo(), PForm.class)) {
-            exp.ponTipoBase(exp.vinculo().tipoNodo());
+            exp.ponTipoNodo(exp.vinculo().tipoNodo());
         } else {
             errorProcesamientos.add(ErrorTipado.errorNoVariable(exp.leeFila(), exp.leeCol(), exp.id()));
-            exp.ponTipoBase(TipoBase.ERROR);
+            exp.ponTipoNodo(new tError());
         }
     }
 
     @Override
     public void procesa(Null exp) {
-        exp.ponTipoBase(TipoBase.NULL);
+        exp.ponTipoNodo(new tNull());
     }
 }

@@ -76,7 +76,6 @@ public class Main {
 						input);
 				asint.disable_tracing();
 				prog = asint.analiza();
-
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ParseException e) {
@@ -103,7 +102,7 @@ public class Main {
 		Tipado tipado = new Tipado();
 		if (tipado.tipar(prog).hayErrores()) {
 			for (ErrorProcesamiento e : tipado.errores()) {
-				System.out.println(e.toString());
+				System.out.println(e.toStringJuez());
 			}
 			return;
 		}

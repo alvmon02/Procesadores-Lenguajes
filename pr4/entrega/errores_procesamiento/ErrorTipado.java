@@ -37,57 +37,74 @@ public class ErrorTipado extends ErrorProcesamiento {
         }
     }
 
-    public static ErrorTipado errorTiposIncompatiblesAsig(int fila, int columna) {
-        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_INCOMPATIBLES_ASIG);
+    public static ErrorTipado errorTiposIncompatiblesAsig(int fila, int columna, String tipo1, String tipo2) {
+        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_INCOMPATIBLES_ASIG, tipo1 + " " + tipo2);
     }
-    public static ErrorTipado errorTiposIncompatiblesOp(int fila, int columna) {
-        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_INCOMPATIBLES_OP);
+
+    public static ErrorTipado errorTiposIncompatiblesOp(int fila, int columna, String tipo1, String tipo2) {
+        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_INCOMPATIBLES_OP, tipo1 + " " + tipo2);
     }
-    public static ErrorTipado errorTipoIncompatibleOp(int fila, int columna) {
-        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_INCOMPATIBLES_OP);
+
+    public static ErrorTipado errorTipoIncompatibleOp(int fila, int columna, String tipo) {
+        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_INCOMPATIBLES_OP, tipo);
     }
+
     public static ErrorTipado errorCampoInexistente(int fila, int columna, String id) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_CAMPO_INEXISTENTE, id);
     }
-    public static ErrorTipado errorTiposIncompatiblesIndx(int fila, int columna) {
-        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_IMCOMPATIBLES_INDX);
+
+    public static ErrorTipado errorTiposIncompatiblesIndx(int fila, int columna, String id) {
+        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPOS_IMCOMPATIBLES_INDX, id);
     }
-    public static ErrorTipado errorAccesoNoReg(int fila, int columna) {
-        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_ACCESO_NO_REG);
+
+    public static ErrorTipado errorAccesoNoReg(int fila, int columna, String id) {
+        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_ACCESO_NO_REG, id);
     }
+
     public static ErrorTipado errorTipoIncompatiblePFormal(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPO_INCOMPATIBLE_PFORMAL);
     }
+
     public static ErrorTipado errorTipoReal(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPO_REAL);
     }
+
     public static ErrorTipado errorEsperabaDesignador(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_ESPERABA_DESIGNADOR);
     }
+
     public static ErrorTipado errorNoVariable(int fila, int columna, String id) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_NO_VARIABLE, id);
     }
+
     public static ErrorTipado errorTipoPuntero(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPO_PUNTERO);
     }
+
     public static ErrorTipado errorDesignadorEsperado(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_DESIGNADOR_ESPERADO);
     }
+
     public static ErrorTipado errorDesignadorIzq(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_DESIGNADOR_IZQ);
     }
+
     public static ErrorTipado errorNoLegible(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_NO_LEGIBLE);
     }
+
     public static ErrorTipado errorNoImprimible(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_NO_IMPRIMIBLE);
     }
+
     public static ErrorTipado errorBooleana(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_BOOLEANA);
     }
+
     public static ErrorTipado errorNParamDist(int fila, int columna) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_N_PARAM_DIST);
     }
+
     public static ErrorTipado errorNoSubprograma(int fila, int columna, String id) {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_NO_SUBPROGRAMA, id);
     }
@@ -113,6 +130,11 @@ public class ErrorTipado extends ErrorProcesamiento {
             case ERROR_NO_VARIABLE:
                 return fila + "," + columna + ":" + id + " " + tipo;
             case ERROR_CAMPO_INEXISTENTE:
+            case ERROR_TIPOS_INCOMPATIBLES_ASIG:
+            case ERROR_TIPOS_INCOMPATIBLES_OP:
+            case ERROR_ACCESO_NO_REG:
+            case ERROR_TIPOS_IMCOMPATIBLES_INDX:
+            case ERROR_TIPO_INCOMPATIBLE_OP:
                 return fila + "," + columna + ":" + tipo + ":" + id;
             default:
                 return fila + "," + columna + ":" + tipo;
