@@ -43,35 +43,6 @@ recolecta-subs(dec_proc(id, pforms, prog)):
 
 
 
-gen-code(si_pforms(pforms)):
-    gen-code(pforms)
-
-gen-code(no_pforms()):
-    noop
-
-gen-code(mas_pforms(pforms, pform)):
-    gen-code(pforms)
-    gen-code(pform)
-
-gen-code(una_pform(pform)):
-    gen-code(pform)
-
-gen-code(pform(tipo, ref, id)):
-    dir(id) = current_dir
-    if ref == si_ref():
-        current_dir = current_dir + tamaño(t_punter(tipo))
-    else:
-        current_dir = current_dir + tamaño(tipo)
-
-
-
-
-
-
-
-
-
-
 gen-code(si_intrs(intrs)):
     gen-code(intrs)
 
@@ -95,23 +66,19 @@ gen-code(i_if(exp, prog, ielse)):
     if es-designador(exp):
         emit apila-ind
     
-    if ielse == no_else():
-        emit ir-f($.sig)
-        gen-code(prog)
-    else:
-        emit ir-f($.sig)
-        gen-code(prog)
-        emit ir-a(&.prim)
-        gen-code(ielse.prog)
+    ir-f($.sig) // si es falso saltamos al else
+    gen-code(prog) //codigo del bloque if
+    emit ir-a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
+    gen-code(ielse) // codigo del bloque else
 
 gen-code(i_while(exp, prog)):
     gen-code(exp)
     if es-designador(exp):
-        emit apila-ind
+        emit apila-ind // apilamos el valor apuntado por el designador
     
-    emit ir-f($.sig)
+    emit ir-f($.sig) // si es falso saltamos a sig (direccion de la instr que sigue al while)
     gen-code(prog)
-    emit ir-a(&.prim)
+    emit ir-a($.prim) // siempre se vuelve a la primera instrucción del while
 
 
 gen-code(i_read(exp)):
@@ -123,22 +90,20 @@ gen-code(i_write(exp)):
     gen-code(exp)
     if es-designador(exp):
         emit apila-ind // apilamos el valor de la dirección
-    emit write     // escribimos
+
 
 gen-code(i_nl()):
     emit nl  // no sé si hay que hacer algo
 
 gen-code(i_new(exp)):
-    gen-code(exp)  //Dirección donde está el puntero
-    emit apila-int(tamaño(exp.tipo))  // no sé muy bn como sacar el tamaño
-    emit alloc     // el tamaño está en la cima, lo cogemos y reservamos ese tamaño de memoria, se apila en cima el comienzo de la memoria reservada
+    gen-code(exp)  //Dirección de comienzo de la expresion
+    emit alloc(tamaño(exp.tipo))     //reservamos tantas celdas como el tamaño del tipo de la expresión y apilamos la dir de comienzo
     emit desapila-ind  // en la cima tenemos el comienzo de la mem dinamica asignada, en la subcima la dir del propio puntero, guardamos en la subcima la cima
 
 gen-code(i_delete(exp)):
     gen-code(exp)  // Direccion donde está el puntero
     emit apila-ind  // apilamos el valor apuntado por el puntero
-    emit apila-int(tamaño(exp.tipo)) //apilamos el tamaño del tipo
-    emit dealloc // liberamos la memoria de dicho tamaño
+    emit dealloc(tamaño(exp.tipo)) // liberamos la memoria de dicho tamaño
 
 
 
@@ -170,8 +135,9 @@ gen-code(e_comp(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind //apilamos el valor apuntado por el designador
-    
-    emit igual  
+
+    emit comp    
+
 
 gen-code(e_dist(opnd0, opnd1)):
     gen-code(opnd0)
@@ -183,6 +149,8 @@ gen-code(e_dist(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
     
     emit dist
+    
+
 
 gen-code(e_lt(opnd0, opnd1)):
     gen-code(opnd0)
@@ -193,7 +161,8 @@ gen-code(e_lt(opnd0, opnd1)):
     if es-designador(opnd1):
         emit apila-ind //apilamos el valor apuntado por el designador
     
-    emit menor 
+    emit lt
+    
 
 gen-code(e_gt(opnd0, opnd1)):
     gen-code(opnd0)
@@ -203,9 +172,9 @@ gen-code(e_gt(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind //apilamos el valor apuntado por el designador
-    
-    emit mayor  
 
+    emit gt
+    
 gen-code(e_leq(opnd0, opnd1)):
     gen-code(opnd0)
     if es-designador(opnd0):
@@ -215,7 +184,8 @@ gen-code(e_leq(opnd0, opnd1)):
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
     
-    emit menor_igual 
+    emit leq
+    
 
 gen-code(e_geq(opnd0, opnd1)):
     gen-code(opnd0)
@@ -225,8 +195,8 @@ gen-code(e_geq(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
-    
-    emit mayor_igual 
+
+    emit geq
 
 
 
@@ -310,7 +280,7 @@ gen-code(e_porcentaje(opnd0, opnd1)):
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
 
-    emit modulo
+
 
 
 
@@ -320,7 +290,6 @@ gen-code(e_and(opnd0, opnd1)):
 gen-code(e_or(opnd0, opnd1)):
   
 
-/* Operadores unarios */
 
 gen-code(e_negativo(opnd)):
     gen-code(opnd)
