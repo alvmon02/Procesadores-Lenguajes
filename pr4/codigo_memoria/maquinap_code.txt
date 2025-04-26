@@ -43,35 +43,6 @@ recolecta-subs(dec_proc(id, pforms, prog)):
 
 
 
-gen-code(si_pforms(pforms)):
-    gen-code(pforms)
-
-gen-code(no_pforms()):
-    noop
-
-gen-code(mas_pforms(pforms, pform)):
-    gen-code(pforms)
-    gen-code(pform)
-
-gen-code(una_pform(pform)):
-    gen-code(pform)
-
-gen-code(pform(tipo, ref, id)):
-    dir(id) = current_dir
-    if ref == si_ref():
-        current_dir = current_dir + tamaño(t_punter(tipo))
-    else:
-        current_dir = current_dir + tamaño(tipo)
-
-
-
-
-
-
-
-
-
-
 gen-code(si_intrs(intrs)):
     gen-code(intrs)
 
@@ -95,23 +66,19 @@ gen-code(i_if(exp, prog, ielse)):
     if es-designador(exp):
         emit apila-ind
     
-    if ielse == no_else():
-        emit ir-f($.sig)
-        gen-code(prog)
-    else:
-        emit ir-f($.sig)
-        gen-code(prog)
-        emit ir-a(&.prim)
-        gen-code(ielse.prog)
+    ir-f($.sig) // si es falso saltamos al else
+    gen-code(prog) //codigo del bloque if
+    emit ir-a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
+    gen-code(ielse) // codigo del bloque else
 
 gen-code(i_while(exp, prog)):
     gen-code(exp)
     if es-designador(exp):
-        emit apila-ind
+        emit apila-ind // apilamos el valor apuntado por el designador
     
-    emit ir-f($.sig)
+    emit ir-f($.sig) // si es falso saltamos a sig (direccion de la instr que sigue al while)
     gen-code(prog)
-    emit ir-a(&.prim)
+    emit ir-a($.prim) // siempre se vuelve a la primera instrucción del while
 
 
 gen-code(i_read(exp)):
@@ -123,48 +90,40 @@ gen-code(i_write(exp)):
     gen-code(exp)
     if es-designador(exp):
         emit apila-ind // apilamos el valor de la dirección
-    emit write     // escribimos
+
 
 gen-code(i_nl()):
     emit nl  // no sé si hay que hacer algo
 
 gen-code(i_new(exp)):
-    gen-code(exp)  //Dirección donde está el puntero
-    emit apila-int(tamaño(exp.tipo))  // no sé muy bn como sacar el tamaño
-    emit alloc     // el tamaño está en la cima, lo cogemos y reservamos ese tamaño de memoria, se apila en cima el comienzo de la memoria reservada
+    gen-code(exp)  //Dirección de comienzo de la expresion
+    emit alloc(tamaño(exp.tipo))     //reservamos tantas celdas como el tamaño del tipo de la expresión y apilamos la dir de comienzo
     emit desapila-ind  // en la cima tenemos el comienzo de la mem dinamica asignada, en la subcima la dir del propio puntero, guardamos en la subcima la cima
 
 gen-code(i_delete(exp)):
     gen-code(exp)  // Direccion donde está el puntero
     emit apila-ind  // apilamos el valor apuntado por el puntero
-    emit apila-int(tamaño(exp.tipo)) //apilamos el tamaño del tipo
-    emit dealloc // liberamos la memoria de dicho tamaño
+    emit dealloc(tamaño(exp.tipo)) // liberamos la memoria de dicho tamaño
 
-gen-code(i_call(id, preals)):
-    //TODO
+
 
 
 gen-code(e_asig(opnd0, opnd1)):
-    if not es-designador(opnd0):
-        error("Lado izquierdo de asignación debe ser un designador")
-    
-    v0 = gen-code(opnd0)  //Direccion donde asignar
-    gen-code(opnd1)  // Valor a asignar o direccion si es designador
-    
-    if es-designador(opnd1):
-        if es_tipo_compuesto(opnd0.tipo):
-            // ns como hacerlo pq hay que hacer , copy(r0, r1, tipo0, ) que eso lo que hace es Copia el valor del tipo  que se encuentra
-                almacenado a partir de la dirección d’ en el bloque que comienza a partir de la dirección d. Peero el copy de la maquina p hace otra cosa
-        else:
-            emit apila-ind //pone en la cima el valor apuntado
-    
-    if opnd1.tipo == t_int() and opnd0.tipo == t_real():
-        emit convertir_int_a_real
-    
-    emit desapila-ind
-    
-    //El valor de la expresion es el resultado de evaluar opnd0
-    gen-code(opnd0)
+   gen_code(opnd0) 
+   gen_code(opnd1) 
+
+    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
+        if es-designador(opnd1):
+            emit apila-ind //traemos el valor de opnd1 a la cima
+            emit int2real //convertimos el valor a real
+            emit desapila-ind //guardamos el valor convertido en la dirección de opnd0
+    else:
+        if es-designador(opnd1):
+            emit copia(tamaño(opnd1.tipo)) // se va copiando celda a celda el valor 
+        else: 
+            emit desapila-ind // guarda en la dirección de opnd0 el valor de la cima (opnd1)
+        
+
 
 
 
@@ -176,8 +135,9 @@ gen-code(e_comp(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind //apilamos el valor apuntado por el designador
-    
-    emit igual  
+
+    emit comp    
+
 
 gen-code(e_dist(opnd0, opnd1)):
     gen-code(opnd0)
@@ -189,6 +149,8 @@ gen-code(e_dist(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
     
     emit dist
+    
+
 
 gen-code(e_lt(opnd0, opnd1)):
     gen-code(opnd0)
@@ -199,7 +161,8 @@ gen-code(e_lt(opnd0, opnd1)):
     if es-designador(opnd1):
         emit apila-ind //apilamos el valor apuntado por el designador
     
-    emit menor 
+    emit lt
+    
 
 gen-code(e_gt(opnd0, opnd1)):
     gen-code(opnd0)
@@ -209,9 +172,9 @@ gen-code(e_gt(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind //apilamos el valor apuntado por el designador
-    
-    emit mayor  
 
+    emit gt
+    
 gen-code(e_leq(opnd0, opnd1)):
     gen-code(opnd0)
     if es-designador(opnd0):
@@ -221,7 +184,8 @@ gen-code(e_leq(opnd0, opnd1)):
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
     
-    emit menor_igual 
+    emit leq
+    
 
 gen-code(e_geq(opnd0, opnd1)):
     gen-code(opnd0)
@@ -231,8 +195,8 @@ gen-code(e_geq(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
-    
-    emit mayor_igual 
+
+    emit geq
 
 
 
@@ -316,7 +280,7 @@ gen-code(e_porcentaje(opnd0, opnd1)):
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
 
-    emit modulo
+
 
 
 
@@ -326,7 +290,6 @@ gen-code(e_and(opnd0, opnd1)):
 gen-code(e_or(opnd0, opnd1)):
   
 
-/* Operadores unarios */
 
 gen-code(e_negativo(opnd)):
     gen-code(opnd)
@@ -341,4 +304,60 @@ gen-code(e_negado(opnd)):
         emit apila-ind
     
     //negarlo (no sé como hacerlo)
+
+
+gen_code(i_call(id, preals)):
+    proc = buscar_proc(id)
+
+    //preparar el resgistro de activación
+    emit activa(proc.nivel, proc.tam, dir_sig) //en la cima tenemos la dirección de comienzo del registro de activación
+
+    id_pform = 0
+
+    for preal in preals:
+        pform = proc.pforms[id_pform]
+
+        dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
+        apila-int(preal.tam) //apilamos el tamaño del parámetro
+        emit suma //tenemos en la cima la dirección de comienzo del parámetro
+        gen-code(preal) //apilamos el valor/dir de comienzo del parámetro
+
+        if pform.ref == no_ref():
+            if es-designador(preal): // param formal por valor y real es designador
+                emit copia(tamaño(pform.tipo)) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
+            else:
+                emit desapila-ind() // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+        else:
+            if es-designador(preal): // param formal por referencia y real es designador
+                emit desapila-ind() // como ambos son punteros, en cima tenemos el valor apuntado por el preal, que se guarda en la dirección del pform 
+            else:
+                //ERROR el pform es designador y preal no lo es
+    
+        id_pform = id_pform + 1
+    
+    desapilad(proc.nivel) //desapilamos una direccion de la pila de evaluación (dirección inicio datos) se guarda en display de nivel proc.nivel
+
+    gen-code(proc)
+
+    emit desactiva(proc.nivel, proc.tam) //desactivamos el registro de activación dejamos en la cima la dirección de retorno
+    emit ir-ind() //salto a la dirección de retorno del registro de activación
+
+
+gen_code(e_indexado(opnd0, opnd1)):
+    gen_code(opnd0) // obtenemos la dirección del array
+    gen_code(opnd1) // obtenemos el índice
+    emit apila-int(tamaño(opnd0.tipo)) //apilamos el tamaño del tipo del array
+    emit mul //apilamos el desplazamiento del índice
+    emit suma // a la dirección de comenzo del array le sumamos el desplazamiento del índice
+
+
+gen_code(e_campo(opnd, id)):
+    gen_code(opnd) //determinamos la dirección de E
+    d = desplazamiento(id) //obtenemos el desplazamiento del campo id, se calcula en asignacion de espacio
+    emit apila-int(d)
+    emit suma // desplazamiento del campo + dirección de comienzo de E
+
+gen_code(e_puntero(opnd)):
+    gen_code(opnd) // determinamos dirección de E
+    emit apila-ind //apilamos la dirección a la que apunta el puntero
 
