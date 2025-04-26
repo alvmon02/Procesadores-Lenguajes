@@ -1,4 +1,4 @@
-El tipo es: tNodo1
-El tipo es: tLista1
-El tipo es: tNodo2
-El tipo es: tNodo2
+El tipo es: tNodo1 en 4,8 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_int(),10[6,12]),vals[6,16])),campo_s(tipo(tLista1[7,8]),sig[7,16]))),tNodo1[8,9])
+El tipo es: tLista1 en 7,8 y su vinculo es: dec_tipo(t_puntero(tipo(tNodo1[4,8])),tLista1[4,15])
+El tipo es: tNodo2 en 9,8 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_int(),10[11,12]),vs[11,16])),campo_s(t_puntero(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_int(),10[13,15]),valores[13,19])),campo_s(t_puntero(tipo(tNodo2[14,12])),siguiente[14,19])))),s[15,11]))),tNodo2[16,9])
+El tipo es: tNodo2 en 14,12 y su vinculo es: null

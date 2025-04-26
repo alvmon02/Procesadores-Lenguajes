@@ -413,7 +413,7 @@ public class Tipado extends ProcesamientoDef {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
         if (!asignable(exp.opnd0())) {
-            errorProcesamientos.add(ErrorTipado.errorDesignadorIzq(exp.opnd0().leeFila(), exp.opnd0().leeCol()));
+            errorProcesamientos.add(ErrorTipado.errorDesignadorIzq(exp.leeFila(), exp.leeCol()));
             exp.ponTipoNodo(new tError());
         } else if (exp.opnd0().tipoNodo().compatible(exp.opnd1().tipoNodo())) {
             exp.ponTipoNodo(new tOk());

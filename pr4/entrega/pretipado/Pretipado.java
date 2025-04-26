@@ -103,7 +103,8 @@ public class Pretipado extends ProcesamientoDef {
 
     @Override
     public void procesa(T_Iden tIden) {
-        System.out.println("El tipo es: " + tIden.id());
+        System.out.println("El tipo es: " + tIden.id() + " en " + tIden.leeFila() + "," + tIden.leeCol()
+                + " y su vinculo es: " + tIden.vinculo());
         if (!claseDe(tIden.vinculo(), Dec_Tipo.class)) {
             errorProcesamientos.add(
                     errores_procesamiento.ErrorPretipado.errorTipoNoDeclarado(tIden.leeFila(), tIden.leeCol(),

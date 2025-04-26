@@ -1,6 +1,6 @@
-El tipo es: tr
-El tipo es: tr
-El tipo es: tr3
+El tipo es: tr en 11,6 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_puntero(t_int()),30[8,8]),ps[8,12])),campo_s(t_int(),c[9,7]))),tr[10,3])
+El tipo es: tr en 12,6 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_puntero(t_int()),30[8,8]),ps[8,12])),campo_s(t_int(),c[9,7]))),tr[10,3])
+El tipo es: tr3 en 13,1 y su vinculo es: dec_tipo(tipo(tr[12,6]),tr3[12,9])
 Errores_tipado fila:57 col:5
 Errores_tipado fila:58 col:5
 Errores_tipado fila:59 col:7
@@ -24,7 +24,7 @@ Errores_tipado fila:76 col:6
 Errores_tipado fila:77 col:13
 Errores_tipado fila:78 col:9
 Errores_tipado fila:79 col:16
-Errores_tipado fila:80 col:3
+Errores_tipado fila:80 col:8
 Errores_tipado fila:81 col:6
 Errores_tipado fila:82 col:7
 Errores_tipado fila:83 col:4
