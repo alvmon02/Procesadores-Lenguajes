@@ -107,7 +107,6 @@ gen-code(i_delete(exp)):
 
 
 
-
 gen-code(e_asig(opnd0, opnd1)):
    gen_code(opnd0) 
    gen_code(opnd1) 
@@ -122,10 +121,6 @@ gen-code(e_asig(opnd0, opnd1)):
             emit copia(tamaño(opnd1.tipo)) // se va copiando celda a celda el valor 
         else: 
             emit desapila-ind // guarda en la dirección de opnd0 el valor de la cima (opnd1)
-        
-
-
-
 
 gen-code(e_comp(opnd0, opnd1)):
     gen-code(opnd0)
@@ -138,7 +133,6 @@ gen-code(e_comp(opnd0, opnd1)):
 
     emit comp    
 
-
 gen-code(e_dist(opnd0, opnd1)):
     gen-code(opnd0)
     if es-designador(opnd0):
@@ -149,8 +143,6 @@ gen-code(e_dist(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
     
     emit dist
-    
-
 
 gen-code(e_lt(opnd0, opnd1)):
     gen-code(opnd0)
@@ -162,7 +154,6 @@ gen-code(e_lt(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
     
     emit lt
-    
 
 gen-code(e_gt(opnd0, opnd1)):
     gen-code(opnd0)
@@ -174,7 +165,7 @@ gen-code(e_gt(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
 
     emit gt
-    
+
 gen-code(e_leq(opnd0, opnd1)):
     gen-code(opnd0)
     if es-designador(opnd0):
@@ -185,7 +176,6 @@ gen-code(e_leq(opnd0, opnd1)):
         emit apila-ind  //apilamos el valor apuntado por el designador
     
     emit leq
-    
 
 gen-code(e_geq(opnd0, opnd1)):
     gen-code(opnd0)
@@ -197,8 +187,6 @@ gen-code(e_geq(opnd0, opnd1)):
         emit apila-ind  //apilamos el valor apuntado por el designador
 
     emit geq
-
-
 
 gen-code(e_suma(opnd0, opnd1)):
     gen-code(opnd0)
@@ -282,10 +270,6 @@ gen-code(e_porcentaje(opnd0, opnd1)):
     
     emit mod
 
-
-
-
-
 gen-code(e_and(opnd0, opnd1)):
     gen-code(opnd0)
     if es-designador(opnd0):
@@ -296,7 +280,6 @@ gen-code(e_and(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
     
     emit and
-    
 
 gen-code(e_or(opnd0, opnd1)):
     gen-code(opnd0)
@@ -308,8 +291,6 @@ gen-code(e_or(opnd0, opnd1)):
         emit apila-ind //apilamos el valor apuntado por el designador
     
     emit or
-  
-
 
 gen-code(e_negativo(opnd)):
     gen-code(opnd)
@@ -324,7 +305,6 @@ gen-code(e_negado(opnd)):
         emit apila-ind
     
     emit not //negamos el valor de la cima
-
 
 gen_code(i_call(id, preals)): //version mejorada abajo del todo
     proc = buscar_proc(id)
@@ -381,8 +361,6 @@ gen_code(e_puntero(opnd)):
     gen_code(opnd) // determinamos dirección de E
     emit apila-ind //apilamos la dirección a la que apunta el puntero
 
-
-
 gen_code(e_lit_ent(num)):
     emit lit-ent(num) //apilamos el literal entero
 
@@ -398,7 +376,6 @@ gen_code(e_false()):
 gen_code(e_string(string))
     emit lit-string(string) //apilamos el literal string
 
-
 gen_code(e_null()):
     emit lit-ent(-1) //apilamos el literal entero -1 (null)
 
@@ -413,12 +390,6 @@ gen-acc-id(dec_var(tipo, id)):
         emit apila-int($.vinculo.dir) //apilamos la dirección de la variable
         emit suma //apilamos la dirección de la variable (display + dir var)
     end if
-
-
-
-
-
-
 
 
 
