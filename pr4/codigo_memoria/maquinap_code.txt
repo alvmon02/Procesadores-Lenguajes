@@ -39,7 +39,7 @@ recolecta-subs(dec_tipo(tipo, id)):
     noop
 
 recolecta-subs(dec_proc(id, pforms, prog)):
-    apila(sub_pendientes, dec_proc(id, pforms, prog))
+    apila(sub_pendientes, $)
 
 
 
@@ -279,15 +279,35 @@ gen-code(e_porcentaje(opnd0, opnd1)):
     gen-code(opnd1)
     if es-designador(opnd1):
         emit apila-ind  //apilamos el valor apuntado por el designador
+    
+    emit mod
 
 
 
 
 
 gen-code(e_and(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    emit and
     
 
 gen-code(e_or(opnd0, opnd1)):
+    gen-code(opnd0)
+    if es-designador(opnd0):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    gen-code(opnd1)
+    if es-designador(opnd1):
+        emit apila-ind //apilamos el valor apuntado por el designador
+    
+    emit or
   
 
 
@@ -296,17 +316,17 @@ gen-code(e_negativo(opnd)):
     if es-designador(opnd):
         emit apila-ind //apilamos el valor apuntado por el designador
     
-    //negarlo (no sé como hacerlo)
+    emit neg //negamos el valor de la cima
 
 gen-code(e_negado(opnd)):
     gen-code(opnd)
     if es-designador(opnd):
         emit apila-ind
     
-    //negarlo (no sé como hacerlo)
+    emit not //negamos el valor de la cima
 
 
-gen_code(i_call(id, preals)):
+gen_code(i_call(id, preals)): //version mejorada abajo del todo
     proc = buscar_proc(id)
 
     //preparar el resgistro de activación
@@ -360,4 +380,92 @@ gen_code(e_campo(opnd, id)):
 gen_code(e_puntero(opnd)):
     gen_code(opnd) // determinamos dirección de E
     emit apila-ind //apilamos la dirección a la que apunta el puntero
+
+
+
+gen_code(e_lit_ent(num)):
+    emit lit-ent(num) //apilamos el literal entero
+
+gen_code(e_lit_real(num)):
+    emit lit-real(num) //apilamos el literal real
+
+gen_code(e_true()):
+    emit lit-bool(true) //apilamos el literal booleano true
+
+gen_code(e_false()):
+    emit lit-bool(false) //apilamos el literal booleano false
+
+gen_code(e_string(string))
+    emit lit-string(string) //apilamos el literal string
+
+
+gen_code(e_null()):
+    emit lit-ent(-1) //apilamos el literal entero -1 (null)
+
+gen_code(e_iden(id)):
+    gen-acc-id($.vinculo)
+
+gen-acc-id(dec_var(tipo, id)):
+    if $.nivel == 0: // variable global
+        emit apila-int($.vinculo.dir) //apilamos la dirección de la variable
+    else:
+        emit apilad($.nivel) //apilamos el display de nivel $.nivel
+        emit apila-int($.vinculo.dir) //apilamos la dirección de la variable
+        emit suma //apilamos la dirección de la variable (display + dir var)
+    end if
+
+
+
+
+
+
+
+
+
+
+
+
+gen-code(i_call(id,preals)):
+    emit activa($.vinculo.nivel,$.vinculo.tam,$.sig) //en la cima tenemos la dirección de comienzo del registro de activación
+
+    for preal in preals:
+        gen-paso-param($.vinculo,preal)
+    
+    desapilad($.vinculo.nivel) //desapilamos una direccion de la pila de evaluación (dirección inicio datos) se guarda en display de nivel proc.nivel
+
+
+    emit desactiva($.vinculo.nivel, $.vinculo.tam) //desactivamos el registro de activación dejamos en la cima la dirección de retorno
+    emit ir-ind() //salto a la dirección de retorno del registro de activación
+
+
+
+
+gen-paso-param(proc, preal):
+    dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
+    apila-int(preal.tam) //apilamos el tamaño del parámetro
+    emit suma //tenemos en la cima la dirección de comienzo del parámetro
+    gen-code(preal) //apilamos el valor/dir de comienzo del parámetro
+
+    if pform.ref == no_ref():
+        if es-designador(preal): // param formal por valor y real es designador
+            emit copia(tamaño(pform.tipo)) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
+        else:
+            emit desapila-ind() // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+    else:
+        if es-designador(preal): // param formal por referencia y real es designador
+            emit desapila-ind() // como ambos son punteros, en cima tenemos el valor apuntado por el preal, que se guarda en la dirección del pform 
+        else:
+            //ERROR el pform es designador y preal no lo es
+
+
+
+
+
+
+
+
+
+
+
+
 

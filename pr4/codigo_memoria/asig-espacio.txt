@@ -155,47 +155,148 @@ asig-espacio(cmp_s(tipo, id)):
     dir+= $.tam
 
 
+asig-espacio(si_intrs(intrs)):
+    asig-espacio(intrs)
 
-// No necesarios
-si_intrs(intrs)
-no_intrs()
-mas_intrs(intrs, intr)
-una_intr(intr)
-i_eval(exp)
-i_if(exp, prog, ielse)
-i_while(exp, prog)
-i_read(exp)
-i_write(exp)
-i_nl()
-i_new(exp)
-i_delete(exp)
-i_call(id, preals)
-i_prog(prog)
-si_else(prog)
-no_else()
-si_preals(preals)
-no_preals()
-mas_preals(preals, exp)
-un_preals(exp)
-e_asig(opnd0, opnd1)
-e_comp(opnd0, opnd1)
-e_dist(opnd0, opnd1)
-e_lt(opnd0, opnd1)
-e_gt(opnd0, opnd1)
-e_leq(opnd0, opnd1)
-e_geq(opnd0, opnd1)
-e_suma(opnd0, opnd1)
-e_resta(opnd0, opnd1)
-e_and(opnd0, opnd1)
-e_or(opnd0, opnd1)
-e_mul(opnd0, opnd1)
-e_div(opnd0, opnd1)
-e_porcentaje(opnd0, opnd1)
-e_negativo(opnd)
-e_negado(opnd)
-e_indexado(opnd0, opnd1)
-e_campo(opnd, id)
-e_puntero(opnd)
+asig-espacio(no_intrs()):
+    noop
+
+asig-espacio(mas_intrs(intrs, intr)):
+    asig-espacio(intrs)
+    asig-espacio(intr)
+
+asig-espacio(una_intr(intr)):
+    asig-espacio(intr)
+
+asig-espacio(i_eval(exp)):
+    asig-espacio(exp)
+
+asig-espacio(i_if(exp, prog, ielse)):
+    asig-espacio(exp)
+    asig-espacio(prog)
+    asig-espacio(ielse)
+
+asig-espacio(i_while(exp, prog)):
+    asig-espacio(exp)
+    asig-espacio(prog)
+
+asig-espacio(i_read(exp)):
+    asig-espacio(exp)
+
+
+asig-espacio(i_write(exp)):
+    asig-espacio(exp)
+
+asig-espacio(i_nl()):
+    noop
+
+asig-espacio(i_new(exp)):
+    asig-espacio(exp)
+
+asig-espacio(i_delete(exp)):
+    asig-espacio(exp)
+
+asig-espacio(i_call(id, preals)):
+    asig-espacio(preals)
+
+
+asig-espacio(i_prog(prog)):
+    asig-espacio(prog)
+
+asig-espacio(si_else(prog)):
+    asig-espacio(prog)
+
+asig-espacio(no_else()):
+    noop
+
+asig-espacio(si_preals(preals)):
+    asig-espacio(preals)
+
+asig-espacio(no_preals()):
+    noop   
+
+asig-espacio(mas_preals(preals, exp)):
+    asig-espacio(preals)
+    asig-espacio(exp)
+
+asig-espacio(un_preals(exp)):
+    asig-espacio(exp)
+
+
+asig-espacio(e_asig(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_comp(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_dist(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_lt(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_gt(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_leq(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_geq(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_suma(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_resta(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_and(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_or(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_mul(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_div(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_porcentaje(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_negativo(opnd)):
+    asig-espacio(opnd)
+
+asig-espacio(e_negado(opnd)):
+    asig-espacio(opnd)
+
+asig-espacio(e_indexado(opnd0, opnd1)):
+    asig-espacio(opnd0)
+    asig-espacio(opnd1)
+
+asig-espacio(e_campo(opnd, id)):
+    asig-espacio(opnd)
+
+asig-espacio(e_puntero(opnd)):
+    asig-espacio(opnd)
+
+// no aplican
+
 e_lit_ent(num)
 e_lit_real(num)
 e_true()
