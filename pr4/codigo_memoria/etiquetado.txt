@@ -128,12 +128,48 @@ etiquetado(i_while(exp,prog)):
 	etq_total++
 	$.sig=etq_final
 
-i_read(exp)
-i_write(exp)
-i_nl()
-i_new(exp)
-i_delete(exp)
-i_call(id, preals)
+etiquetado(i_read(exp)):
+	$.prim = etq_final
+	etiquetado(exp)
+	etiquetado-acc-val(exp)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(i_write(exp)):
+	$.prim = etq_final
+	etiquetado(exp)
+	etiquetado-acc-val(exp)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(i_nl()):
+	$.prim = etq_final
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(i_new(exp)):
+	$.prim = etq_final
+	etiquetado(exp)
+	etiquetado-acc-val(exp)
+	etq_final++
+	$.sig=etq_final
+
+etiquetado(i_delete(exp)):
+	$.prim = etq_final
+	etiquetado(exp)
+	etiquetado-acc-val(exp)
+	etq_final++
+	$.sig=etq_final
+
+
+etiquetado(i_call(id, preals)):
+	$.prim = etq_final
+	etq_final++
+	for preal in preals
+		etiquetado_paso_param(&.vinculo, preal)
+	etq_final++
+	$.sig=etq_final
+
 i_prog(prog)
 //si_else(prog) ?
 //no_else() ?
@@ -238,9 +274,17 @@ etiquetado(e_porcentaje(opnd0, opnd1)):
 
 e_negativo(opnd)
 e_negado(opnd)
-e_indexado(opnd0, opnd1)
+
 e_campo(opnd, id)
 e_puntero(opnd)
+
+etiquetado(e_indexado(opnd0, opnd1)):
+	$.prim =etq_final
+	etiquetado(opnd0)
+	etiquetado(opnd1)
+	etq-acc-val(opnd1)
+	etq_final+=3
+	$.sig=etq_final
 
 etiquetado(e_lit_ent(num))
 	$.prim=etq_final
@@ -290,3 +334,7 @@ etiquetado-acc-valor(exp):
 		etq_final++
 	end if
 
+etiquetado_paso_param(proc(id, pforms, prog), preal):
+	etq_final+= 3
+	etiquetado(preal)
+	etq_final++
