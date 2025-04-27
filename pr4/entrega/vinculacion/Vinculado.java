@@ -10,7 +10,7 @@ import java.util.Stack;
 import java.util.Collection;
 
 public class Vinculado extends ProcesamientoDef {
-    
+
     private class TablaSimbolos {
         private Stack<HashMap<String, Nodo>> ambitos = new Stack<>();
 
@@ -49,7 +49,7 @@ public class Vinculado extends ProcesamientoDef {
 
     private TablaSimbolos tablaSimbolos;
     private TreeSet<ErrorProcesamiento> errorProcesamientos = new TreeSet<>();
-    
+
     public boolean hayErrores() {
         return errorProcesamientos.size() > 0;
     }
@@ -61,8 +61,7 @@ public class Vinculado extends ProcesamientoDef {
     private void contieneInserta(String id, Nodo nodo) {
         if (this.tablaSimbolos.contiene(id)) {
             errorProcesamientos.add(ErrorVinculacion.errorDuplicado(nodo.leeFila(), nodo.leeCol(), id));
-        }
-        else {
+        } else {
             this.tablaSimbolos.inserta(id, nodo);
         }
     }
@@ -195,9 +194,20 @@ public class Vinculado extends ProcesamientoDef {
     }
 
     @Override
+    public void procesa2(T_Struct tStruct) {
+        tStruct.camposS().procesa2(this);
+    }
+
+    @Override
     public void procesa(Mas_Cmp_S mas_Cmp_S) {
         mas_Cmp_S.campoS().procesa(this);
         mas_Cmp_S.camposS().procesa(this);
+    }
+
+    @Override
+    public void procesa2(Mas_Cmp_S mas_Cmp_S) {
+        mas_Cmp_S.campoS().procesa2(this);
+        mas_Cmp_S.camposS().procesa2(this);
     }
 
     @Override
@@ -206,8 +216,18 @@ public class Vinculado extends ProcesamientoDef {
     }
 
     @Override
+    public void procesa2(Un_Cmp_S un_Cmp_S) {
+        un_Cmp_S.campoS().procesa2(this);
+    }
+
+    @Override
     public void procesa(CampoS campoS) {
         campoS.tipo().procesa(this);
+    }
+
+    @Override
+    public void procesa2(CampoS campoS) {
+        campoS.tipo().procesa2(this);
     }
 
     @Override
