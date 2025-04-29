@@ -411,11 +411,11 @@ gen-code(i_call(id,preals)):
 
 
 
-gen-paso-param(proc, preal):
+gen-paso-param(proc(id, pform, decs, Is), preal):
     dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
     apila-int(preal.tam) //apilamos el tamaño del parámetro
     emit suma //tenemos en la cima la dirección de comienzo del parámetro
-    gen-code(preal) //apilamos el valor/dir de comienzo del parámetro
+    gen-code(preal) //apilamos el valor/dir  del parámetro
 
     if pform.ref == no_ref():
         if es-designador(preal): // param formal por valor y real es designador
