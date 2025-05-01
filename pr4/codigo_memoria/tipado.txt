@@ -38,7 +38,7 @@ ambos_ok(t0, t1):
 
     // Ver que sean tipos compatibles no iguales
 tipo_asig(t0, t1):
-    if t0 == t1 then
+    if compatibles(t0, t1) then
         return OK
     else
         aviso_error(t0, t1)
@@ -229,8 +229,6 @@ tipado(i_delete(exp)):
         $.tipo = ERROR
     end if
 
-
-    // TODO revisar el call
 tipado(i_call(id, preals)):
     v = $.vinculo
     if (v == ⊥ || v != dec_proc(_,_,_)) then 
@@ -271,6 +269,7 @@ compatibles_preal_pform(mas_pforms(pforms, pform), mas_preals(preals, exp)):
 compatibles_preal_pform(una_pform(pform), una_preals(exp)):
     return compatibles_preal_pform(pform, exp)
 
+    // TODO
 compatibles_preal_pform(pform(tipo, ref, id), exp):
     tipado(exp)
     t0, t1 = ref!(exp.tipo), ref!(tipo)
@@ -301,10 +300,13 @@ tipado(no_else()):
     $.tipo = OK
 
 
+asignable(exp):
+    return exp == e_iden(_) || exp == e_campo(_, _) || exp == e_indexado(_, _) || exp == e_puntero(_)
+
 tipado(e_asig(opnd0, opnd1)):
     tipado(opnd0)
     tipado(opnd1)
-    if (exp == e_iden(_) || exp == e_campo(_, _) || exp == e_indexado(_, _) || exp == e_puntero(_)) && compatibles(opnd0.tipo, opnd1.tipo) then
+    if (asignable(exp)) && compatibles(opnd0.tipo, opnd1.tipo) then
         $.tipo = opnd0.tipo
     else
         aviso_error(opnd0.tipo, opnd1.tipo)

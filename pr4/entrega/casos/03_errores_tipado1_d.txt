@@ -1,46 +1,32 @@
--1,-1:el numero de parametros reales no coincide con el numero de parametros formales
-15,11:tipos incompatibles en operacion
-30,5:tipos incompatibles en operacion
-31,5:tipos incompatibles en operacion
-32,7:tipos incompatibles en operacion
-33,7:tipos incompatibles en operacion
-37,17:tipos incompatibles en operacion
-38,5:se trata de acceder a un campo de un objeto que no es un registro
-41,7:se trata de acceder a un campo de un objeto que no es un registro
-41,9:esperado tipo puntero
-43,8:se trata de acceder a un campo de un objeto que no es un registro
-43,14:valor no legible
-44,9:se trata de acceder a un campo de un objeto que no es un registro
-44,17:valor no imprimible
-47,6:esperada expresion booleana
-48,8:esperada expresion booleana
-51,12:esperada expresion booleana
-52,13:tipos incompatibles en operacion
-57,5:tipos incompatibles en asignacion
-58,5:tipos incompatibles en operacion
-59,7:tipos incompatibles en operacion
-60,20:tipos incompatibles en operacion
-61,5:tipos incompatibles en operacion
-62,5:tipos incompatibles en operacion
-63,6:tipos incompatibles en operacion
-64,5:tipos incompatibles en operacion
-65,3:tipos incompatibles en operacion
-66,5:se trata de acceder a un campo de un objeto que no es un registro
-67,4:tipos incompatibles en indexacion
-68,4:tipos incompatibles en indexacion
-69,5:se trata de acceder a un campo de un objeto que no es un registro
-74,7:p no es variable ni parametro
-75,7:tr2 no es variable ni parametro
-76,6:tipos incompatibles en asignacion
-77,7:se trata de acceder a un campo de un objeto que no es un registro
-77,13:esperado tipo puntero
-78,9:esperado tipo puntero
-79,8:se trata de acceder a un campo de un objeto que no es un registro
-79,16:valor no legible
-80,3:la parte izquierda debe ser un designador
-81,6:designador esperado
-82,7:valor no imprimible
-83,4:esperada expresion booleana
-84,7:esperada expresion booleana
-87,10:esperada expresion booleana
-88,13:tipos incompatibles en operacion
+El tipo es: tr en 11,6 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_puntero(t_int()),30[8,8]),ps[8,12])),campo_s(t_int(),c[9,7]))),tr[10,3])
+El tipo es: tr en 12,6 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_puntero(t_int()),30[8,8]),ps[8,12])),campo_s(t_int(),c[9,7]))),tr[10,3])
+El tipo es: tr3 en 13,1 y su vinculo es: dec_tipo(tipo(tr[12,6]),tr3[12,9])
+Errores_tipado fila:57 col:5
+Errores_tipado fila:58 col:5
+Errores_tipado fila:59 col:7
+Errores_tipado fila:60 col:20
+Errores_tipado fila:61 col:5
+Errores_tipado fila:62 col:5
+Errores_tipado fila:63 col:6
+Errores_tipado fila:64 col:5
+Errores_tipado fila:65 col:3
+Errores_tipado fila:66 col:5
+Errores_tipado fila:67 col:4
+Errores_tipado fila:68 col:4
+Errores_tipado fila:69 col:5
+Errores_tipado fila:70 col:11
+Errores_tipado fila:71 col:16
+Errores_tipado fila:72 col:12
+Errores_tipado fila:73 col:11
+Errores_tipado fila:74 col:7
+Errores_tipado fila:75 col:7
+Errores_tipado fila:76 col:6
+Errores_tipado fila:77 col:13
+Errores_tipado fila:78 col:9
+Errores_tipado fila:79 col:16
+Errores_tipado fila:80 col:8
+Errores_tipado fila:81 col:6
+Errores_tipado fila:82 col:7
+Errores_tipado fila:83 col:4
+Errores_tipado fila:84 col:7
+Errores_tipado fila:87 col:10

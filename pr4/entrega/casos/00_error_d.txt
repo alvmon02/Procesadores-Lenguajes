@@ -1,0 +1,4 @@
+Errores_vinculacion fila:3 col:3
+Errores_vinculacion fila:4 col:6
+Errores_vinculacion fila:4 col:8
+Errores_vinculacion fila:4 col:18
