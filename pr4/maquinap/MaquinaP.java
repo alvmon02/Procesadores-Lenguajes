@@ -22,6 +22,8 @@ public class MaquinaP {
    private class Valor {
       public int valorInt() {throw new EAccesoIlegitimo();}  
       public boolean valorBool() {throw new EAccesoIlegitimo();} 
+      public String valorStr() {throw new EAccesoIlegitimo();}
+      public float valorReal() {throw new EAccesoIlegitimo();}
    } 
    private class ValorInt extends Valor {
       private int valor;
@@ -39,6 +41,30 @@ public class MaquinaP {
          this.valor = valor; 
       }
       public boolean valorBool() {return valor;}
+      public String toString() {
+        return String.valueOf(valor);
+      }
+   }
+
+   // ############### NUEVAS CLASES VALOR ###############
+
+   private class ValorStr extends Valor {
+      private String valor;
+      public ValorStr(String valor) {
+         this.valor = valor; 
+      }
+      public String valorStr() {return valor;}
+      public String toString() {
+        return valor;
+      }
+   }
+   
+   private class ValorReal extends Valor {
+      private float valor;
+      public ValorReal(float valor) {
+         this.valor = valor; 
+      }
+      public float valorReal() {return valor;}
       public String toString() {
         return String.valueOf(valor);
       }
@@ -82,6 +108,146 @@ public class MaquinaP {
       } 
       public String toString() {return "and";};
    }
+
+   // ############### NUEVAS CLASES INSTRUCCION OPERACIONES ###############
+
+   private e_negado E_NEGADO;
+   private class e_negado implements Instruccion {
+      public void ejecuta() {
+         Valor opnd = pilaEvaluacion.pop(); 
+         pilaEvaluacion.push(new ValorBool(!opnd.valorBool()));
+         pc++;
+      } 
+      public String toString() {return "negado";};
+   }
+
+   private e_negativo E_NEGATIVO;
+   private class e_negativo implements Instruccion {
+      public void ejecuta() {
+         Valor opnd = pilaEvaluacion.pop(); 
+         pilaEvaluacion.push(new ValorInt(-opnd.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "negativo";};
+   }
+
+   private e_or E_OR;
+   private class e_or implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorBool()||opnd2.valorBool()));
+         pc++;
+      } 
+      public String toString() {return "or";};
+   }
+
+   private e_porcentaje E_PORCENTAJE;
+   private class e_porcentaje implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorInt(opnd1.valorInt()%opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "porcentaje";};
+   }
+
+   private e_div E_DIV;
+   private class e_div implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         if (opnd2.valorInt() == 0) throw new EAccesoIlegitimo();
+         pilaEvaluacion.push(new ValorInt(opnd1.valorInt()/opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "div";};
+   }
+
+   private e_resta E_RESTA;
+   private class e_resta implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorInt(opnd1.valorInt()-opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "resta";};
+   }
+
+   private e_geq E_GEQ;
+   private class e_geq implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorInt() >= opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "geq";};
+   }
+
+   private e_leq E_LEQ;
+   private class e_leq implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorInt() <= opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "leq";};
+   }
+
+   private e_gt E_GT;
+   private class e_gt implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorInt() > opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "gt";};
+   }
+
+   private e_lt E_LT;
+   private class e_lt implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorInt() < opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "lt";};
+   }
+
+   private e_dist E_DIST;
+   private class e_dist implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorInt() != opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "dist";};
+   }
+
+   private e_comp E_COMP;
+   private class e_comp implements Instruccion {
+      public void ejecuta() {
+         Valor opnd2 = pilaEvaluacion.pop(); 
+         Valor opnd1 = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorBool(opnd1.valorInt() == opnd2.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "comp";};
+   }
+
+
+
+
+
+
+
    private class IApilaInt implements Instruccion {
       private int valor;
       public IApilaInt(int valor) {
@@ -104,6 +270,31 @@ public class MaquinaP {
          pc++;
       } 
       public String toString() {return "apila-bool("+valor+")";};
+   }
+
+   // ############### NUEVAS CLASES INSTRUCCION ###############
+   private class IApilaStr implements Instruccion {
+      private String valor;
+      public IApilaStr(String valor) {
+        this.valor = valor;  
+      }
+      public void ejecuta() {
+         pilaEvaluacion.push(new ValorStr(valor)); 
+         pc++;
+      } 
+      public String toString() {return "apila-str("+valor+")";};
+   }
+
+   private class IApilaReal implements Instruccion {
+      private float valor;
+      public IApilaReal(float valor) {
+        this.valor = valor;  
+      }
+      public void ejecuta() {
+         pilaEvaluacion.push(new ValorReal(valor)); 
+         pc++;
+      } 
+      public String toString() {return "apila-real("+valor+")";};
    }
 
    private class IIrA implements Instruccion {
@@ -304,8 +495,23 @@ public class MaquinaP {
    public Instruccion suma() {return ISUMA;}
    public Instruccion mul() {return IMUL;}
    public Instruccion and() {return IAND;}
+   public Instruccion or() {return E_OR;}
+   public Instruccion div() {return E_DIV;}
+   public Instruccion resto() {return E_PORCENTAJE;}
+   public Instruccion geq() {return E_GEQ;}
+   public Instruccion leq() {return E_LEQ;}
+   public Instruccion gt() {return E_GT;}
+   public Instruccion lt() {return E_LT;}
+   public Instruccion dist() {return E_DIST;}
+   public Instruccion comp() {return E_COMP;}
+   public Instruccion negativo() {return E_NEGATIVO;}
+   public Instruccion negado() {return E_NEGADO;}
+   
    public Instruccion apila_int(int val) {return new IApilaInt(val);}
    public Instruccion apila_bool(boolean val) {return new IApilaBool(val);}
+   public Instruccion apila_str(String val) {return new IApilaStr(val);}   // NUEVO
+   public Instruccion apila_real(float val) {return new IApilaReal(val);} // NUEVO
+
    public Instruccion apilad(int nivel) {return new IApilad(nivel);}
    public Instruccion apila_ind() {return IAPILAIND;}
    public Instruccion desapila_ind() {return IDESAPILAIND;}
