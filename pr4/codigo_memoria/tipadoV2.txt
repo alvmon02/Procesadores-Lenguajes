@@ -1,0 +1,443 @@
+tipado(prog(decs, intrs)):
+    tipado(decs)
+    tipado(intrs)
+    $.tipo = ambos_ok(decs.tipo, intrs.tipo)
+
+tipado(si_decs(decs)):
+    tipado(decs)
+    $.tipo = decs.tipo
+
+tipado(no_decs()):
+    $.tipo = OK
+
+tipado(mas_decs(decs, dec)):
+    tipado(decs)
+    tipado(dec)
+    $.tipo = ambos_ok(decs.tipo, dec.tipo)
+
+tipado(una_dec(dec)):
+    tipado(dec)
+    $.tipo = dec.tipo
+
+tipado(dec_var(tipo, id)):
+    noop // Ya tienen el tipo asignado
+
+tipado(dec_tipo(tipo, id)):
+    noop // Ya tienen el tipo asignado
+
+tipado(dec_proc(id, pforms, prog)):
+    tipado(prog)
+    $.tipo = prog.tipo
+
+// si_pforms(pfroms)
+// no_pforms()
+// mas_pforms(pforms, pform)
+// una_pform(pform)
+// pform(tipo, ref, id)
+// si_ref()
+// no_ref()
+// t_iden(id)
+// t_string()
+// t_int()
+// t_bool()
+// t_real()
+// t_array(tipo, ent)
+// t_punter(tipo)
+// t_struct(camposs)
+// mas_cmp_s(camposs, campos)
+// un_cmp_s(campos)
+// cmp_s(tipo, id)
+
+tipado(si_intrs(intrs)):
+    tipado(intrs)
+    $.tipo = intrs.tipo
+
+tipado(no_intrs()):
+    $.tipo = OK
+
+tipado(mas_intrs(intrs, intr)):
+    tipado(intrs)
+    tipado(intr)
+    $.tipo = ambos_ok(intrs.tipo, intr.tipo)
+
+tipado(una_intr(intr)):
+    tipado(intr)
+    $.tipo = intr.tipo
+
+tipado(i_eval(exp)):
+    tipado(exp)
+    if exp.tipo == ERROR then
+        $.tipo = ERROR
+    else
+        $.tipo = OK
+    end if
+
+tipado(i_if(exp, prog, ielse)):
+    tipado(exp)
+    if exp.tipo != t_bool() then
+        error()
+    end if
+    tipado(prog)
+    tipado(ielse)
+    if exp.tipo == t_bool() && prog.tipo == OK && ielse.tipo == OK then
+        $.tipo = OK
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(i_while(exp, prog)):
+    tipado(exp)
+    if exp.tipo != t_bool() then
+        error()
+    end if
+    tipado(prog)
+    if exp.tipo == t_bool() && prog.tipo == OK then
+        $.tipo = OK
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(i_read(exp)):
+    tipado(exp)
+    if (exp.tipo == t_int() || exp.tipo == t_real() || exp.tipo == t_string()) && asignable(exp) then
+        $.tipo = OK
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(i_write(exp)):
+    tipado(exp)
+    if exp.tipo == t_int() || exp.tipo == t_real() || exp.tipo == t_bool() || exp.tipo == t_string() then
+        $.tipo = OK
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(i_nl()):
+    $.tipo = OK
+
+tipado(i_new(exp)):
+    tipado(exp)
+    if exp.tipo == t_punter() then
+        $.tipo = OK
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(i_delete(exp)):
+    tipado(exp)
+    if exp.tipo == t_punter() then
+        $.tipo = OK
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(i_call(id, preals)):
+    v = $.vinculo
+    if v != ⊥ && v == dec_proc(_, pforms, _) then
+        $.tipo = son_parametros_compatibles(pforms, preals)
+    else
+        $.tipo = ERROR
+    end if
+
+son_parametros_compatibles(no_pforms(), no_preals()):
+    return OK
+
+son_parametros_compatibles(no_pforms(), si_preals(_)):
+    return ERROR
+
+son_parametros_compatibles(si_pforms(_), no_preals()):
+    return ERROR
+
+son_parametros_compatibles(si_pforms(pforms), si_preals(preals)):
+    if (len(pforms) != len(preals)) then
+        return ERROR
+    else
+        return son_parametros_compatibles(pforms, preals)
+    end if
+
+son_parametros_compatibles(mas_pforms(pforms, pform), mas_preals(preals, exp)):
+    t0 = compatibles_preal_pform(pforms, preals)
+    t1 = compatibles_preal_pform(pform, exp)
+    return ambos_ok(t0, t1)
+
+son_parametros_compatibles(una_pform(pform), una_preals(exp)):
+    return es_parametro_compatible(pform, exp)
+
+es_parametro_compatible(pform(tipo, ref, id), exp):
+    tipado(exp)
+    t0, t1 = ref!(exp.tipo), ref!(tipo)
+    if ref == si_ref() && exp != e_iden(_) then
+        error("Para pasar por referencia, el argumento tiene que ser una variable")
+        return ERROR
+    else if tipo_asig(t0, t1) == OK then // falta hacer tipo_asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
+        if ref == si_ref() && t1 == t_real() && t0 != t_real() then 
+            error("El tipo de la variable a la que se le pasa por referencia tiene que coincidir con el tipo del argumento")
+            return ERROR
+        else
+            return OK
+        end if
+    else
+        error("El tipo del argumento tiene que ser compatible con el tipo del parametro formal")
+        return ERROR
+    end if
+
+tipado(i_prog(prog)):
+    tipado(prog)
+    $.tipo = prog.tipo
+
+tipado(si_else(prog)):
+    tipado(prog)
+    $.tipo = prog.tipo
+
+tipado(no_else()):
+    $.tipo = OK
+
+// si_preals(preals)
+// no_preals()
+// mas_preals(preals, exp)
+// un_preals(exp)
+
+tipado(e_asig(opnd0, opnd1)):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if asignable(opnd0) && compatibles(t0, t1) then
+        $.tipo = t0
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado_comp(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if ((t0 == t_punter() || t0 == NULL) && (t1 == t_punter() || t1 == NULL)) || 
+        (t0 == t_string() && t1 == t_string()) || 
+        (t0 == t_bool() && t1 == t_bool()) || 
+        ((t0 == t_int() || t0 == t_real()) && (t1 == t_int() || t1 == t_real())) then
+        $.tipo = t_bool()
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado_comp_ord(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if (t0 == t_string() && t1 == t_string()) || 
+        (t0 == t_bool() && t1 == t_bool()) || 
+        ((t0 == t_int() || t0 == t_real()) && (t1 == t_int() || t1 == t_real())) then
+        $.tipo = t_bool()
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado(e_comp(opnd0, opnd1)):
+    tipado_comp(opnd0, opnd1)
+
+tipado(e_dist(opnd0, opnd1)):
+    tipado_comp(opnd0, opnd1)
+
+tipado(e_lt(opnd0, opnd1)):
+    tipado_comp_ord(opnd0, opnd1)
+
+tipado(e_gt(opnd0, opnd1)):
+    tipado_comp_ord(opnd0, opnd1)
+
+tipado(e_leq(opnd0, opnd1)):
+    tipado_comp_ord(opnd0, opnd1)
+
+tipado(e_geq(opnd0, opnd1)):
+    tipado_comp_ord(opnd0, opnd1)
+
+    tipado_arit(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if (t0 == t_int() || t0 == t_real()) && (t1 == t_int() || t1 == t_real()) then
+        $.tipo = (t0 == t_real() || t1 == t_real()) ? t_real() : t_int()
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado(e_suma(opnd0, opnd1)):
+    tipado_arit(opnd0, opnd1)
+
+tipado(e_resta(opnd0, opnd1)):
+    tipado_arit(opnd0, opnd1)
+
+tipado_and_or(opnd0, opnd1):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if t0 == t_bool() && t1 == t_bool() then
+        $.tipo = t_bool()
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado(e_and(opnd0, opnd1)):
+    tipado_and_or(opnd0, opnd1)
+
+tipado(e_or(opnd0, opnd1)):
+    tipado_and_or(opnd0, opnd1)
+
+tipado(e_mul(opnd0, opnd1)):
+    tipado_arit(opnd0, opnd1)
+
+tipado(e_div(opnd0, opnd1)):
+    tipado_arit(opnd0, opnd1)
+
+tipado(e_porcentaje(opnd0, opnd1)):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if t0 == t_int() && t1 == t_int() then
+        $.tipo = t_int()
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado(e_negativo(opnd)):
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t == t_int() || t == t_real() then
+        $.tipo = t
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(e_negado(opnd)):
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t == t_bool() then
+        $.tipo = t_bool()
+    else
+        $.tipo = ERROR
+    end if
+
+tipado(e_indexado(opnd0, opnd1)):
+    tipado(opnd0)
+    tipado(opnd1)
+    t0, t1 = ref!(opnd0.tipo), ref!(opnd1.tipo)
+    if t0 == t_array(tb, _) && t1 == t_int() then
+        $.tipo = tb
+    else
+        aviso_error(t0, t1)
+        $.tipo = ERROR
+    end if
+
+tipado(e_campo(opnd, id)):
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+
+    if t == t_struct(campos) then
+        $.tipo = busquedaCampo(id, campos)
+    else
+        error("Se esta intentando acceder a un campo de un tipo no estructurado")
+        $.tipo = ERROR
+    end if
+
+busquedaCampo(idCampo, mas_cmp_s(camposs, cmp_s(tipo, id))):
+    if idCampo == id then
+        return tipo
+    else
+        return busquedaCampo(id, camposs)
+    end if
+
+busquedaCampo(idCampo, un_cmp_s(cmp_s(tipo, id))):
+    if idCampo == id then
+        return tipo
+    else
+        error("Campo no definido en el struct")
+        return ERROR
+    end if    
+
+tipado(e_puntero(opnd)):
+    tipado(opnd)
+    t = ref!(opnd.tipo)
+    if t == t_punter(tb) then
+        $.tipo = tb
+    else
+        error("Se esta intentando desreferenciar un puntero a un tipo no puntero")
+        $.tipo = ERROR
+    end if
+
+tipado(e_lit_ent(num)):
+    $.tipo = t_int()
+
+tipado(e_lit_real(num)):
+    $.tipo = t_real()
+
+tipado(e_true()):
+    $.tipo = t_bool()
+
+tipado(e_false()):
+    $.tipo = t_bool()
+
+tipado(e_string(string)):
+    $.tipo = t_string()
+
+tipado(e_iden(id)):
+    if $.vinculo != dec_var(_, _) then
+        error("No es una variable")
+        $.tipo = ERROR
+    else
+        $.tipo = $.vinculo.tipo
+    end if
+
+tipado(e_null()):
+    $.tipo = NULL
+
+compatibles(t1, t2):
+    C = {t1 = t2}
+    return unificables(t1, t2)
+    
+unificables(t1, t2):
+    t1p, t2p = ref!(t1), ref!(t2) 
+
+    if  (t1p == INT && t2p == INT) ||
+        (t1p == REAL && (t2p == INT || t2p == REAL)) ||
+        (t1p == BOOL && t2p == BOOL) ||
+        (t1p == STRING && t2p == STRING) then
+        return true
+    else if t1p == t_array(t1a, n1) && t2p == t_array(t2a, n2) then
+        return n1 == n2 && son_unificables(t1a, t2a)
+    else if t1p == t_struct(camposs1) && t2p == t_struct(camposs2) then
+        return len(camposs1) == len(camposs2) && son_campos_unificables(camposs1, camposs2)
+    else if t1p == t_punter(t1a) && t2p == NULL then
+        return true
+    else if t1p == t_punter(t1a) && t2p == t_punter(t2a)
+        return son_unificables(t1a, t2a)
+    else
+        return false
+    end if  
+
+son_unificables(t1, t2):
+    if C.contiene(t1 = t2) then
+        return true
+    else
+        C.add(t1 = t2)
+        return unificables(t1, t2)
+    end if
+
+son_campos_unificables(mas_cmp_s(camposs1, campos1), mas_cmp_s(camposs2, campos2)):
+    return son_campos_unificables(camposs1, camposs2) && son_unificables(campos1, campos2)
+
+son_campos_unificables(un_cmp_s(campos1), un_cmp_s(campos2)):
+    return son_campos_unificables(campos1, campos2)
+
+son_campos_unificables(cmp_s(t1, _), cmp_s(t2, _)):
+    t1p, t2p = ref!(t1), ref!(t2)
+    return son_unificables(t1, t2)
+
+asignable(exp):
+    return  exp == e_iden(_) || exp == e_campo(_, _) || 
+            exp == e_indexado(_, _) || exp == e_puntero(_)

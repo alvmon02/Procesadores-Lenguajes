@@ -67,8 +67,10 @@ public class Main {
 				prog = (Prog) asint.parse().value;
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
+				return;
 			} catch (ErrorSintactico e) {
 				System.out.println("ERROR_SINTACTICO");
+				return;
 			}
 		} else { // si no es a(en su defecto, es decir, d)
 			try {
@@ -78,8 +80,10 @@ public class Main {
 				prog = asint.analiza();
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
+				return;
 			} catch (ParseException e) {
 				System.out.println("ERROR_SINTACTICO");
+				return;
 			}
 		}
 
@@ -89,8 +93,8 @@ public class Main {
 				System.out.println(e.toStringJuez());
 			}
 			return;
-		}	
-		
+		}
+
 		Pretipado pretipado = new Pretipado();
 		if (pretipado.pretipa(prog).hayErrores()) {
 			for (ErrorProcesamiento e : pretipado.errores()) {
@@ -99,12 +103,12 @@ public class Main {
 			return;
 		}
 
-		Tipado tipado = new Tipado();
-		if (tipado.tipar(prog).hayErrores()) {
-			for (ErrorProcesamiento e : tipado.errores()) {
-				System.out.println(e.toStringJuez());
-			}
-			return;
-		}
+		// Tipado tipado = new Tipado();
+		// if (tipado.tipar(prog).hayErrores()) {
+		// for (ErrorProcesamiento e : tipado.errores()) {
+		// System.out.println(e.toStringJuez());
+		// }
+		// return;
+		// }
 	}
 }

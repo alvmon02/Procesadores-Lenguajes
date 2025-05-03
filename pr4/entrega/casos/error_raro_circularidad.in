@@ -1,0 +1,24 @@
+a
+{ 
+  type ^Tipo1 Tipo2;
+  type struct {
+    int a
+  } Tipo1;
+  type ^Tipo3 Tipo4;
+  type struct {
+    int b,
+    Tipo4 yo
+  } Tipo3
+  &&
+    
+  {
+    type struct {
+      int a,
+      Tipo2 me
+    } Tipo1;
+    Tipo3 a;
+    Tipo1 b
+    &&
+    @ a = b
+  }
+}

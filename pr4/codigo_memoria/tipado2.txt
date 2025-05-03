@@ -1,0 +1,115 @@
+tipado(prog(Decs,Is)):
+    tipado(Is)
+    $.tipo = Is.tipo
+
+tipado(muchas_is(Is,I)):
+    tipado(Is)
+    tipado(I)
+    $.tipo = ambos_ok(Is.tipo,I.tipo)
+
+tipado(una_i(I)):
+    tipado(I)
+    $.tipo = I.tipo
+
+tipado(asig(ExpI,ExpD)):
+    tipado(ExpI)
+    tipado(ExpD)
+    if es_designador(ExpI) then
+        if compatibles(ExpI.tipo,ExpD.tipo) then
+            $.tipo = OK
+        else
+            aviso_error(ExpI.tipo,ExpD.tipo)
+            $.tipo = ERROR
+        end if
+    else
+        error() // la parte izq. debe ser un designador
+        $.tipo = ERROR
+    end if 
+
+tipado(suma(e0,e1)):
+    tipado_bin(e0,e1,$)
+
+tipado(resta(e0,e1)):
+    tipado_bin(e0,e1,$)
+
+tipado(mul(e0,e1)):
+    tipado_bin(e0,e1,$)
+
+tipado(div(e0,e1)):
+    tipado_bin(e0,e1,$)
+
+tipado(lit_int(N)): $.tipo = int
+
+tipado(lit_real(N)): $.tipo = real
+
+tipado(iden(Id)):
+    let $.vinculo = Dec_var(T,I) in
+        $.tipo = T
+    end let
+
+tipado_bin(e0,e1,E):
+    tipado(e0)
+    tipado(e1)
+    E.tipo = tipo_bin(e0.tipo,e1.tipo)
+
+tipo_bin(t0,t1):
+    if ref!(t0) == ref!(t1) then
+        return t0
+    else
+        aviso_error(t0,t1)
+        return ERROR
+    end if
+
+tipo_asig(t0,t1):
+    if ref!(t0) == ref!(t1) then
+        return OK
+    else
+        aviso_error(t0,t1)
+        return ERROR
+    end if
+
+ambos_ok(t0,t1):
+    if t0 == OK && t1 == OK then
+        return OK
+    else
+        return ERROR
+    end if
+
+aviso_error(t0,t1):
+    if t0 != ERROR && t1 != ERROR then
+        error()
+    end if
+
+ref!(T):
+    if T == Ref(I) then
+        let T.vinculo = Dec_tipo(Tp,I) in
+            return ref!(Tp)
+        end let
+    else
+        return T
+    end if
+
+compatibles(T1,T2):
+    C = {T1=T2}
+    return unificables(T1,T2)
+    
+unificables(T1,T2):
+    let T1’ = ref!(T1) && T2’ = ref!(T2) in
+        if T1’ == T2’ then
+            return true;
+        elsif T1’ == par(T1a,T1b)  T2’ == par(T2a,T2b)then
+            return son_unificables(T1a,T2a)  son_unificables(T1b,T2b)
+        elseif T1’ == puntero(T1a)  T2’ == puntero(T2a) then
+            return son_unificables(T1a,T2a)
+        else
+            return false
+        end if  
+    end let
+
+son_unificables(T1,T2):
+    if C.contiene(T1=T2) then
+        return true;
+    else
+        C.add(T1=T2)
+        return unificables(T1,T2)
+    end if
