@@ -140,16 +140,17 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(I_Read i_Read) {
-        i_Read.exp().procesa(this);
-        m.emit(m.read());
-        m.emit(m.desapila_ind());
+        i_Read.exp().procesa(this); // dirección de lectura se deja en la cima
+        m.emit(m.read()); // lee el valor y se guarda en la cima
+        m.emit(m.desapila_ind()); //guarda la cima en la dirección de la subcima
     }
 
     public void procesa(I_Write i_Write) {
-        i_Write.exp().procesa(this);
-        if(es_designador()){
-            m.emit(m.apila_ind());
+        i_Write.exp().procesa(this); //apilamos el valor a escribir
+        if(es_designador()){ // si el valor es una direccion
+            m.emit(m.apila_ind());  // apilamos el valor de la dirección
         }
+        m.emit(m.write()); // escribimos el valor de la cima
     }
 
     public void procesa(I_NL i_Nl) {
@@ -157,17 +158,49 @@ public class cod_maquina_p extends ProcesamientoDef{
 
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
-        m.emit(m.alloc(i_New.tipoNodo().tamano()));
+        m.emit(m.alloc(i_New.tipoNodo().tamano())); // se aisgna espacio desde la posicion de la cima. Tamaño asignado el del tipo
     }
 
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         m.emit(m.apila_ind());
-        m.emit(m.dealloc(i_Delete.tipoNodo().tamano()));
+        m.emit(m.dealloc(i_Delete.tipoNodo().tamano())); // desapila la cima que tiene la direccion de inicio y desde esa pos se libera el tamaño del tipo
     }
 
     public void procesa(I_Call i_Call) {
+        m.emit(m.activa(i_Call.vinculo().nivel(), i_Call.vinculo().tamano(), i_Call.sig())); // Activamos el registro de activación, dejamos en la cima la direccion de comienzo del registro
+
+        for (PReal preal : i_Call.preals()) {
+            genPasoParam(i_Call.vinculo(), preal); // Generamos el paso de parámetros
+        }
+
+        m.emit(m.desapilad(i_Call.vinculo().nivel()));  //desapilamos una direccion de la pila de evaluación (dirección inicio datos) se guarda en display de nivel proc.nivel
+
+        m.emit(m.desactiva(i_Call.vinculo().nivel(), i_Call.vinculo().tamano())); // desactivamos el registro de activación dejamos en la cima la dirección de retorno
+        m.emit(m.ir_ind()); // Saltamos a la dirección de retorno del resgistro de activación
     }
+
+    private void genPasoParam(Proc proc, PReal preal) {
+        m.emit(m.dup()); // Duplicamos la cima (dir de comienzo de los datos del registro de activación) par mantener invariante de que la cima es la dirección de comienzo del registro de activación
+        m.emit(m.apila_int(preal.tamano())); // Apilamos el tamaño del parámetro
+        m.emit(m.suma()); // Tenemos en la cima la dirección de comienzo del parámetro
+        preal.procesa(this); // Generamos el código para el valor/dirección del parámetro
+
+        if (proc.pform().ref() instanceof No_Ref) {
+            if (es_designador(preal)) { // Parámetro formal por valor y real es designador
+                m.emit(m.copia(proc.pform().tipo().tamano())); //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
+            } else {
+                m.emit(m.desapila_ind()); // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+            }
+        } else {
+            if (es_designador(preal)) { // Parámetro formal por referencia y real es designador
+                m.emit(m.desapila_ind()); // Guardamos el valor apuntado por el preal en la dirección del pform
+            } else {
+                throw new IllegalArgumentException("Error: el parámetro formal es por referencia y el real no es designador.");
+            }
+        }
+    }
+
 
     public void procesa(I_Prog i_Prog) {
     }
