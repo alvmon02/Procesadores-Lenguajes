@@ -1,7 +1,9 @@
 -----repertorio instrucciones-----
 
 apila-int(n) -> apila en la cima el número n
+apila-real(n) -> apila en la cima el número n
 apila-bool(b) -> apila en la cima el booleano b
+apila-string(s) -> apila en la cima la cadena s
 apila-dir(d) -> apila en la cima el contenido de la dirección d
 desapila-dir(d) -> desapila la cima y lo guarda en la dirección d
 
@@ -63,5 +65,10 @@ menor_igual -> desapila la cima y la subcima, realiza la comparacion menor o igu
 mayor_igual -> desapila la cima y la subcima, realiza la comparacion mayor o igual que y apila el resultado
 igual -> desapila la cima y la subcima, calcula si ambos son iguales y apila el resultado
 dist -> desapila la cima y la subcima, calcula si ambos son distintos y apila el resultado
-negado -> desapila la cima, invierte el valor y lo apila // Se podria implementar como un apila_int(0) y un resta()
+neg -> desapila la cima, invierte el valor y lo apila // Se podria implementar como un apila_int(0) y un resta()
 not -> desapila la cima, niega el valor y lo apila // Se podria implementar con un apila_bool()
+
+write -> desapila la cima y la escribe por la salida
+read -> le la entrada y lo apila
+
+int2real -> desapila la cima, si es un entero lo pasa a real y lo apila, sino da fallo
