@@ -232,7 +232,8 @@ asig_espacio(si_else(prog)):
 asig_espacio(no_else()):
     noop
 
-// no aplica
+// no aplica    (se llamaban a hacer asignacion de espacio a las expresiones, no les hace falta, ya que 
+//              ya estará definido su espacio, trabajan con la pila, no crean nuevas variables ni describen nuevos tipos)
 si_preals(preals)
 no_preals()
 mas_preals(preals, exp)
