@@ -1,10 +1,17 @@
 package cod_maquina_p;
+import java.util.Arrays;
+
 import asint.ProcesamientoDef;
+import asint.SintaxisAbstractaTiny;
 import asint.SintaxisAbstractaTiny.*;
-import asint.TiposBase.tReal;
 import maquinap.*;
 
 public class cod_maquina_p extends ProcesamientoDef{
+
+    private boolean es_designador(SintaxisAbstractaTiny.Exp exp) {
+        
+        return false;
+    }
 
     private MaquinaP m = new MaquinaP(5,10,10,2); // habrá que inicializarla con los params correctos
 
@@ -116,7 +123,7 @@ public class cod_maquina_p extends ProcesamientoDef{
 
     public void procesa(I_If i_If) {
         i_If.exp().procesa(this);
-        if (es_designador()){
+        if (es_designador(i_If.exp())) {
             m.emit(m.apila_ind());
         }
         else{
@@ -129,7 +136,7 @@ public class cod_maquina_p extends ProcesamientoDef{
 
     public void procesa(I_While i_While) {
         i_While.exp().procesa(this);
-        if (es_designador()){
+        if (es_designador(i_While.exp())) {
             m.emit(m.apila_ind());
         }
         else{
@@ -147,7 +154,7 @@ public class cod_maquina_p extends ProcesamientoDef{
 
     public void procesa(I_Write i_Write) {
         i_Write.exp().procesa(this); //apilamos el valor a escribir
-        if(es_designador()){ // si el valor es una direccion
+        if(es_designador(i_Write.exp())){ // si el valor es una direccion
             m.emit(m.apila_ind());  // apilamos el valor de la dirección
         }
         m.emit(m.write()); // escribimos el valor de la cima
@@ -158,25 +165,25 @@ public class cod_maquina_p extends ProcesamientoDef{
 
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
-        m.emit(m.alloc(i_New.tipoNodo().tamano())); // se aisgna espacio desde la posicion de la cima. Tamaño asignado el del tipo
+        m.emit(m.alloc(i_New.tipo().tam())); // se aisgna espacio desde la posicion de la cima. Tamaño asignado el del tipo
     }
 
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         m.emit(m.apila_ind());
-        m.emit(m.dealloc(i_Delete.tipoNodo().tamano())); // desapila la cima que tiene la direccion de inicio y desde esa pos se libera el tamaño del tipo
+        m.emit(m.dealloc(i_Delete.tipo().tam())); // desapila la cima que tiene la direccion de inicio y desde esa pos se libera el tamaño del tipo
     }
 
     public void procesa(I_Call i_Call) {
-        m.emit(m.activa(i_Call.vinculo().nivel(), i_Call.vinculo().tamano(), i_Call.sig())); // Activamos el registro de activación, dejamos en la cima la direccion de comienzo del registro
+        m.emit(m.activa(i_Call.vinculo().nivel(), i_Call.vinculo().tam(), i_Call.sig())); // Activamos el registro de activación, dejamos en la cima la direccion de comienzo del registro
 
-        for (PReal preal : i_Call.preals()) {
+        for (PReals preal : Arrays.asList(i_Call.preals())) {
             genPasoParam(i_Call.vinculo(), preal); // Generamos el paso de parámetros
         }
 
         m.emit(m.desapilad(i_Call.vinculo().nivel()));  //desapilamos una direccion de la pila de evaluación (dirección inicio datos) se guarda en display de nivel proc.nivel
 
-        m.emit(m.desactiva(i_Call.vinculo().nivel(), i_Call.vinculo().tamano())); // desactivamos el registro de activación dejamos en la cima la dirección de retorno
+        m.emit(m.desactiva(i_Call.vinculo().nivel(), i_Call.vinculo().tam())); // desactivamos el registro de activación dejamos en la cima la dirección de retorno
         m.emit(m.ir_ind()); // Saltamos a la dirección de retorno del resgistro de activación
     }
 
@@ -235,7 +242,7 @@ public class cod_maquina_p extends ProcesamientoDef{
             }
         } else { 
             if (es_designador(exp.opnd1())) {
-                m.emit(m.copia(exp.opnd1().tipoNodo().tamano())); 
+                m.emit(m.copia(exp.opnd1().tipo().tam())); 
             } else {
                 m.emit(m.desapila_ind()); // coge la cima(valor que se quiere asignar), la subcima (dirección de la exp0) y se le asigna el valor
             }
@@ -481,8 +488,8 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Negativo exp) {
-        exp.opnd().procesa(this);
-        if (es_designador(exp.opnd())) {
+        exp.opnd0().procesa(this);
+        if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
         m.emit(m.negativo()); // Negamos el valor de la cima
@@ -499,7 +506,7 @@ public class cod_maquina_p extends ProcesamientoDef{
     public void procesa(Index exp) {
         exp.opnd0().procesa(this); // Obtenemos la dirección del array
         exp.opnd1().procesa(this); // Obtenemos el índice
-        m.emit(m.apila_int(exp.opnd0().tipoNodo().tamano())); // Apilamos el tamaño del tipo del array
+        m.emit(m.apila_int(exp.opnd0().tipo().tam())); // Apilamos el tamaño del tipo del array
         m.emit(m.mul()); // Apilamos el desplazamiento del índice
         m.emit(m.suma()); // Sumamos el desplazamiento del índice a la dirección de comienzo del array
     }
@@ -507,7 +514,7 @@ public class cod_maquina_p extends ProcesamientoDef{
     public void procesa(Acceso exp) {
         exp.opnd0().procesa(this); // Determinamos la dirección de E
         int d = exp.desplazamiento(); // Obtenemos el indice que se pide
-        int tam_tipo = exp.opnd0().tipoNodo().tamano(); // Obtenemos el tamaño del tipo de E
+        int tam_tipo = exp.opnd0().tipo().tam(); // Obtenemos el tamaño del tipo de E
         m.emit(m.apila_int(tam_tipo)); // Apilamos el tamaño del tipo de E
         m.emit(m.suma()); // Sumamos el desplazamiento del campo a la dirección de comienzo de E
         m.emit(m.acceso()); // Emitimos la instrucción de acceso al campo

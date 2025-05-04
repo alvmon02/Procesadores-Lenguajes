@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
-import asint.TiposBase.*;
 import errores_procesamiento.*;
 
 public class asig_espacio extends ProcesamientoDef{
@@ -16,6 +15,13 @@ public class asig_espacio extends ProcesamientoDef{
     private int dir = 0;
     private int nivel = 0;
     private int max_dir = 0;
+
+    private void inc_dir(int tam){
+        dir += tam;
+        if (dir > max_dir) {
+            max_dir = dir;
+        }
+    }
 
     @Override
     public void procesa(Prog prog){
@@ -55,10 +61,10 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa (Dec_Var dec_Var){
-        dec_Var.pondir(dir); //Todo
-        dec_Var.ponnivel(nivel); //todo
+        dec_Var.ponDir(dir);
+        dec_Var.ponNivel(nivel); //todo
         dec_Var.tipo().procesa(this);
-        inc_dir(dec_Var.tipo().tamano()); //todo
+        inc_dir(dec_Var.tipo().tam()); //todo
     }
 
     @Override
@@ -81,12 +87,12 @@ public class asig_espacio extends ProcesamientoDef{
         int dir_ant = dir;
         int max_dir_ant = max_dir;
         nivel++;
-        dec_proc.ponnivel(nivel); //todo
+        dec_proc.ponNivel(nivel);
         dir = 0;
         max_dir = 0;
         dec_proc.pforms().procesa(this);
         dec_proc.prog().procesa(this);
-        dec_proc.pontam(max_dir); //todo
+        dec_proc.ponTam(max_dir);
         dir = dir_ant;
         max_dir = max_dir_ant;
         nivel--;
@@ -116,7 +122,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(T_Iden t_iden){
-        t_iden.pontam(t_iden.vinculo().tipoNodo()); //todo
+        t_iden.ponTam(t_iden.vinculo().tipo().tam()); //todo
     }
 
     @Override
@@ -125,7 +131,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(T_String t_string){
-        t_string.pontam(1); //todo
+        t_string.ponTam(1); //todo
     }
 
     @Override
@@ -134,7 +140,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(T_Int t_int){
-        t_int.pontam(1); //todo
+        t_int.ponTam(1); //todo
     }
 
     @Override
@@ -143,7 +149,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(T_Bool t_bool){
-        t_bool.pontam(1); //todo
+        t_bool.ponTam(1); //todo
     }
 
     @Override
@@ -152,7 +158,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(T_Real t_real){
-        t_real.pontam(1); //todo
+        t_real.ponTam(1); //todo
     }
 
     @Override
@@ -161,9 +167,9 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(T_Array t_array){
-        t_array.pondir(dir); //todo
+        t_array.ponDir(dir); //todo
         t_array.tipo().procesa(this);
-        t_array.pontam(t_array.tipo().tamano() * t_array.numelems()); //todo
+        t_array.ponTam(t_array.tipo().tam() * t_array.numelems()); //todo
     }
 
     @Override
@@ -175,7 +181,7 @@ public class asig_espacio extends ProcesamientoDef{
         if (!(t_puntero.tipo() instanceof T_Iden)) {
             t_puntero.tipo().procesa(this);
         }
-        t_puntero.pontam(1);
+        t_puntero.ponTam(1);
     }
 
     @Override
@@ -184,7 +190,7 @@ public class asig_espacio extends ProcesamientoDef{
             T_Iden tipoIden = (T_Iden) t_puntero.tipo();
             if (tipoIden.vinculo() instanceof Dec_Tipo) {
                 Dec_Tipo decTipo = (Dec_Tipo) tipoIden.vinculo();
-                tipoIden.pontam(decTipo.tipo().tamano());
+                tipoIden.ponTam(decTipo.tipo().tam());
             }
         } else {
             t_puntero.tipo().procesa2(this);
@@ -209,10 +215,10 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(CampoS campoS){
-        campoS.pondir(dir); //todo
+        campoS.ponDir(dir); //todo
         campoS.procesa(this);
-        campoS.pontam(campoS.tipo().tamano()); //todo
-        dir += campoS.tamano(); //todo
+        campoS.ponTam(campoS.tipo().tam()); //todo
+        dir += campoS.tam(); //todo
     }
 
 
@@ -241,7 +247,7 @@ public class asig_espacio extends ProcesamientoDef{
     public void procesa(I_If i_if) {
         i_if.exp().procesa(this);
         i_if.prog().procesa(this);
-        i_if.ielse().procesa(this);
+        i_if.i_else().procesa(this);
     }
 
     @Override
@@ -296,23 +302,23 @@ public class asig_espacio extends ProcesamientoDef{
     }
 
     @Override
-    public void procesa(Si_Preals si_preals) {
+    public void procesa(Si_PReals si_preals) {
         si_preals.preals().procesa(this);
     }
 
     @Override
-    public void procesa(No_Preals no_preals) {
+    public void procesa(No_PReals no_preals) {
         // No operation
     }
 
     @Override
-    public void procesa(Mas_Preals mas_preals) {
+    public void procesa(Mas_PReals mas_preals) {
         mas_preals.preals().procesa(this);
         mas_preals.exp().procesa(this);
     }
 
     @Override
-    public void procesa(Un_Preals un_preals) {
+    public void procesa(Un_PReal un_preals) {
         un_preals.exp().procesa(this);
     }
 

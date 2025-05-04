@@ -246,7 +246,29 @@ public class MaquinaP {
 
 
 
+   private class Int2RealSubcima implements Instruccion {
+      public void ejecuta() {
+         Valor cima = pilaEvaluacion.pop();
+         Valor subcima = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorReal((float) subcima.valorInt()));
+         pilaEvaluacion.push(cima);
+         pc++;
+      }
+      public String toString() {
+         return "int2real-subcima";
+      }
+   }
 
+   private class int2real_cima implements Instruccion {
+      public void ejecuta() {
+         Valor cima = pilaEvaluacion.pop();
+         pilaEvaluacion.push(new ValorReal((float) cima.valorInt()));
+         pc++;
+      }
+      public String toString() {
+         return "int2real-cima";
+      }
+   }
 
    private class IApilaInt implements Instruccion {
       private int valor;
@@ -501,6 +523,7 @@ public class MaquinaP {
    }
 
    public Instruccion suma() {return ISUMA;}
+   public Instruccion resta() {return E_RESTA;}
    public Instruccion mul() {return IMUL;}
    public Instruccion and() {return IAND;}
    public Instruccion or() {return E_OR;}
@@ -515,6 +538,8 @@ public class MaquinaP {
    public Instruccion negativo() {return E_NEGATIVO;}
    public Instruccion negado() {return E_NEGADO;}
    
+   public Instruccion int2real_subcima() {return new Int2RealSubcima();}
+   public Instruccion int2real_cima() {return new int2real_cima();}
    public Instruccion apila_int(int val) {return new IApilaInt(val);}
    public Instruccion apila_bool(boolean val) {return new IApilaBool(val);}
    public Instruccion apila_str(String val) {return new IApilaStr(val);}   // NUEVO

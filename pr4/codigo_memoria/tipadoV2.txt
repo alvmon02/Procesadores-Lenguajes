@@ -158,7 +158,7 @@ son_parametros_compatibles(si_pforms(pforms), si_preals(preals)):
 
 son_parametros_compatibles(mas_pforms(pforms, pform), mas_preals(preals, exp)):
     t0 = compatibles_preal_pform(pforms, preals)
-    t1 = compatibles_preal_pform(pform, exp)
+    t1 = es_parametro_compatible(pform, exp)
     return ambos_ok(t0, t1)
 
 son_parametros_compatibles(una_pform(pform), una_preals(exp)):

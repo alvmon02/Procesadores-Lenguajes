@@ -31,7 +31,21 @@ public class SintaxisAbstractaTiny {
 
         private int col;
 
+        private int tam;
+
+        private int dir;
+
+        private int nivel;
+
+        private int sig;
+
+        private int prim;
+
+        private int fin;
+
         private Nodo vinculo = null;
+
+
 
         public Nodo ponFila(int fila) {
             this.fila = fila;
@@ -51,6 +65,60 @@ public class SintaxisAbstractaTiny {
         public Nodo ponTipo(Tipo tipo) {
             this.tipo = tipo;
             return this;
+        }
+
+        public Nodo ponTam(int tam) {
+            this.tam = tam;
+            return this;
+        }
+
+        public Nodo ponDir(int dir) {
+            this.dir = dir;
+            return this;
+        }
+
+        public Nodo ponNivel(int nivel) {
+            this.nivel = nivel;
+            return this;
+        }
+        
+        public Nodo ponSig(int sig) {
+            this.sig = sig;
+            return this;
+        }
+
+        public Nodo ponPrim(int prim) {
+            this.prim = prim;
+            return this;
+        }
+
+        public Nodo ponFin(int fin) {
+            this.fin = fin;
+            return this;
+        }
+
+        public int fin() {
+            return this.fin;
+        }
+
+        public int sig() {
+            return this.sig;
+        }
+
+        public int prim() {
+            return this.prim;
+        }
+
+        public int nivel() {
+            return this.nivel;
+        }
+
+        public int dir() {
+            return this.dir;
+        }
+
+        public int tam() {
+            return this.tam;
         }
 
         public Tipo tipo() {

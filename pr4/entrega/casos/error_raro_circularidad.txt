@@ -1,12 +1,1 @@
-No inicializadot_struct(un_cmp_s(campo_s(t_int(),a[5,9])))
-No inicializadot_int()
-No inicializadot_struct(mas_cmp_s(un_cmp_s(campo_s(t_int(),b[9,9])),campo_s(tipo(Tipo4[10,5]),yo[10,11])))
-No inicializadot_int()
-No inicializadot_struct(mas_cmp_s(un_cmp_s(campo_s(t_int(),a[16,11])),campo_s(tipo(Tipo2[17,7]),me[17,13])))
-No inicializadot_int()
-El tipo es: Tipo1 en 3,9 y su vinculo es: dec_tipo(t_struct(un_cmp_s(campo_s(t_int(),a[5,9]))),Tipo1[6,5])
-El tipo es: Tipo3 en 7,9 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_int(),b[9,9])),campo_s(tipo(Tipo4[10,5]),yo[10,11]))),Tipo3[11,5])
-El tipo es: Tipo4 en 10,5 y su vinculo es: dec_tipo(t_puntero(tipo(Tipo3[7,9])),Tipo4[7,15])
-El tipo es: Tipo2 en 17,7 y su vinculo es: dec_tipo(t_puntero(tipo(Tipo1[3,9])),Tipo2[3,15])
-El tipo es: Tipo3 en 19,5 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_int(),b[9,9])),campo_s(tipo(Tipo4[10,5]),yo[10,11]))),Tipo3[11,5])
-El tipo es: Tipo1 en 20,5 y su vinculo es: dec_tipo(t_struct(mas_cmp_s(un_cmp_s(campo_s(t_int(),a[16,11])),campo_s(tipo(Tipo2[17,7]),me[17,13]))),Tipo1[18,7])
+Errores_tipado fila:22 col:9

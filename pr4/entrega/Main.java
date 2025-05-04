@@ -103,12 +103,12 @@ public class Main {
 			return;
 		}
 
-		// Tipado tipado = new Tipado();
-		// if (tipado.tipar(prog).hayErrores()) {
-		// for (ErrorProcesamiento e : tipado.errores()) {
-		// System.out.println(e.toStringJuez());
-		// }
-		// return;
-		// }
+		Tipado tipado = new Tipado();
+		if (tipado.tipar(prog).hayErrores()) {
+			for (ErrorProcesamiento e : tipado.errores()) {
+				System.out.println(e.toStringJuez());
+			}
+			return;
+		}
 	}
 }
