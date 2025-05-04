@@ -37,7 +37,15 @@ public class SintaxisAbstractaTiny {
 
         private int nivel;
 
+        private int sig;
+
+        private int prim;
+
+        private int fin;
+
         private Nodo vinculo = null;
+
+
 
         public Nodo ponFila(int fila) {
             this.fila = fila;
@@ -73,11 +81,38 @@ public class SintaxisAbstractaTiny {
             this.nivel = nivel;
             return this;
         }
+        
+        public Nodo ponSig(int sig) {
+            this.sig = sig;
+            return this;
+        }
+
+        public Nodo ponPrim(int prim) {
+            this.prim = prim;
+            return this;
+        }
+
+        public Nodo ponFin(int fin) {
+            this.fin = fin;
+            return this;
+        }
+
+        public int fin() {
+            return this.fin;
+        }
+
+        public int sig() {
+            return this.sig;
+        }
+
+        public int prim() {
+            return this.prim;
+        }
 
         public int nivel() {
             return this.nivel;
         }
-        
+
         public int dir() {
             return this.dir;
         }
