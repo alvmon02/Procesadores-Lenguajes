@@ -9,8 +9,10 @@ inc_dir(inc):
         max_dir = dir
 
 asig_espacio(prog(decs, intrs)):
+    dir_ant = dir
     asig_espacio(decs)
     asig_espacio(intrs)
+    dir = dir_ant
 
 
 asig_espacio(si_decs(decs)):
@@ -35,9 +37,9 @@ asig_espacio2(una_dec(dec)):
     asig_espacio2(dec)
 
 asig_espacio1(dec_var(tipo, id)):
+    asig_tam1(tipo)
     $.dir = dir
     $.nivel = nivel
-    asig_tam1(tipo)
     inc_dir(tipo.tam) //var se actualiza a la siguiente dirección libre y si se pasa de max_dir se actualiza tmb
     
 
@@ -64,11 +66,9 @@ asig_espacio1(dec_proc(id, pforms, prog)):
     dir = dir_ant
     max_dir = max_dir_ant
     nivel -= 1
-
-
+    
 asig_espacio2(dec_proc(id, pforms, prog)): // Deberia de ser aqui donde se hace todo, por el hecho de que igual tenemos despues de la declaracion del procedimiento una de claracion de tipo que se usa dentro
-    asig_espacio(pforms)
-    asig_espacio(prog)
+    noop
 
 asig_espacio(pforms(si_pforms(pforms))):
     asig_espacio(pforms)
@@ -126,44 +126,58 @@ asig_espacio2(t_real()):
     noop
 
 asig_espacio1(t_array(tipo, ent)):
-    $.dir = dir
     asig_espacio1(tipo)
     $.tam = tipo.tam * ent
-    dir+= $.tam
 
 asig_espacio2(t_array(tipo, ent)):
-    noop    // no sé si debería hacer algo aquí
+    asig_espacio2(tipo)
 
 asig_espacio1(t_puntero(tipo)):
-    if tipo != ref(id) then
+    if tipo != ref(_) then
         asig_espacio1(tipo)
     end if
     $.tam = 1
 
 asig_espacio2(t_puntero(tipo)):
-    if tipo = ref(id) then 
-        let tipo.vinculo = dec_tipo(T,id) in
-            $.tam = T.tam
+    if tipo = ref(_) then 
+        let tipo.vinculo = dec_tipo(T, _) in
+            tipo.tam = T.tam
     else
         asig_espacio2(tipo)
     end if
 
-asig_espacio(t_struct(camposs)):
-    asig_espacio(camposs)
+asig_espacio1(t_struct(camposs)):
+    dirAux = dir
+    dir = 0
+    asig_espacio1(camposs)
+    $.tam = dir
+    dir = dirAux
 
-asig_espacio(mas_cmp_s(camposs, campos)):
-    asig_espacio(camposs)
-    asig_espacio(campos)
+asig_espacio1(mas_cmp_s(camposs, campos)):
+    asig_espacio1(camposs)
+    asig_espacio1(campos)
 
-asig_espacio(un_cmp_s(campos)):
-    asig_espacio(campos)
+asig_espacio1(un_cmp_s(campos)):
+    asig_espacio1(campos)
 
-asig_espacio(cmp_s(tipo, id)):
+asig_espacio1(cmp_s(tipo, id)):
     $.dir = dir
     asig_espacio1(tipo)
-    $.tam = tipo.tam
-    dir+= $.tam
+    $.tam = tipo.tam // Mirar si el tamaño solo lo tienen los tipos y simplemente hay que hacer += a la dir
+    dir += $.tam
 
+asig_espacio2(t_struct(camposs)):
+    asig_espacio2(camposs)
+
+asig_espacio2(mas_cmp_s(camposs, campos)):
+    asig_espacio2(camposs)
+    asig_espacio2(campos)
+
+asig_espacio2(un_cmp_s(campos)):
+    asig_espacio2(campos)
+
+asig_espacio2(cmp_s(tipo, id)):
+    asig_espacio2(tipo)
 
 asig_espacio(si_intrs(intrs)):
     asig_espacio(intrs)
@@ -179,36 +193,35 @@ asig_espacio(una_intr(intr)):
     asig_espacio(intr)
 
 asig_espacio(i_eval(exp)):
-    asig_espacio(exp)
+    noop // no hace asig_espacio(exp)
 
 asig_espacio(i_if(exp, prog, ielse)):
-    asig_espacio(exp)
+    // no hace asig_espacio(exp)
     asig_espacio(prog)
     asig_espacio(ielse)
 
 asig_espacio(i_while(exp, prog)):
-    asig_espacio(exp)
+    // no hace asig_espacio(exp)
     asig_espacio(prog)
 
 asig_espacio(i_read(exp)):
-    asig_espacio(exp)
+    noop // no hace asig_espacio(exp)
 
 
 asig_espacio(i_write(exp)):
-    asig_espacio(exp)
+    noop // no hace asig_espacio(exp)
 
 asig_espacio(i_nl()):
     noop
 
 asig_espacio(i_new(exp)):
-    asig_espacio(exp)
+    noop // no hace asig_espacio(exp)
 
 asig_espacio(i_delete(exp)):
-    asig_espacio(exp)
+    noop // no hace asig_espacio(exp)
 
 asig_espacio(i_call(id, preals)):
-    asig_espacio(preals)
-
+    noop // no hace asig_espacio(preals)
 
 asig_espacio(i_prog(prog)):
     asig_espacio(prog)
@@ -219,94 +232,30 @@ asig_espacio(si_else(prog)):
 asig_espacio(no_else()):
     noop
 
-asig_espacio(si_preals(preals)):
-    asig_espacio(preals)
-
-asig_espacio(no_preals()):
-    noop   
-
-asig_espacio(mas_preals(preals, exp)):
-    asig_espacio(preals)
-    asig_espacio(exp)
-
-asig_espacio(un_preals(exp)):
-    asig_espacio(exp)
-
-
-asig_espacio(e_asig(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_comp(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_dist(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_lt(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_gt(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_leq(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_geq(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_suma(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_resta(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_and(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_or(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_mul(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_div(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_porcentaje(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_negativo(opnd)):
-    asig_espacio(opnd)
-
-asig_espacio(e_negado(opnd)):
-    asig_espacio(opnd)
-
-asig_espacio(e_indexado(opnd0, opnd1)):
-    asig_espacio(opnd0)
-    asig_espacio(opnd1)
-
-asig_espacio(e_campo(opnd, id)):
-    asig_espacio(opnd)
-
-asig_espacio(e_puntero(opnd)):
-    asig_espacio(opnd)
-
-// no aplican
-
+// no aplica
+si_preals(preals)
+no_preals()
+mas_preals(preals, exp)
+un_preals(exp)
+e_asig(opnd0, opnd1)
+e_comp(opnd0, opnd1)
+e_dist(opnd0, opnd1)
+e_lt(opnd0, opnd1)
+e_gt(opnd0, opnd1)
+e_leq(opnd0, opnd1)
+e_geq(opnd0, opnd1)
+e_suma(opnd0, opnd1)
+e_resta(opnd0, opnd1)
+e_and(opnd0, opnd1)
+e_or(opnd0, opnd1)
+e_mul(opnd0, opnd1)
+e_div(opnd0, opnd1)
+e_porcentaje(opnd0, opnd1)
+e_negativo(opnd)
+e_negado(opnd)
+e_indexado(opnd0, opnd1)
+e_campo(opnd, id)
+e_puntero(opnd)
 e_lit_ent(num)
 e_lit_real(num)
 e_true()
