@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import asint.SintaxisAbstractaTiny.*;
-import tipadoPost.TipadoV2;
+import tipadoPost.Tipado;
 import asint.ProcesamientoDef;
 
 public class Prueba {
@@ -65,7 +65,7 @@ public class Prueba {
                 System.out.println("Pasando por aqui, " + cont);
                 return false;
             }
-            Tipo t0p = TipadoV2.refenciar(t0), t1p = TipadoV2.refenciar(t1);
+            Tipo t0p = Tipado.refenciar(t0), t1p = Tipado.refenciar(t1);
 
             if ((ProcesamientoDef.claseDe(t0p, T_Int.class) && ProcesamientoDef.claseDe(t1p, T_Int.class)) ||
                     (ProcesamientoDef.claseDe(t0p, T_Real.class) && (ProcesamientoDef.claseDe(t1p, T_Int.class)
@@ -111,7 +111,7 @@ public class Prueba {
         }
 
         private static boolean son_campos_unificables(CampoS campos0, CampoS campos1) {
-            return son_unificables(TipadoV2.refenciar(campos0.tipo()), TipadoV2.refenciar(campos1.tipo()));
+            return son_unificables(Tipado.refenciar(campos0.tipo()), Tipado.refenciar(campos1.tipo()));
         }
     }
 

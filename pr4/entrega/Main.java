@@ -9,7 +9,7 @@ import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
 import errores_procesamiento.ErrorProcesamiento;
 import pretipado.Pretipado;
-import tipadoPost.TipadoV2;
+import tipadoPost.Tipado;
 import vinculacion.Vinculado;
 
 import java.io.File;
@@ -103,7 +103,7 @@ public class Main {
 			return;
 		}
 
-		TipadoV2 tipado = new TipadoV2();
+		Tipado tipado = new Tipado();
 		if (tipado.tipar(prog).hayErrores()) {
 			for (ErrorProcesamiento e : tipado.errores()) {
 				System.out.println(e.toStringJuez());
