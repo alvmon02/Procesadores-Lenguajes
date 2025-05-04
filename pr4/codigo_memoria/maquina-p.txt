@@ -1,6 +1,7 @@
 -----repertorio instrucciones-----
 
 apila-int(n) -> apila en la cima el número n
+apila-bool(b) -> apila en la cima el booleano b
 apila-dir(d) -> apila en la cima el contenido de la dirección d
 desapila-dir(d) -> desapila la cima y lo guarda en la dirección d
 
@@ -53,3 +54,14 @@ suma -> desapila la cima y la subcima, los suma y lo apila
 resta -> desapila la cima y la subcima, los resta y lo apila
 mul -> desapila la cima y la subcima, los multiplica y lo apila
 div -> desapila la cima y la subcima, los divide y lo apila
+mod -> desapila la cima y la subcima, reliza la operacion del modulo y apila el resultado
+or -> desapila la cima y la subcima, realiza la operacion or logica y apila el resultado
+and -> desapila la cima y la subcima, realiza la operacion and logica y apila el resultado
+menor -> desapila la cima y la subcima, realiza la comparacion menor que y apila el resultado
+mayor -> desapila la cima y la subcima, realiza la comparacion mayor que y apila el resultado
+menor_igual -> desapila la cima y la subcima, realiza la comparacion menor o igual que y apila el resultado
+mayor_igual -> desapila la cima y la subcima, realiza la comparacion mayor o igual que y apila el resultado
+igual -> desapila la cima y la subcima, calcula si ambos son iguales y apila el resultado
+dist -> desapila la cima y la subcima, calcula si ambos son distintos y apila el resultado
+negado -> desapila la cima, invierte el valor y lo apila // Se podria implementar como un apila_int(0) y un resta()
+not -> desapila la cima, niega el valor y lo apila // Se podria implementar con un apila_bool()
