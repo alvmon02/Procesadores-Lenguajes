@@ -227,17 +227,17 @@ public class cod_maquina_p extends ProcesamientoDef{
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
 
-        if (exp.opnd0().tipoNodo() == tReal && exp.opnd1().tipoNodo() == tInt) {
-            if (es_designador(exp.opnd1())) {
-                m.emit(m.apila_ind());
-                m.emit(m.int2real()); 
-                m.emit(m.desapila_ind());
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) { //asignación de un int a un real
+            if (es_designador(exp.opnd1())) { // si el real es un designador
+                m.emit(m.apila_ind()); //apilamos el valor apuntado por el designador
+                m.emit(m.int2real()); //convertimos el valor de la cima a real
+                m.emit(m.desapila_ind()); //guardamos el valor convertido a int en la dirección de opnd0
             }
-        } else {
+        } else { 
             if (es_designador(exp.opnd1())) {
                 m.emit(m.copia(exp.opnd1().tipoNodo().tamano())); 
             } else {
-                m.emit(m.desapila_ind());
+                m.emit(m.desapila_ind()); // coge la cima(valor que se quiere asignar), la subcima (dirección de la exp0) y se le asigna el valor
             }
         }
     }
@@ -327,21 +327,25 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Suma exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd1().procesa(this);
+        }
 
-        if (exp.opnd0().tipoNodo() == tReal || exp.opnd1().tipoNodo() == tReal) {
-            if (exp.opnd0().tipoNodo() == tInt) {
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) || claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
             }
-            if (exp.opnd1().tipoNodo() == tInt) {
+            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_cima()); // Convertimos cima de int a real
             }
         }
@@ -350,21 +354,25 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Resta exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd1().procesa(this);
+        }
 
-        if (exp.opnd0().tipoNodo() == tReal || exp.opnd1().tipoNodo() == tReal) {
-            if (exp.opnd0().tipoNodo() == tInt) {
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) ||claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
             }
-            if (exp.opnd1().tipoNodo() == tInt) {
+            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_cima()); // Convertimos cima de int a real
             }
         }
@@ -401,21 +409,25 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Mul exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd1().procesa(this);
+        }
 
-        if (exp.opnd0().tipoNodo() == tReal || exp.opnd1().tipoNodo() == tReal) {
-            if (exp.opnd0().tipoNodo() == tInt) {
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) ||claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
             }
-            if (exp.opnd1().tipoNodo() == tInt) {
+            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_cima()); // Convertimos cima de int a real
             }
         }
@@ -424,21 +436,25 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Div exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd1().procesa(this);
+        }
 
-        if (exp.opnd0().tipoNodo() == tReal || exp.opnd1().tipoNodo() == tReal) {
-            if (exp.opnd0().tipoNodo() == tInt) {
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) ||claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
             }
-            if (exp.opnd1().tipoNodo() == tInt) {
+            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
                 m.emit(m.int2real_cima()); // Convertimos cima de int a real
             }
         }
@@ -447,14 +463,18 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Porcentaje exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
         }
 
         m.emit(m.porcentaje()); // Emitimos la instrucción de módulo
@@ -469,8 +489,8 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Negado exp) {
-        exp.opnd().procesa(this);
-        if (es_designador(exp.opnd())) {
+        exp.opnd0().procesa(this);
+        if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
         m.emit(m.negado()); // Negamos el valor de la cima
@@ -485,10 +505,12 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Acceso exp) {
-        exp.opnd().procesa(this); // Determinamos la dirección de E
-        int d = exp.desplazamiento(); // Obtenemos el desplazamiento del campo id
-        m.emit(m.apila_int(d)); // Apilamos el desplazamiento
+        exp.opnd0().procesa(this); // Determinamos la dirección de E
+        int d = exp.desplazamiento(); // Obtenemos el indice que se pide
+        int tam_tipo = exp.opnd0().tipoNodo().tamano(); // Obtenemos el tamaño del tipo de E
+        m.emit(m.apila_int(tam_tipo)); // Apilamos el tamaño del tipo de E
         m.emit(m.suma()); // Sumamos el desplazamiento del campo a la dirección de comienzo de E
+        m.emit(m.acceso()); // Emitimos la instrucción de acceso al campo
     }
 
     public void procesa(Indireccion exp) {
