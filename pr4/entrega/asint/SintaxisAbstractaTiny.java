@@ -31,6 +31,12 @@ public class SintaxisAbstractaTiny {
 
         private int col;
 
+        private int tam;
+
+        private int dir;
+
+        private int nivel;
+
         private Nodo vinculo = null;
 
         public Nodo ponFila(int fila) {
@@ -51,6 +57,33 @@ public class SintaxisAbstractaTiny {
         public Nodo ponTipo(Tipo tipo) {
             this.tipo = tipo;
             return this;
+        }
+
+        public Nodo ponTam(int tam) {
+            this.tam = tam;
+            return this;
+        }
+
+        public Nodo ponDir(int dir) {
+            this.dir = dir;
+            return this;
+        }
+
+        public Nodo ponNivel(int nivel) {
+            this.nivel = nivel;
+            return this;
+        }
+
+        public int nivel() {
+            return this.nivel;
+        }
+        
+        public int dir() {
+            return this.dir;
+        }
+
+        public int tam() {
+            return this.tam;
         }
 
         public Tipo tipo() {
