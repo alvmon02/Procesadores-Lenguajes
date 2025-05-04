@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import asint.ProcesamientoDef;
@@ -24,15 +25,40 @@ public class TipadoV2 extends ProcesamientoDef {
 
         private static class ParTipos {
 
-            @SuppressWarnings("unused")
-            int col0, col1, fila0, fila1;
+            Tipo t0, t1;
 
             protected ParTipos(Tipo t0, Tipo t1) {
-                col0 = t0.leeCol();
-                col0 = t0.leeFila();
-                col1 = t1.leeCol();
-                col1 = t1.leeFila();
+                this.t0 = t0;
+                this.t1 = t1;
             }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(t0, t1);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (getClass() != obj.getClass())
+                    return false;
+                ParTipos other = (ParTipos) obj;
+                if (t0 == null) {
+                    if (other.t0 != null)
+                        return false;
+                } else if (!t0.equals(other.t0))
+                    return false;
+                if (t1 == null) {
+                    if (other.t1 != null)
+                        return false;
+                } else if (!t1.equals(other.t1))
+                    return false;
+                return true;
+            }
+
         }
 
         protected static boolean compatibles(Tipo t0, Tipo t1) {
@@ -314,154 +340,270 @@ public class TipadoV2 extends ProcesamientoDef {
 
     }
 
+    private Tipo tipado_comp(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        if (((claseDe(t0, T_Puntero.class) || claseDe(t0, T_Null.class))
+                && (claseDe(t1, T_Puntero.class) || claseDe(t1, T_Null.class))) ||
+                (claseDe(t0, T_String.class) && claseDe(t1, T_String.class)) ||
+                (claseDe(t0, T_Bool.class) && claseDe(t1, T_Bool.class)) ||
+                ((claseDe(t0, T_Int.class) || claseDe(t0, T_Real.class))
+                        && (claseDe(t1, T_Int.class) || claseDe(t1, T_Real.class)))) {
+            return new T_Bool();
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
+            return new T_Error();
+        }
+    }
+
+    private Tipo tipado_comp_ord(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        if ((claseDe(t0, T_String.class) && claseDe(t1, T_String.class)) ||
+                (claseDe(t0, T_Bool.class) && claseDe(t1, T_Bool.class)) ||
+                ((claseDe(t0, T_Int.class) || claseDe(t0, T_Real.class))
+                        && (claseDe(t1, T_Int.class) || claseDe(t1, T_Real.class)))) {
+            return new T_Bool();
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
+            return new T_Error();
+        }
+    }
+
+    private Tipo tipado_arit(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        if ((claseDe(t0, T_Int.class) || claseDe(t0, T_Real.class))
+                && (claseDe(t1, T_Int.class) || claseDe(t1, T_Real.class))) {
+            return (claseDe(t0, T_Real.class) || claseDe(t1, T_Real.class)) ? new T_Real() : new T_Int();
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
+            return new T_Error();
+        }
+    }
+
+    private Tipo tipado_and_or(Exp exp) {
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        if (claseDe(t0, T_Bool.class) && claseDe(t1, T_Bool.class)) {
+            return new T_Bool();
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
+            return new T_Error();
+        }
+    }
+
     @Override
     public void procesa(Comp exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_comp(exp));
     }
 
     @Override
     public void procesa(Dist exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_comp(exp));
     }
 
     @Override
     public void procesa(Menor exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_comp_ord(exp));
     }
 
     @Override
     public void procesa(Mayor exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_comp_ord(exp));
     }
 
     @Override
     public void procesa(MenorIgual exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_comp_ord(exp));
     }
 
     @Override
     public void procesa(MayorIgual exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_comp_ord(exp));
     }
 
     @Override
     public void procesa(Suma exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_arit(exp));
     }
 
     @Override
     public void procesa(Resta exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_arit(exp));
     }
 
     @Override
     public void procesa(And exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_and_or(exp));
     }
 
     @Override
     public void procesa(Or exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_and_or(exp));
     }
 
     @Override
     public void procesa(Mul exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_arit(exp));
     }
 
     @Override
     public void procesa(Div exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(tipado_arit(exp));
     }
 
     @Override
     public void procesa(Porcentaje exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        if (claseDe(t0, T_Int.class) && claseDe(t1, T_Int.class)) {
+            exp.ponTipo(new T_Int());
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesOp(exp.leeFila(), exp.leeCol(),
+                    t0 == null ? "null" : t0.toString(),
+                    t1 == null ? "null" : t1.toString()));
+            exp.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(Negativo exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.opnd0().procesa(this);
+        Tipo tipo = refenciar(exp.opnd0().tipo());
+        if (claseDe(tipo, T_Int.class) || claseDe(tipo, T_Real.class)) {
+            exp.ponTipo(tipo);
+        } else {
+            if (!claseDe(tipo, T_Error.class)) {
+                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol(),
+                        tipo == null ? "null" : tipo.toString()));
+            }
+            exp.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(Negado exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.opnd0().procesa(this);
+        Tipo tipo = refenciar(exp.opnd0().tipo());
+        if (claseDe(tipo, T_Bool.class)) {
+            exp.ponTipo(tipo);
+        } else {
+            if (!claseDe(tipo, T_Error.class)) {
+                errorProcesamientos.add(ErrorTipado.errorTipoIncompatibleOp(exp.leeFila(), exp.leeCol(),
+                        tipo == null ? "null" : tipo.toString()));
+            }
+            exp.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(Index exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        if (claseDe(t0, T_Array.class) && claseDe(t1, T_Int.class)) {
+            exp.ponTipo(refenciar(t0.tipo()));
+        } else {
+            aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesIndx(exp.leeFila(), exp.leeCol(),
+                    (t0 == null ? "null" : t0.toString()) + " " + (t1 == null ? "null" : t1.toString())));
+            exp.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(Acceso exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.opnd0().procesa(this);
+        Tipo tipo = refenciar(exp.opnd0().tipo());
+        if (claseDe(tipo, T_Struct.class)) {
+            Tipo tCampo = busquedaCampo(exp.id(), tipo.camposS());
+            if (claseDe(tCampo, T_Error.class)) {
+                errorProcesamientos.add(ErrorTipado.errorCampoInexistente(exp.leeFila(), exp.leeCol(), exp.id()));
+            }
+            exp.ponTipo(tCampo);
+
+        } else {
+            if (!claseDe(tipo, T_Error.class)) {
+                errorProcesamientos.add(ErrorTipado.errorAccesoNoReg(exp.leeFila(), exp.leeCol(),
+                        (tipo == null ? "null" : tipo.toString()) + " " + exp.opnd0().vinculo().getClass()));
+            }
+            exp.ponTipo(new T_Error());
+        }
+    }
+
+    private Tipo busquedaCampo(String id, CamposS camposS) {
+        if (id.equals(camposS.campoS().id())) {
+            return camposS.campoS().tipo();
+        } else {
+            return busquedaCampo(id, camposS.camposS());
+        }
     }
 
     @Override
     public void procesa(Indireccion exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.opnd0().procesa(this);
+        Tipo tipo = refenciar(exp.opnd0().tipo());
+        if (claseDe(tipo, T_Puntero.class)) {
+            exp.ponTipo(tipo.tipo());
+        } else {
+            if (!claseDe(tipo, T_Error.class)) {
+                errorProcesamientos.add(ErrorTipado.errorTipoPuntero(exp.leeFila(), exp.leeCol()));
+            }
+            exp.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(Lit_ent exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(new T_Int());
     }
 
     @Override
     public void procesa(True exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(new T_Bool());
     }
 
     @Override
     public void procesa(False exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(new T_Bool());
     }
 
     @Override
     public void procesa(Lit_real exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(new T_Real());
     }
 
     @Override
     public void procesa(Cadena exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(new T_String());
     }
 
     @Override
     public void procesa(Iden exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        if (claseDe(exp.vinculo(), Dec_Var.class) || claseDe(exp.vinculo(), PForm.class)) {
+            exp.ponTipo(exp.vinculo().tipo());
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNoVariable(exp.leeFila(), exp.leeCol(), exp.id()));
+            exp.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(Null exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponTipo(new T_Null());
     }
 
 }

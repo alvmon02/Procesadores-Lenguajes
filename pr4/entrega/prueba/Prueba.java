@@ -1,6 +1,7 @@
 package prueba;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import asint.SintaxisAbstractaTiny.*;
@@ -23,6 +24,33 @@ public class Prueba {
                 this.t0 = t0;
                 this.t1 = t1;
             }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(t0, t1);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (getClass() != obj.getClass())
+                    return false;
+                ParTipos other = (ParTipos) obj;
+                if (t0 == null) {
+                    if (other.t0 != null)
+                        return false;
+                } else if (!t0.equals(other.t0))
+                    return false;
+                if (t1 == null) {
+                    if (other.t1 != null)
+                        return false;
+                } else if (!t1.equals(other.t1))
+                    return false;
+                return true;
+            }
         }
 
         protected static boolean compatibles(Tipo t0, Tipo t1) {
@@ -34,7 +62,7 @@ public class Prueba {
         private static boolean unificables(Tipo t0, Tipo t1) {
             cont -= 1;
             if (cont == 0) {
-                System.out.println("Pasando por aqui, " +  cont);
+                System.out.println("Pasando por aqui, " + cont);
                 return false;
             }
             Tipo t0p = TipadoV2.refenciar(t0), t1p = TipadoV2.refenciar(t1);
@@ -87,12 +115,18 @@ public class Prueba {
         }
     }
 
+    private static Tipo busquedaCampo(String id, CamposS camposS) {
+        if (id.equals(camposS.campoS().id())) {
+            return camposS.campoS().tipo();
+        } else {
+            return busquedaCampo(id, camposS.camposS());
+        }
+    }
+
     public static void main(String[] args) {
 
-        Tipo t0 = new T_Struct(new Mas_Cmp_S(new Un_Cmp_S(new CampoS(new T_Real(), "Hola0")), new CampoS(new T_Null(), "Hola0")));
-        t0.camposS().campoS().ponTipo(new T_Puntero(t0));
-        Tipo t1 = new T_Struct(new Mas_Cmp_S(new Un_Cmp_S(new CampoS(new T_Int(), "Hola1")), new CampoS(new T_Puntero(new T_Int()), null)));
-        t1.camposS().campoS().ponTipo(new T_Puntero(t1));
-        System.out.println(Compatibilizador.compatibles(t0, t1));
+        Tipo t0 = new T_Struct(
+                new Mas_Cmp_S(new Un_Cmp_S(new CampoS(new T_Int(), "Hola1")), new CampoS(new T_Null(), "Hola0")));
+        System.out.println(busquedaCampo("Hola0", t0.camposS()));
     }
 }
