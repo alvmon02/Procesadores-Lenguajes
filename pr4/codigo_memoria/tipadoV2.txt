@@ -307,17 +307,17 @@ tipado(e_porcentaje(opnd0, opnd1)):
 
 tipado(e_negativo(opnd)):
     tipado(opnd)
-    t = ref!(opnd.tipo)
-    if t == t_int() || t == t_real() then
-        $.tipo = t
+    tipo = ref!(opnd.tipo)
+    if tipo == t_int() || tipo == t_real() then
+        $.tipo = tipo
     else
         $.tipo = ERROR
     end if
 
 tipado(e_negado(opnd)):
     tipado(opnd)
-    t = ref!(opnd.tipo)
-    if t == t_bool() then
+    tipo = ref!(opnd.tipo)
+    if tipo == t_bool() then
         $.tipo = t_bool()
     else
         $.tipo = ERROR
@@ -336,9 +336,9 @@ tipado(e_indexado(opnd0, opnd1)):
 
 tipado(e_campo(opnd, id)):
     tipado(opnd)
-    t = ref!(opnd.tipo)
+    tipo = ref!(opnd.tipo)
 
-    if t == t_struct(campos) then
+    if tipo == t_struct(campos) then
         $.tipo = busquedaCampo(id, campos)
     else
         error("Se esta intentando acceder a un campo de un tipo no estructurado")
@@ -362,8 +362,8 @@ busquedaCampo(idCampo, un_cmp_s(cmp_s(tipo, id))):
 
 tipado(e_puntero(opnd)):
     tipado(opnd)
-    t = ref!(opnd.tipo)
-    if t == t_punter(tb) then
+    tipo = ref!(opnd.tipo)
+    if tipo == t_punter(tb) then
         $.tipo = tb
     else
         error("Se esta intentando desreferenciar un puntero a un tipo no puntero")
@@ -441,3 +441,17 @@ son_campos_unificables(cmp_s(t1, _), cmp_s(t2, _)):
 asignable(exp):
     return  exp == e_iden(_) || exp == e_campo(_, _) || 
             exp == e_indexado(_, _) || exp == e_puntero(_)
+
+ambos_ok(t0, t1):
+    if t0 == OK && t1 == OK then
+        return OK
+    else
+        return ERROR
+    end if
+
+ref!(tipo):
+    if tipo == t_iden(id) then
+        return ref!(tipo.vinculo.tipo)
+    else
+        return tipo
+    end if

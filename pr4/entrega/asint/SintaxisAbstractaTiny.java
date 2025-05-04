@@ -1,7 +1,5 @@
 package asint;
 
-import asint.TiposBase.TipoNodo;
-
 public class SintaxisAbstractaTiny {
 
     private static void imprimeOpnd(Exp opnd, int np) {
@@ -27,7 +25,7 @@ public class SintaxisAbstractaTiny {
             fila = col = -1;
         }
 
-        private TipoNodo tipoNodo;
+        protected Tipo tipo;
 
         private int fila;
 
@@ -50,13 +48,13 @@ public class SintaxisAbstractaTiny {
             return this;
         }
 
-        public Nodo ponTipoNodo(TipoNodo tipoNodo) {
-            this.tipoNodo = tipoNodo;
+        public Nodo ponTipo(Tipo tipo) {
+            this.tipo = tipo;
             return this;
         }
 
-        public TipoNodo tipoNodo() {
-            return tipoNodo;
+        public Tipo tipo() {
+            return tipo;
         }
 
         public int leeFila() {
@@ -273,10 +271,6 @@ public class SintaxisAbstractaTiny {
             super();
         }
 
-        public Tipo tipo() {
-            throw new UnsupportedOperationException();
-        }
-
         public String id() {
             throw new UnsupportedOperationException();
         }
@@ -296,17 +290,12 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Tipo tipo;
         private String id;
 
         public Dec_Var(Tipo tipo, String id) {
             super();
             this.tipo = tipo;
             this.id = id;
-        }
-
-        public Tipo tipo() {
-            return tipo;
         }
 
         public String id() {
@@ -334,17 +323,12 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Tipo tipo;
         private String id;
 
         public Dec_Tipo(Tipo tipo, String id) {
             super();
             this.tipo = tipo;
             this.id = id;
-        }
-
-        public Tipo tipo() {
-            return tipo;
         }
 
         public String id() {
@@ -569,7 +553,6 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Tipo tipo;
         private Ref ref;
         private String id;
 
@@ -578,10 +561,6 @@ public class SintaxisAbstractaTiny {
             this.tipo = tipo;
             this.ref = ref;
             this.id = id;
-        }
-
-        public Tipo tipo() {
-            return tipo;
         }
 
         public Ref ref() {
@@ -675,12 +654,62 @@ public class SintaxisAbstractaTiny {
             throw new UnsupportedOperationException();
         }
 
-        public Tipo tipo() {
-            throw new UnsupportedOperationException();
-        }
-
         public String ent() {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    public static class T_Ok extends Tipo {
+
+        @Override
+        public void procesa(Procesamiento p) {
+            throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        }
+
+        @Override
+        public void procesa2(Procesamiento p) {
+            throw new UnsupportedOperationException("Unimplemented method 'procesa2'");
+        }
+
+        @Override
+        public void imprime() {
+            throw new UnsupportedOperationException("Unimplemented method 'imprime'");
+        }
+    }
+
+    public static class T_Error extends Tipo {
+
+        @Override
+        public void procesa(Procesamiento p) {
+            throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        }
+
+        @Override
+        public void procesa2(Procesamiento p) {
+            throw new UnsupportedOperationException("Unimplemented method 'procesa2'");
+        }
+
+        @Override
+        public void imprime() {
+            throw new UnsupportedOperationException("Unimplemented method 'imprime'");
+        }
+    }
+
+    public static class T_Null extends Tipo {
+
+        @Override
+        public void procesa(Procesamiento p) {
+            throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        }
+
+        @Override
+        public void procesa2(Procesamiento p) {
+            throw new UnsupportedOperationException("Unimplemented method 'procesa2'");
+        }
+
+        @Override
+        public void imprime() {
+            throw new UnsupportedOperationException("Unimplemented method 'imprime'");
         }
     }
 
@@ -817,17 +846,12 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Tipo tipo;
         private String ent;
 
         public T_Array(Tipo tipo, String ent) {
             super();
             this.tipo = tipo;
             this.ent = ent;
-        }
-
-        public Tipo tipo() {
-            return tipo;
         }
 
         public String ent() {
@@ -855,15 +879,9 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Tipo tipo;
-
         public T_Puntero(Tipo tipo) {
             super();
             this.tipo = tipo;
-        }
-
-        public Tipo tipo() {
-            return tipo;
         }
 
         public String toString() {
@@ -1003,16 +1021,11 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Tipo tipo;
         private String id;
 
         public CampoS(Tipo tipo, String id) {
             this.tipo = tipo;
             this.id = id;
-        }
-
-        public Tipo tipo() {
-            return tipo;
         }
 
         public String id() {
@@ -2689,6 +2702,18 @@ public class SintaxisAbstractaTiny {
 
     public Ref no_ref() {
         return new No_Ref();
+    }
+
+    public Tipo t_ok() {
+        return new T_Ok();
+    }
+
+    public Tipo t_error() {
+        return new T_Error();
+    }
+
+    public Tipo t_null() {
+        return new T_Null();
     }
 
     public Tipo t_iden(String id) {

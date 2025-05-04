@@ -436,7 +436,8 @@ public class ProcesamientoDef implements Procesamiento {
     }
 
     @SuppressWarnings("rawtypes")
-    protected boolean claseDe(Object o, Class c) {
+    public
+    static boolean claseDe(Object o, Class c) {
         return o.getClass() == c;
     }
 }
