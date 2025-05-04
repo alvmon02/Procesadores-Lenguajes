@@ -1,0 +1,316 @@
+var dir = 0 // primera dirección libre
+var nivel = 0
+var max_dir = 0 // máxima dirección ocupada
+
+
+inc_dir(inc):
+    dir += inc
+    if dir > max_dir then
+        max_dir = dir
+
+asig_espacio(prog(decs, intrs)):
+    asig_espacio(decs)
+    asig_espacio(intrs)
+
+
+asig_espacio(si_decs(decs)):
+    asig_espacio1(decs)
+    asig_espacio2(decs)
+
+asig_espacio(no_decs()):
+    noop
+
+asig_espacio1(mas_decs(decs, dec)):
+    asig_espacio1(decs)
+    asig_espacio1(dec)
+
+asig_espacio2(mas_decs(decs, dec)):
+    asig_espacio2(decs)
+    asig_espacio2(dec)
+
+asig_espacio1(una_dec(dec)):
+    asig_espacio1(dec)
+
+asig_espacio2(una_dec(dec)):
+    asig_espacio2(dec)
+
+asig_espacio1(dec_var(tipo, id)):
+    $.dir = dir
+    $.nivel = nivel
+    asig_tam1(tipo)
+    inc_dir(tipo.tam) //var se actualiza a la siguiente dirección libre y si se pasa de max_dir se actualiza tmb
+    
+
+asig_espacio2(dec_var(tipo, id)):
+    asig_tam2(tipo)
+
+
+asig_espacio1(dec_tipo(tipo, id)):
+    asig_tam1(tipo)
+
+asig_espacio2(dec_tipo(tipo, id)):
+    asig_tam2(tipo)
+
+asig_espacio1(dec_proc(id, pforms, prog)):
+    dir_ant = dir       // guardamos la direccion de inicio y la max_dir
+    max_dir_ant = max_dir
+    nivel += 1
+    $.nivel = nivel
+    dir = 0            // ambos se fijan a 0 porque las direcciones en el ámbito de un procedimiento son relativas a su registro de activación
+    max_dir = 0
+    asig_espacio(pforms)
+    asig_espacio(prog)
+    $.tam = max_dir
+    dir = dir_ant
+    max_dir = max_dir_ant
+    nivel -= 1
+
+
+asig_espacio2(dec_proc(id, pforms, prog)): // Deberia de ser aqui donde se hace todo, por el hecho de que igual tenemos despues de la declaracion del procedimiento una de claracion de tipo que se usa dentro
+    asig_espacio(pforms)
+    asig_espacio(prog)
+
+asig_espacio(pforms(si_pforms(pforms))):
+    asig_espacio(pforms)
+
+asig_espacio(pforms(no_pforms())):
+    noop
+
+asig_espacio(mas_pforms(pforms, pform)):
+    asig_espacio(pforms)
+    asig_espacio(pform)
+
+
+asig_espacio(una_pform(pform)):
+    asig_espacio(pform)
+
+asig_espacio(pform(tipo, ref, id)):
+    asig_espacio(tipo)
+    $.dir = dir
+    $.nivel = nivel
+    if (ref == si_ref())
+        inc_dir(1)
+    else
+        inc_dir(tipo.tam)
+    
+
+asig_espacio1(t_iden(id)):
+    let $.vinculo = dec_tipo(T,id) in
+        $.tam = T.tam
+
+asig_espacio2(t_iden(id)):
+    noop
+
+asig_espacio1(t_string()):
+    $.tam = 1
+
+asig_espacio2(t_string()):
+    noop
+
+asig_espacio1(t_int()):
+    $.tam = 1
+
+asig_espacio2(t_int()):
+    noop
+
+asig_espacio1(t_bool()):
+    $.tam = 1
+
+asig_espacio2(t_bool()):
+    noop
+
+asig_espacio1(t_real()):
+    $.tam = 1
+
+asig_espacio2(t_real()):
+    noop
+
+asig_espacio1(t_array(tipo, ent)):
+    $.dir = dir
+    asig_espacio1(tipo)
+    $.tam = tipo.tam * ent
+    dir+= $.tam
+
+asig_espacio2(t_array(tipo, ent)):
+    noop    // no sé si debería hacer algo aquí
+
+asig_espacio1(t_puntero(tipo)):
+    if tipo != ref(id) then
+        asig_espacio1(tipo)
+    end if
+    $.tam = 1
+
+asig_espacio2(t_puntero(tipo)):
+    if tipo = ref(id) then 
+        let tipo.vinculo = dec_tipo(T,id) in
+            $.tam = T.tam
+    else
+        asig_espacio2(tipo)
+    end if
+
+asig_espacio(t_struct(camposs)):
+    asig_espacio(camposs)
+
+asig_espacio(mas_cmp_s(camposs, campos)):
+    asig_espacio(camposs)
+    asig_espacio(campos)
+
+asig_espacio(un_cmp_s(campos)):
+    asig_espacio(campos)
+
+asig_espacio(cmp_s(tipo, id)):
+    $.dir = dir
+    asig_espacio1(tipo)
+    $.tam = tipo.tam
+    dir+= $.tam
+
+
+asig_espacio(si_intrs(intrs)):
+    asig_espacio(intrs)
+
+asig_espacio(no_intrs()):
+    noop
+
+asig_espacio(mas_intrs(intrs, intr)):
+    asig_espacio(intrs)
+    asig_espacio(intr)
+
+asig_espacio(una_intr(intr)):
+    asig_espacio(intr)
+
+asig_espacio(i_eval(exp)):
+    asig_espacio(exp)
+
+asig_espacio(i_if(exp, prog, ielse)):
+    asig_espacio(exp)
+    asig_espacio(prog)
+    asig_espacio(ielse)
+
+asig_espacio(i_while(exp, prog)):
+    asig_espacio(exp)
+    asig_espacio(prog)
+
+asig_espacio(i_read(exp)):
+    asig_espacio(exp)
+
+
+asig_espacio(i_write(exp)):
+    asig_espacio(exp)
+
+asig_espacio(i_nl()):
+    noop
+
+asig_espacio(i_new(exp)):
+    asig_espacio(exp)
+
+asig_espacio(i_delete(exp)):
+    asig_espacio(exp)
+
+asig_espacio(i_call(id, preals)):
+    asig_espacio(preals)
+
+
+asig_espacio(i_prog(prog)):
+    asig_espacio(prog)
+
+asig_espacio(si_else(prog)):
+    asig_espacio(prog)
+
+asig_espacio(no_else()):
+    noop
+
+asig_espacio(si_preals(preals)):
+    asig_espacio(preals)
+
+asig_espacio(no_preals()):
+    noop   
+
+asig_espacio(mas_preals(preals, exp)):
+    asig_espacio(preals)
+    asig_espacio(exp)
+
+asig_espacio(un_preals(exp)):
+    asig_espacio(exp)
+
+
+asig_espacio(e_asig(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_comp(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_dist(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_lt(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_gt(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_leq(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_geq(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_suma(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_resta(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_and(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_or(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_mul(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_div(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_porcentaje(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_negativo(opnd)):
+    asig_espacio(opnd)
+
+asig_espacio(e_negado(opnd)):
+    asig_espacio(opnd)
+
+asig_espacio(e_indexado(opnd0, opnd1)):
+    asig_espacio(opnd0)
+    asig_espacio(opnd1)
+
+asig_espacio(e_campo(opnd, id)):
+    asig_espacio(opnd)
+
+asig_espacio(e_puntero(opnd)):
+    asig_espacio(opnd)
+
+// no aplican
+
+e_lit_ent(num)
+e_lit_real(num)
+e_true()
+e_false()
+e_string(string)
+e_iden(id)
+e_null()
