@@ -146,7 +146,7 @@ public class TipadoV2 extends ProcesamientoDef {
 
     public static Tipo refenciar(Tipo tipo) {
         if (claseDe(tipo, T_Iden.class))
-            return tipo.vinculo().tipo();
+            return refenciar(tipo.vinculo().tipo());
         else
             return tipo;
     }
@@ -253,11 +253,16 @@ public class TipadoV2 extends ProcesamientoDef {
     public void procesa(I_Read i_Read) {
         i_Read.exp().procesa(this);
         Tipo tipoExp = i_Read.exp().tipo();
-        if ((claseDe(tipoExp, T_Int.class) || claseDe(tipoExp, T_Real.class) || claseDe(tipoExp, T_String.class))
-                && asignable(i_Read.exp()))
-            i_Read.ponTipo(new T_Ok());
-        else
+        if (!asignable(i_Read.exp())) {
+            errorProcesamientos.add(ErrorTipado.errorDesignadorEsperado(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
             i_Read.ponTipo(new T_Error());
+        } else if ((claseDe(tipoExp, T_Int.class) || claseDe(tipoExp, T_Real.class)
+                || claseDe(tipoExp, T_String.class)))
+            i_Read.ponTipo(new T_Ok());
+        else {
+            errorProcesamientos.add(ErrorTipado.errorNoLegible(i_Read.exp().leeFila(), i_Read.exp().leeCol()));
+            i_Read.ponTipo(new T_Error());
+        }
 
     }
 
@@ -266,10 +271,13 @@ public class TipadoV2 extends ProcesamientoDef {
         i_Write.exp().procesa(this);
         Tipo tipoExp = i_Write.exp().tipo();
         if (claseDe(tipoExp, T_Int.class) || claseDe(tipoExp, T_Real.class)
-                || claseDe(tipoExp, T_Bool.class) || claseDe(tipoExp, T_String.class))
+                || claseDe(tipoExp, T_Bool.class) || claseDe(tipoExp, T_String.class)) {
+
             i_Write.ponTipo(new T_Ok());
-        else
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNoImprimible(i_Write.exp().leeFila(), i_Write.exp().leeCol()));
             i_Write.ponTipo(new T_Error());
+        }
 
     }
 
@@ -282,26 +290,138 @@ public class TipadoV2 extends ProcesamientoDef {
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
         Tipo tipoExp = i_New.exp().tipo();
-        if (claseDe(tipoExp, T_Puntero.class))
+        if (claseDe(tipoExp, T_Puntero.class)) {
             i_New.ponTipo(new T_Ok());
-        else
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_New.exp().leeFila(), i_New.exp().leeCol()));
             i_New.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         Tipo tipoExp = i_Delete.exp().tipo();
-        if (claseDe(tipoExp, T_Puntero.class))
+        if (claseDe(tipoExp, T_Puntero.class)) {
             i_Delete.ponTipo(new T_Ok());
-        else
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_Delete.exp().leeFila(), i_Delete.exp().leeCol()));
             i_Delete.ponTipo(new T_Error());
+        }
     }
 
     @Override
     public void procesa(I_Call i_Call) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        if (claseDe(i_Call.vinculo(), Dec_Proc.class)) {
+            PForms pforms = ((Dec_Proc) i_Call.vinculo()).pforms();
+            PReals preals = i_Call.preals();
+            if (n_preals(preals) == n_pforms(pforms)) {
+                i_Call.ponTipo(son_parametros_compatibles(pforms, preals));
+            } else {
+                errorProcesamientos
+                        .add(ErrorTipado.errorNParamDist(i_Call.leeFila(), i_Call.leeCol()));
+                i_Call.ponTipo(new T_Error());
+            }
+        } else {
+            errorProcesamientos.add(ErrorTipado.errorNoSubprograma(i_Call.leeFila(), i_Call.leeCol(), i_Call.id()));
+            i_Call.preals().procesa(this);
+            i_Call.ponTipo(new T_Error());
+        }
+    }
+
+    private Tipo son_parametros_compatibles(PForms pforms, PReals preals) {
+        if (claseDe(pforms, No_PForms.class) && claseDe(preals, No_PReals.class)) {
+            return new T_Ok();
+        } else if (claseDe(pforms, Si_PForms.class) && claseDe(preals, Si_PReals.class)) {
+            return son_parametros_compatibles(pforms.pforms(), preals.preals());
+        } else {
+            // No deberia ocurrir
+            System.out
+                    .println("Hay un fallo, se ha calculado que tienen el mismo tamaño, pero claramente no lo tienen");
+            return new T_Error();
+        }
+    }
+
+    private Tipo son_parametros_compatibles(LPForms pforms, LPReals preals) {
+        if ((claseDe(pforms, Mas_PForms.class) && claseDe(preals, Un_PReal.class)) ||
+                (claseDe(pforms, Una_PForm.class) && claseDe(preals, Mas_PReals.class))) {
+            // No deberia ocurrir
+            System.out.println(
+                    "Hay un fallo, se ha calculado que tienen el mismo tamaño, pero claramente no lo tienen");
+            return new T_Error();
+        }
+        Tipo resto = new T_Ok();
+        if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
+            resto = son_parametros_compatibles(pforms.pforms(), preals.preals());
+        }
+        return ambos_ok(resto, es_parametro_compatible(pforms.pform(), preals.exp()));
+    }
+
+    private Tipo es_parametro_compatible(PForm pform, Exp exp) {
+        exp.procesa(this);
+        if (claseDe(pform.ref(), Si_Ref.class) && claseDe(pform.tipo(), T_Real.class)
+                && !claseDe(exp.tipo(), T_Real.class)) {
+            errorProcesamientos.add(ErrorTipado.errorTipoReal(exp.leeFila(), exp.leeCol()));
+            return new T_Error();
+        }
+        if (!Compatibilizador.compatibles(pform.tipo(), exp.tipo())) {
+            errorProcesamientos.add(ErrorTipado.errorTipoIncompatiblePFormal(exp.leeFila(), exp.leeCol(),
+                    pform.tipo().toString() + " " + exp.tipo()));
+            return new T_Error();
+        }
+        if (claseDe(pform.ref(), Si_Ref.class) && !asignable(exp)) {
+            errorProcesamientos.add(ErrorTipado.errorEsperabaDesignador(exp.leeFila(), exp.leeCol()));
+            return new T_Error();
+        }
+        return new T_Ok();
+    }
+
+    private int n_pforms(PForms pforms) {
+        if (claseDe(pforms, Si_PForms.class)) {
+            return n_pforms(pforms.pforms());
+        } else {
+            return 0;
+        }
+    }
+
+    private int n_pforms(LPForms pforms) {
+        if (claseDe(pforms, Mas_PForms.class)) {
+            return 1 + n_pforms(pforms.pforms());
+        } else {
+            return 1;
+        }
+    }
+
+    private int n_preals(PReals preals) {
+        if (claseDe(preals, Si_PReals.class)) {
+            return n_preals(preals.preals());
+        } else {
+            return 0;
+        }
+    }
+
+    private int n_preals(LPReals preals) {
+        if (claseDe(preals, Mas_PReals.class)) {
+            return 1 + n_preals(preals.preals());
+        } else {
+            return 1;
+        }
+    }
+
+    @Override
+    public void procesa(Si_PReals si_PReals) {
+        si_PReals.preals().procesa(this);
+    }
+
+    @Override
+    public void procesa(Mas_PReals mas_PReals) {
+        mas_PReals.preals().procesa(this);
+        mas_PReals.exp().procesa(this);
+    }
+
+    @Override
+    public void procesa(Un_PReal un_PReal) {
+        un_PReal.exp().procesa(this);
     }
 
     @Override
@@ -538,7 +658,7 @@ public class TipadoV2 extends ProcesamientoDef {
         } else {
             if (!claseDe(tipo, T_Error.class)) {
                 errorProcesamientos.add(ErrorTipado.errorAccesoNoReg(exp.leeFila(), exp.leeCol(),
-                        (tipo == null ? "null" : tipo.toString()) + " " + exp.opnd0().vinculo().getClass()));
+                        (tipo == null ? "null" : tipo.toString()) + " " + exp + " " + exp.opnd0().tipo()));
             }
             exp.ponTipo(new T_Error());
         }
@@ -548,7 +668,11 @@ public class TipadoV2 extends ProcesamientoDef {
         if (id.equals(camposS.campoS().id())) {
             return camposS.campoS().tipo();
         } else {
-            return busquedaCampo(id, camposS.camposS());
+            if (claseDe(camposS, Mas_Cmp_S.class)) {
+                return busquedaCampo(id, camposS.camposS());
+            } else {
+                return new T_Error();
+            }
         }
     }
 

@@ -1396,3 +1396,8 @@ x$f:88,c:11$
 }
 }
 }
+
+
+
+i_new(index(acceso(iden(r[41,5]),ps[41,7]),lit_ent(25[41,10])))
+i_new(indireccion(index(acceso(iden(r[77,5]),ps[77,7]),lit_ent(25[77,10]))))

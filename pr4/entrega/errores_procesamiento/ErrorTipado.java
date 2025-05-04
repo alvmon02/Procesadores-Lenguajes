@@ -61,8 +61,8 @@ public class ErrorTipado extends ErrorProcesamiento {
         return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_ACCESO_NO_REG, id);
     }
 
-    public static ErrorTipado errorTipoIncompatiblePFormal(int fila, int columna) {
-        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPO_INCOMPATIBLE_PFORMAL);
+    public static ErrorTipado errorTipoIncompatiblePFormal(int fila, int columna, String id) {
+        return new ErrorTipado(fila, columna, TipoErrorTipado.ERROR_TIPO_INCOMPATIBLE_PFORMAL, id);
     }
 
     public static ErrorTipado errorTipoReal(int fila, int columna) {
@@ -134,6 +134,7 @@ public class ErrorTipado extends ErrorProcesamiento {
             case ERROR_TIPOS_INCOMPATIBLES_OP:
             case ERROR_ACCESO_NO_REG:
             case ERROR_TIPOS_IMCOMPATIBLES_INDX:
+            case ERROR_TIPO_INCOMPATIBLE_PFORMAL:
             case ERROR_TIPO_INCOMPATIBLE_OP:
                 return fila + "," + columna + ":" + tipo + ":" + id;
             default:
