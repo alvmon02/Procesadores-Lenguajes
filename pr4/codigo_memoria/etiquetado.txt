@@ -1,6 +1,8 @@
 var sub_pendientes=pila_vacia()
 var etq_final
 
+// TODO añadir el Nodo tipo Bloque y hacer las modificaciones pertinentes
+
 etiquetado(prog(decs,intrs)):
 	$.prim=etq_final
 	recolecta_subs(decs)

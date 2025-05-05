@@ -2,6 +2,7 @@ var dir = 0 // primera dirección libre
 var nivel = 0
 var max_dir = 0 // máxima dirección ocupada
 
+// TODO añadir el nodo de tipo Bloque y las modificaciones pertinentes
 
 inc_dir(inc):
     dir += inc

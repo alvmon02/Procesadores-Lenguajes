@@ -1,6 +1,7 @@
 var ts // La tabla de símbolos
 var noop = null
 
+// TODO quitar esto y que diferencie entre programa y bloque
 main(proc):
     ts = creaTS()
     vincula(proc)

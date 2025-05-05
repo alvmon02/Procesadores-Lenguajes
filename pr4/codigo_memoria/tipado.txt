@@ -1,3 +1,4 @@
+// TODO añadir el nodo de tipo bloque y hacer las modificaciones pertinentes
 tipado(prog(decs, intrs)):
     tipado(decs)
     tipado(intrs)
@@ -363,7 +364,7 @@ tipado(e_indexado(opnd0, opnd1)):
 tipado(e_campo(opnd, id)):
     tipado(opnd)
     tipo = ref!(opnd.tipo)
-    
+
     if tipo == t_struct(campos) then
         $.tipo = busquedaCampo(id, campos)
     else

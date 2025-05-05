@@ -1,5 +1,6 @@
 var sub_pendientes = pila_vacia()
 
+// TODO añadir el Nodo tipo Bloque y hacer las modificaciones pertinentes
 
 gen_code(prog(decs, intrs))
     recolecta_subs(decs)
@@ -21,7 +22,7 @@ gen_code(prog(decs, intrs))
 
 recolecta_subs(si_decs(decs)):
     recolecta_subs(decs)
-
+    
 recolecta_subs(no_decs()):
     noop
 
@@ -61,9 +62,7 @@ gen_code(i_eval(exp)):
     emit desapila()  // desechar el valor
 
 gen_code(i_if(exp, prog, ielse)):
-    
-    gen_code(exp)
-    gen_acc_valor(exp)
+    gen_code_exp(exp)
     
     emit ir_f($.sig) // si es falso saltamos al else
     gen_code_bloque(prog) //codigo del bloque if
@@ -74,8 +73,7 @@ gen_code(i_else(prog)):
     gen_code_bloque(prog)
 
 gen_code(i_while(exp, prog)):
-    gen_code(exp)
-    gen_acc_valor(exp)
+    gen_code_exp(exp)
     
     emit ir_f($.sig) // si es falso saltamos a sig (direccion de la instr que sigue al while)
     gen_code_bloque(prog)
@@ -88,8 +86,7 @@ gen_code(i_read(exp)):
     emit desapila_ind  //guarda la cima en la dirección de la subcima
 
 gen_code(i_write(exp)):
-    gen_code(exp)
-    gen_acc_valor(exp)
+    gen_code_exp(exp)
     emit write
 
 
@@ -106,7 +103,9 @@ gen_code(i_delete(exp)):
     emit apila_ind  // apilamos el valor apuntado por el puntero
     emit dealloc(exp.tipo.tipo.tamaño) // liberamos la memoria de dicho tamaño // tipo.tipo porque es tipo puntero
 
-
+gen_code_exp(exp):
+    gen_code(exp)
+    gen_acc_valor(exp)
 
 gen_code(e_asig(opnd0, opnd1)):
    gen_code(opnd0) 
@@ -123,162 +122,78 @@ gen_code(e_asig(opnd0, opnd1)):
         else: 
             emit desapila_ind // guarda en la dirección de opnd0 el valor de la cima (opnd1)
 
+gen_code_bin(opnd0, opnd1):
+    gen_code_exp(opnd0)
+    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
+        emit int2real
+
+    gen_code_exp(opnd1)
+    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
+        emit int2real
+
 gen_code(e_comp(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-
+    gen_code_bin(opnd0, opnd1)
     emit comp
 
-gen_code(e_dist(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
+gen_code(e_dist(opnd0, opnd1)):   
+    gen_code_bin(opnd0, opnd1)
     emit dist
 
 gen_code(e_lt(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
+    gen_code_bin(opnd0, opnd1)
     emit lt
 
 gen_code(e_gt(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-
+    gen_code_bin(opnd0, opnd1)
     emit gt
 
 gen_code(e_leq(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
+    gen_code_bin(opnd0, opnd1)
     emit leq
 
 gen_code(e_geq(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-
+    gen_code_bin(opnd0, opnd1)
     emit geq
 
 gen_code(e_suma(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
-        emit int2real
-
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
-    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
-        emit int2real
-    
+    gen_code_bin(opnd0, opnd1)
     emit suma
 
 gen_code(e_resta(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
-        emit int2real
-
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
-    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
-        emit int2real
-    
+    gen_code_bin(opnd0, opnd1)
     emit resta
 
 gen_code(e_mul(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-
-    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
-        emit int2real
-
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
-    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
-        emit int2real
-    
+    gen_code_bin(opnd0, opnd1)
     emit mul
 
 gen_code(e_div(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-
-    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
-        emit int2real
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
-    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
-        emit int2real
-    
+    gen_code_bin(opnd0, opnd1)
     emit div
 
 gen_code(e_porcentaje(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
+    gen_code_bin(opnd0, opnd1)
     emit mod
 
 gen_code(e_and(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
+    gen_code_bin(opnd0, opnd1)
     emit and
 
 gen_code(e_or(opnd0, opnd1)):
-    gen_code(opnd0)
-    gen_acc_valor(opnd0)
-    
-    gen_code(opnd1)
-    gen_acc_valor(opnd1)
-    
+    gen_code_bin(opnd0, opnd1)
     emit or
 
 gen_code(e_negativo(opnd)):
-    gen_code(opnd)
-    gen_acc_valor(opnd)
-    
+    gen_code_exp(opnd)
     emit neg //negamos el valor de la cima
 
 gen_code(e_negado(opnd)):
-    gen_code(opnd)
-    gen_acc_valor(opnd)
-    
+    gen_code_exp(opnd)
     emit not //negamos el valor de la cima
 
+    // TODO
 gen_code(i_call(id, preals)): //version mejorada abajo del todo
     proc = $.vinculo
-
     //preparar el resgistro de activación
     emit activa(proc.nivel, proc.tam, $.sig) //en la cima tenemos la dirección de comienzo del registro de activación
 

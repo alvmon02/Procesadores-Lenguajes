@@ -1,5 +1,6 @@
 var conjunto
 
+// TODO poner el nodo de tipo bloque, y cambiar los prog de i_if, i_else, i_while y i_prog a bloque
 pretipado(prog(decs, intrs)):
     pretipado(decs)
     pretipado(intrs)

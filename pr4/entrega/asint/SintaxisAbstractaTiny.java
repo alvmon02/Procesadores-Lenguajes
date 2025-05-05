@@ -1,7 +1,8 @@
 package asint;
 
 public class SintaxisAbstractaTiny {
-
+    // TODO Cambiar para que existan los bloques, y haya distincion entre uno y
+    // otro, por lo tanto tambien hay que cambiar en CUP y javacc
     private static void imprimeOpnd(Exp opnd, int np) {
         if (opnd.prioridad() < np) {
             System.out.println("(");
@@ -45,8 +46,6 @@ public class SintaxisAbstractaTiny {
 
         private Nodo vinculo = null;
 
-
-
         public Nodo ponFila(int fila) {
             this.fila = fila;
             return this;
@@ -81,7 +80,7 @@ public class SintaxisAbstractaTiny {
             this.nivel = nivel;
             return this;
         }
-        
+
         public Nodo ponSig(int sig) {
             this.sig = sig;
             return this;
