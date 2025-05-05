@@ -321,7 +321,7 @@ gen_code(e_indexado(opnd0, opnd1)):
 // TODO
 gen_code(e_campo(opnd, id)):
     gen_code(opnd) //determinamos la dirección de E
-    d = desplazamiento(id) //obtenemos el desplazamiento del campo id, se calcula en asignacion de espacio
+    d = desplazamiento(opnd.tipo, id) //obtenemos el desplazamiento del campo id, se calcula en asignacion de espacio
     emit apila_int(d)
     emit suma // desplazamiento del campo + dirección de comienzo de E
 
@@ -372,3 +372,12 @@ gen_acc_valor(exp):
         emit apila_ind //apilamos el valor apuntado por el designador
 
 
+desplazamiento(t_struct(camposs), idCampo):
+    return desplazamiento(camposs, idCampo)
+
+asig_espacio(mas_cmp_s(camposs, cmp_s(tipo, id)), idCampo):
+    if idCampo == id then:
+        return cmp_s.dir
+    else
+        return asig_espacio(camposs, idCampo)
+    end if
