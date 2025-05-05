@@ -26,24 +26,12 @@ recolecta_subs(si_decs(decs)):
 recolecta_subs(no_decs()):
 	noop
 
-	// TODO
 recolecta_subs(mas_decs(decs, dec)):
 	recolecta_subs(decs)
 	recolecta_subs(dec)
 
-// etiquetado(mas_decs(decs,dec)):
-// 	$.prim=etq_final
-// 	etiquetado(decs)
-// 	etiquetado(dec)
-// 	$.sig=etq_final
-
 recolecta_subs(una_dec(dec)):
 	recolecta_subs(dec)
-
-// etiquetado(una_dec(dec)):
-// 	$.prim=etq_final
-// 	etiquetado(dec)
-// 	$.sig=etq_final
 
 recolecta_subs(dec_var(tipo, id)):
 	noop
@@ -53,47 +41,6 @@ recolecta_subs(dec_tipo(tipo, id)):
 
 recolecta_subs(dec_proc(id, pforms, prog)):
 	apila(sub_pendientes, $)
-
-
-// etiquetado(dec_proc(id, pforms, prog)):
-// 	$.prim=etq_final
-// 	etiquetado(pform)
-// 	etq_final+=2
-// 	recolecta_subs(prog)
-
-// etiquetado(si_pforms(pforms)):
-// 	etiquetado(pforms)
-
-// etiquetado(no_pforms()):
-// 	noop
-
-// etiquetado(mas_pforms(pforms,pform))
-// 	$.prim=etq_final
-// 	etiquetado(pforms)
-// 	etiquetado(pform)
-// 	$.sig=etq_final
-
-// etiquetado(una_pform(pform)):
-// 	$.prim=etq_final
-// 	etiquetado(pform)
-// 	$.sig=etq_final
-
-// etiquetado(t_iden(id)):
-
-
-// etiquetado(mas_cmp_s(camposs,campos)):
-// 	$.prim=etq_final
-// 	etiquetado(camposs)
-// 	etiquetado(campos)
-// 	$.sig=etq_final
-
-// etiquetado(un_cmp_s(campos)):
-// 	$.prim=etq_final
-// 	etiquetado(campos)
-// 	$.sig=etq_final
-// Hasta aqui TODO
-
-//cmp_s(tipo, id)
 
 etiquetado(si_intrs(intrs)):
 	etiquetado(intrs)

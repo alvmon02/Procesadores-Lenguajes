@@ -74,8 +74,9 @@ pretipado(t_punter(tipo)):
     pretipado(tipo)
 
 pretipado(t_struct(camposs)):
-    conjunto = creaconjunto()
+    abreAmbito(conjunto) // De esta forma cada struct tiene sus propios campos
     pretipado(camposs)
+    cierraAmbito(conjunto)
 
 pretipado(mas_cmp_s(camposs, campos)):
     pretipado(camposs)

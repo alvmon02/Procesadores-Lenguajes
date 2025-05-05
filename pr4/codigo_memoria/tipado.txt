@@ -13,17 +13,26 @@ tipado(no_decs()):
 tipado(mas_decs(decs, dec)):
     tipado(decs)
     tipado(dec)
-    $.tipo = ambos_ok(decs.tipo, dec.tipo)
+    if (dec.tipo == ERROR || decs.tipo == ERROR) then
+        $.tipo = ERROR
+    else
+        $.tipo = OK
+    end if
 
 tipado(una_dec(dec)):
     tipado(dec)
-    $.tipo = dec.tipo
+    if (dec.tipo == ERROR) then
+        $.tipo = ERROR
+    else
+        $.tipo = OK
+    end if
+
 
 tipado(dec_var(tipo, id)):
-    noop // Ya tienen el tipo asignado
+    $.tipo = tipo
 
 tipado(dec_tipo(tipo, id)):
-    noop // Ya tienen el tipo asignado
+    $.tipo = tipo
 
 tipado(dec_proc(id, pforms, prog)):
     tipado(prog)
@@ -74,12 +83,13 @@ tipado(i_eval(exp)):
 
 tipado(i_if(exp, prog, ielse)):
     tipado(exp)
-    if exp.tipo != t_bool() then
+    tipoExp = ref!(exp.tipo)
+    if tipoExp != t_bool() then
         error()
     end if
     tipado(prog)
     tipado(ielse)
-    if exp.tipo == t_bool() && prog.tipo == OK && ielse.tipo == OK then
+    if tipoExp == t_bool() && prog.tipo == OK && ielse.tipo == OK then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -87,11 +97,13 @@ tipado(i_if(exp, prog, ielse)):
 
 tipado(i_while(exp, prog)):
     tipado(exp)
-    if exp.tipo != t_bool() then
+    tipoExp = ref!(exp.tipo)
+    if tipoExp != t_bool() then
         error()
     end if
     tipado(prog)
-    if exp.tipo == t_bool() && prog.tipo == OK then
+    tipoExp = ref!(exp.tipo)
+    if tipoExp == t_bool() && prog.tipo == OK then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -99,7 +111,8 @@ tipado(i_while(exp, prog)):
 
 tipado(i_read(exp)):
     tipado(exp)
-    if (exp.tipo == t_int() || exp.tipo == t_real() || exp.tipo == t_string()) && asignable(exp) then
+    tipoExp = ref!(exp.tipo)
+    if (tipoExp == t_int() || tipoExp == t_real() || tipoExp == t_string()) && asignable(exp) then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -107,7 +120,8 @@ tipado(i_read(exp)):
 
 tipado(i_write(exp)):
     tipado(exp)
-    if exp.tipo == t_int() || exp.tipo == t_real() || exp.tipo == t_bool() || exp.tipo == t_string() then
+    tipoExp = ref!(exp.tipo)
+    if tipoExp == t_int() || tipoExp == t_real() || tipoExp == t_bool() || tipoExp == t_string() then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -118,7 +132,7 @@ tipado(i_nl()):
 
 tipado(i_new(exp)):
     tipado(exp)
-    if exp.tipo == t_punter() then
+    if ref!(exp.tipo) == t_punter() then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -126,7 +140,7 @@ tipado(i_new(exp)):
 
 tipado(i_delete(exp)):
     tipado(exp)
-    if exp.tipo == t_punter() then
+    if ref!(exp.tipo) == t_punter() then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -134,7 +148,7 @@ tipado(i_delete(exp)):
 
 tipado(i_call(id, preals)):
     v = $.vinculo
-    if v != ⊥ && v == dec_proc(_, pforms, _) then
+    if v == dec_proc(_, pforms, _) then
         $.tipo = son_parametros_compatibles(pforms, preals)
     else
         $.tipo = ERROR
@@ -156,12 +170,24 @@ son_parametros_compatibles(si_pforms(pforms), si_preals(preals)):
         return son_parametros_compatibles(pforms, preals)
     end if
 
+len(mas_pforms(pforms, pform)):
+    return len(pforms) + 1
+
+len(una_pform(pform)):
+    return 1
+
+len(mas_preals(preals, exp)):
+    return len(preals) + 1
+
+len(un_preal(exp)):
+    return 1
+
 son_parametros_compatibles(mas_pforms(pforms, pform), mas_preals(preals, exp)):
     t0 = son_parametros_compatibles(pforms, preals)
     t1 = es_parametro_compatible(pform, exp)
     return ambos_ok(t0, t1)
 
-son_parametros_compatibles(una_pform(pform), una_preals(exp)):
+son_parametros_compatibles(una_pform(pform), un_preal(exp)):
     return es_parametro_compatible(pform, exp)
 
 es_parametro_compatible(pform(tipo, ref, id), exp):
@@ -337,7 +363,7 @@ tipado(e_indexado(opnd0, opnd1)):
 tipado(e_campo(opnd, id)):
     tipado(opnd)
     tipo = ref!(opnd.tipo)
-
+    
     if tipo == t_struct(campos) then
         $.tipo = busquedaCampo(id, campos)
     else
