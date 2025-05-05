@@ -56,17 +56,17 @@ PARSER_END(ConstructorASTsTiny)
     }
   
   Prog programa() :
-    { Prog prog; }
+    { Bloque bloq; }
     {
-      prog = bloque()
-          { return prog; }
+      bloq = bloque()
+          { return sem.prog(bloq); }
     }
 
-  Prog bloque() :
+  Bloque bloque() :
     { DecsOpt decs; IntrsOpt intrs; }
     {
       "{" decs = declar_opt() intrs = instr_opt() "}" 
-          { return sem.prog(decs, intrs); }
+          { return sem.bloque(decs, intrs); }
     }
 
   DecsOpt declar_opt() :
@@ -122,7 +122,7 @@ PARSER_END(ConstructorASTsTiny)
     }
 
   Dec declaracion_proc() :
-    { Token id; PForms pforms; Prog prog; }
+    { Token id; PForms pforms; Bloque prog; }
     {
       <proc> id = <iden> "(" pforms = param_formales() ")" prog = bloque()
         { return (Dec)sem.dec_proc(id.image, pforms, prog).ponFila(id.beginLine).ponCol(id.beginColumn); }
@@ -328,14 +328,14 @@ PARSER_END(ConstructorASTsTiny)
     }
   
   Intr instruccion_if():
-    { Exp exp; Prog prog; I_Else ielse; }
+    { Exp exp; Bloque prog; I_Else ielse; }
     {
       <t_if> exp = expresion() prog = bloque() ielse = instruccion_else_opt()
         { return sem.i_if(exp, prog, ielse); }
     }
 
   I_Else instruccion_else_opt():
-    { Prog prog; }
+    { Bloque prog; }
     {
       <t_else> prog = bloque()
         { return sem.si_else(prog); }
@@ -344,7 +344,7 @@ PARSER_END(ConstructorASTsTiny)
     }
   
   Intr instruccion_while():
-    { Exp exp; Prog prog; }
+    { Exp exp; Bloque prog; }
     {
       <t_while> exp = expresion() prog = bloque()
         { return sem.i_while(exp, prog); } 
@@ -418,7 +418,7 @@ PARSER_END(ConstructorASTsTiny)
     }
   
   Intr instruccion_compuesta(): 
-    { Prog prog; } 
+    { Bloque prog; } 
     {
       prog = bloque()
         { return sem.i_prog(prog); }

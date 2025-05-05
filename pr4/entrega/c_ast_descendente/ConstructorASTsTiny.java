@@ -15,18 +15,18 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     throw new Error("Missing return statement in function");
 }
 
-  final public Prog programa() throws ParseException {Prog prog;
-    prog = bloque();
-{if ("" != null) return prog;}
+  final public Prog programa() throws ParseException {Bloque bloq;
+    bloq = bloque();
+{if ("" != null) return sem.prog(bloq);}
     throw new Error("Missing return statement in function");
 }
 
-  final public Prog bloque() throws ParseException {DecsOpt decs; IntrsOpt intrs;
+  final public Bloque bloque() throws ParseException {DecsOpt decs; IntrsOpt intrs;
     jj_consume_token(35);
     decs = declar_opt();
     intrs = instr_opt();
     jj_consume_token(36);
-{if ("" != null) return sem.prog(decs, intrs);}
+{if ("" != null) return sem.bloque(decs, intrs);}
     throw new Error("Missing return statement in function");
 }
 
@@ -122,7 +122,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     throw new Error("Missing return statement in function");
 }
 
-  final public Dec declaracion_proc() throws ParseException {Token id; PForms pforms; Prog prog;
+  final public Dec declaracion_proc() throws ParseException {Token id; PForms pforms; Bloque prog;
     jj_consume_token(proc);
     id = jj_consume_token(iden);
     jj_consume_token(39);
@@ -466,7 +466,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     throw new Error("Missing return statement in function");
 }
 
-  final public Intr instruccion_if() throws ParseException {Exp exp; Prog prog; I_Else ielse;
+  final public Intr instruccion_if() throws ParseException {Exp exp; Bloque prog; I_Else ielse;
     jj_consume_token(t_if);
     exp = expresion();
     prog = bloque();
@@ -475,7 +475,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     throw new Error("Missing return statement in function");
 }
 
-  final public I_Else instruccion_else_opt() throws ParseException {Prog prog;
+  final public I_Else instruccion_else_opt() throws ParseException {Bloque prog;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case t_else:{
       jj_consume_token(t_else);
@@ -490,7 +490,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     throw new Error("Missing return statement in function");
 }
 
-  final public Intr instruccion_while() throws ParseException {Exp exp; Prog prog;
+  final public Intr instruccion_while() throws ParseException {Exp exp; Bloque prog;
     jj_consume_token(t_while);
     exp = expresion();
     prog = bloque();
@@ -588,7 +588,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     throw new Error("Missing return statement in function");
 }
 
-  final public Intr instruccion_compuesta() throws ParseException {Prog prog;
+  final public Intr instruccion_compuesta() throws ParseException {Bloque prog;
     prog = bloque();
 {if ("" != null) return sem.i_prog(prog);}
     throw new Error("Missing return statement in function");

@@ -49,7 +49,8 @@ terminal StringLocalizado PAP, PCIERRE,
              CORCHETEAP,CORCHETECIERRE, 
              PUNTO, EXPONENTE,  IDEN, ENT, REAL, STRING;
 
-non terminal Prog programa, bloque;
+non terminal Prog programa;
+non terminal Bloque bloque;
 non terminal DecsOpt declar_opt;
 non terminal LDecs declaraciones;
 non terminal Dec declaracion, declar_var, declar_tipo, declar_proc;
@@ -74,9 +75,9 @@ non terminal StringLocalizado OP1, OP4, OP5;
 start with programa;
 
 programa				      ::= bloque: bloq
-    {: RESULT = bloq; :};
+    {: RESULT = sem.prog(bloq); :};
 bloque					      ::= LLAVEAP declar_opt: decs intr_opt: intrs LLAVECIERRE
-    {: RESULT = sem.prog(decs, intrs); :};
+    {: RESULT = sem.bloque(decs, intrs); :};
 
 declar_opt				    ::= declaraciones: decs FINDECLAR
     {: RESULT = sem.si_decs(decs); :};
