@@ -309,7 +309,14 @@ public class MaquinaP {
 
 
 
-
+   private class int2real implements Instruccion {
+      public void ejecuta() {
+         Valor opnd = pilaEvaluacion.pop(); 
+         pilaEvaluacion.push(new ValorReal(opnd.valorInt()));
+         pc++;
+      } 
+      public String toString() {return "int2real";};
+   }
 
 
    private class IApilaInt implements Instruccion {
@@ -576,6 +583,7 @@ public class MaquinaP {
    public Instruccion apila_bool(boolean val) {return new IApilaBool(val);}
    public Instruccion apila_str(String val) {return new IApilaStr(val);}   // NUEVO
    public Instruccion apila_real(float val) {return new IApilaReal(val);} // NUEVO
+   public Instruccion int2real() {return new int2real();}
 
    public Instruccion apilad(int nivel) {return new IApilad(nivel);}
    public Instruccion apila_ind() {return IAPILAIND;}
