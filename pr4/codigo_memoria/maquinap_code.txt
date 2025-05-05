@@ -181,13 +181,13 @@ gen_code(e_suma(opnd0, opnd1)):
     gen_code(opnd0)
     gen_acc_valor(opnd0)
     
-    if opnd0.tipo == t_int() or opnd1.tipo == t_real():
+    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
         emit int2real
 
     gen_code(opnd1)
     gen_acc_valor(opnd1)
     
-    if opnd0.tipo == t_real() or opnd1.tipo == t_int():
+    if opnd0.tipo == t_real() and opnd1.tipo == t_int():
         emit int2real
     
     emit suma
@@ -196,7 +196,7 @@ gen_code(e_resta(opnd0, opnd1)):
     gen_code(opnd0)
     gen_acc_valor(opnd0)
     
-    if opnd0.tipo == t_int() or opnd1.tipo == t_real():
+    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
         emit int2real
 
     gen_code(opnd1)
@@ -211,7 +211,7 @@ gen_code(e_mul(opnd0, opnd1)):
     gen_code(opnd0)
     gen_acc_valor(opnd0)
 
-    if opnd0.tipo == t_int() or opnd1.tipo == t_real():
+    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
         emit int2real
 
     gen_code(opnd1)
@@ -226,7 +226,7 @@ gen_code(e_div(opnd0, opnd1)):
     gen_code(opnd0)
     gen_acc_valor(opnd0)
 
-    if opnd0.tipo == t_int() or opnd1.tipo == t_real():
+    if opnd0.tipo == t_int() and opnd1.tipo == t_real():
         emit int2real
     
     gen_code(opnd1)
@@ -294,6 +294,7 @@ gen_code(i_call(id, preals)): //version mejorada abajo del todo
 
         if pform.ref == no_ref():
             if es_designador(preal): // param formal por valor y real es designador
+                // TODO cuando pasamos un entero a un real hay que hacer lo de int2real
                 emit copia(pform.tipo.tamaño) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
             else:
                 emit desapila_ind() // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param

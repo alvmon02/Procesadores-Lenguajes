@@ -157,7 +157,7 @@ son_parametros_compatibles(si_pforms(pforms), si_preals(preals)):
     end if
 
 son_parametros_compatibles(mas_pforms(pforms, pform), mas_preals(preals, exp)):
-    t0 = compatibles_preal_pform(pforms, preals)
+    t0 = son_parametros_compatibles(pforms, preals)
     t1 = es_parametro_compatible(pform, exp)
     return ambos_ok(t0, t1)
 
@@ -167,7 +167,7 @@ son_parametros_compatibles(una_pform(pform), una_preals(exp)):
 es_parametro_compatible(pform(tipo, ref, id), exp):
     tipado(exp)
     t0, t1 = ref!(exp.tipo), ref!(tipo)
-    if ref == si_ref() && exp != e_iden(_) then
+    if ref == si_ref() && asignable(exp) then
         error("Para pasar por referencia, el argumento tiene que ser una variable")
         return ERROR
     else if tipo_asig(t0, t1) == OK then // falta hacer tipo_asig, está arriba, pero solo comprueba si son iguales (en este caso hay que seguir las normas de las asignaciones)
