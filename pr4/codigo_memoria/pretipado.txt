@@ -1,7 +1,9 @@
 var conjunto
 
-// TODO poner el nodo de tipo bloque, y cambiar los prog de i_if, i_else, i_while y i_prog a bloque
-pretipado(prog(decs, intrs)):
+pretipado(prog(bloque)):
+    pretipado(bloque)
+
+pretipado(bloque(decs, intrs)):
     pretipado(decs)
     pretipado(intrs)
 
@@ -24,9 +26,9 @@ pretipado(dec_var(tipo, id)):
 pretipado(dec_tipo(tipo, id)):
     pretipado(tipo)
 
-pretipado(dec_proc(id, pforms, prog)):
+pretipado(dec_proc(id, pforms, bloque)):
     pretipado(pforms)
-    pretipado(prog)
+    pretipado(bloque)
 
 pretipado(si_pforms(pfroms)):
     pretipado(pforms)
@@ -110,12 +112,12 @@ pretipado(una_intr(intr)):
 pretipado(i_eval(exp)):
     noop
 
-pretipado(i_if(exp, prog, ielse)):
-    pretipado(prog)
+pretipado(i_if(exp, bloque, ielse)):
+    pretipado(bloque)
     pretipado(ielse)
 
-pretipado(i_while(exp, prog)): 
-    pretipado(prog)
+pretipado(i_while(exp, bloque)): 
+    pretipado(bloque)
 
 pretipado(i_read(exp)):
     noop
@@ -135,11 +137,11 @@ pretipado(i_delete(exp)):
 pretipado(i_call(id, preals)):
     noop
 
-pretipado(i_prog(prog)):
-    pretipado(prog)
+pretipado(i_bloque(bloque)):
+    pretipado(bloque)
 
-pretipado(si_else(prog)):
-    pretipado(prog)
+pretipado(si_else(bloque)):
+    pretipado(bloque)
 
 pretipado(no_else()):
     noop

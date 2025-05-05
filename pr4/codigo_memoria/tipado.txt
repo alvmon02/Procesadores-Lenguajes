@@ -1,5 +1,8 @@
-// TODO añadir el nodo de tipo bloque y hacer las modificaciones pertinentes
-tipado(prog(decs, intrs)):
+tipado(prog(bloque)):
+    tipado(bloque)
+    $.tipo = bloque.tipo
+
+tipado(bloque(decs, intrs)):
     tipado(decs)
     tipado(intrs)
     $.tipo = ambos_ok(decs.tipo, intrs.tipo)
@@ -35,9 +38,9 @@ tipado(dec_var(tipo, id)):
 tipado(dec_tipo(tipo, id)):
     $.tipo = tipo
 
-tipado(dec_proc(id, pforms, prog)):
-    tipado(prog)
-    $.tipo = prog.tipo
+tipado(dec_proc(id, pforms, bloque)):
+    tipado(bloque)
+    $.tipo = bloque.tipo
 
 // si_pforms(pfroms)
 // no_pforms()
@@ -82,29 +85,29 @@ tipado(i_eval(exp)):
         $.tipo = OK
     end if
 
-tipado(i_if(exp, prog, ielse)):
+tipado(i_if(exp, bloque, ielse)):
     tipado(exp)
     tipoExp = ref!(exp.tipo)
     if tipoExp != t_bool() then
         error()
     end if
-    tipado(prog)
+    tipado(bloque)
     tipado(ielse)
-    if tipoExp == t_bool() && prog.tipo == OK && ielse.tipo == OK then
+    if tipoExp == t_bool() && bloque.tipo == OK && ielse.tipo == OK then
         $.tipo = OK
     else
         $.tipo = ERROR
     end if
 
-tipado(i_while(exp, prog)):
+tipado(i_while(exp, bloque)):
     tipado(exp)
     tipoExp = ref!(exp.tipo)
     if tipoExp != t_bool() then
         error()
     end if
-    tipado(prog)
+    tipado(bloque)
     tipoExp = ref!(exp.tipo)
-    if tipoExp == t_bool() && prog.tipo == OK then
+    if tipoExp == t_bool() && bloque.tipo == OK then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -209,13 +212,13 @@ es_parametro_compatible(pform(tipo, ref, id), exp):
         return ERROR
     end if
 
-tipado(i_prog(prog)):
-    tipado(prog)
-    $.tipo = prog.tipo
+tipado(i_bloque(bloque)):
+    tipado(bloque)
+    $.tipo = bloque.tipo
 
-tipado(si_else(prog)):
-    tipado(prog)
-    $.tipo = prog.tipo
+tipado(si_else(bloque)):
+    tipado(bloque)
+    $.tipo = bloque.tipo
 
 tipado(no_else()):
     $.tipo = OK

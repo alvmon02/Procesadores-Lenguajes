@@ -1,10 +1,9 @@
 var sub_pendientes = pila_vacia()
 
-// TODO añadir el Nodo tipo Bloque y hacer las modificaciones pertinentes
+// TODO Abstraer mas, e igualar con gen_code
 
-gen_code(prog(decs, intrs))
-    recolecta_subs(decs)
-    gen_code(intrs)
+gen_code(prog(bloque))
+    gen_code(bloque)
     emit stop()
 
     while not es_vacia(sub_pendientes)
@@ -19,10 +18,14 @@ gen_code(prog(decs, intrs))
         end let
     end while
 
+gen_code(bloque(decs, intrs)):
+    recolecta_subs(decs)
+    gen_code(intrs)
+
 
 recolecta_subs(si_decs(decs)):
     recolecta_subs(decs)
-    
+
 recolecta_subs(no_decs()):
     noop
 
@@ -39,7 +42,7 @@ recolecta_subs(dec_var(tipo, id)):
 recolecta_subs(dec_tipo(tipo, id)):
     noop
 
-recolecta_subs(dec_proc(id, pforms, prog)):
+recolecta_subs(dec_proc(id, pforms, bloque)):
     apila(sub_pendientes, $)
 
 
@@ -61,22 +64,22 @@ gen_code(i_eval(exp)):
     gen_code(exp)
     emit desapila()  // desechar el valor
 
-gen_code(i_if(exp, prog, ielse)):
+gen_code(i_if(exp, bloque, ielse)):
     gen_code_exp(exp)
     
     emit ir_f($.sig) // si es falso saltamos al else
-    gen_code_bloque(prog) //codigo del bloque if
+    gen_code(bloque) //codigo del bloque if
     emit ir_a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
     gen_code(ielse) // codigo del bloque else
 
-gen_code(i_else(prog)):
-    gen_code_bloque(prog)
+gen_code(i_else(bloque)):
+    gen_code(bloque)
 
-gen_code(i_while(exp, prog)):
+gen_code(i_while(exp, bloque)):
     gen_code_exp(exp)
     
     emit ir_f($.sig) // si es falso saltamos a sig (direccion de la instr que sigue al while)
-    gen_code_bloque(prog)
+    gen_code(bloque)
     emit ir_a($.prim) // siempre se vuelve a la primera instrucción del while
 
 
@@ -191,7 +194,7 @@ gen_code(e_negado(opnd)):
     gen_code_exp(opnd)
     emit not //negamos el valor de la cima
 
-    // TODO
+    // TODO Hacer que sea recursivo sin el for
 gen_code(i_call(id, preals)): //version mejorada abajo del todo
     proc = $.vinculo
     //preparar el resgistro de activación
@@ -219,10 +222,10 @@ gen_code(i_call(id, preals)): //version mejorada abajo del todo
         id_pform = id_pform + 1
     ir_a(proc.prim)
 
-gen_code(i_prog(prog)):
-    gen_code_bloque(prog)
+gen_code(i_bloque(bloque)):
+    gen_code(bloque)
 
-gen_code_bloque(prog(decs, intrs)):
+gen_code(bloque(decs, intrs)):
     recolecta_subs(decs)
     gen_code(intrs)
 
@@ -234,7 +237,7 @@ gen_code(e_indexado(opnd0, opnd1)):
     emit mul //apilamos el desplazamiento del índice
     emit suma // a la dirección de comenzo del array le sumamos el desplazamiento del índice
 
-// TODO
+// TODO Creo que está pero revisar porque está el TODO
 gen_code(e_campo(opnd, id)):
     gen_code(opnd) //determinamos la dirección de E
     d = desplazamiento(opnd.tipo, id) //obtenemos el desplazamiento del campo id, se calcula en asignacion de espacio

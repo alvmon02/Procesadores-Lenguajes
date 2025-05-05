@@ -2,14 +2,16 @@ var dir = 0 // primera dirección libre
 var nivel = 0
 var max_dir = 0 // máxima dirección ocupada
 
-// TODO añadir el nodo de tipo Bloque y las modificaciones pertinentes
-
 inc_dir(inc):
     dir += inc
     if dir > max_dir then
         max_dir = dir
 
-asig_espacio(prog(decs, intrs)):
+
+asig_espacio(prog(bloque)):
+    asig_espacio(bloque)
+
+asig_espacio(bloque(decs, intrs)):
     dir_ant = dir
     asig_espacio(decs)
     asig_espacio(intrs)
@@ -54,7 +56,7 @@ asig_espacio1(dec_tipo(tipo, id)):
 asig_espacio2(dec_tipo(tipo, id)):
     asig_tam2(tipo)
 
-asig_espacio1(dec_proc(id, pforms, prog)):
+asig_espacio1(dec_proc(id, pforms, bloque)):
     dir_ant = dir       // guardamos la direccion de inicio y la max_dir
     max_dir_ant = max_dir
     nivel += 1
@@ -62,13 +64,13 @@ asig_espacio1(dec_proc(id, pforms, prog)):
     dir = 0            // ambos se fijan a 0 porque las direcciones en el ámbito de un procedimiento son relativas a su registro de activación
     max_dir = 0
     asig_espacio(pforms)
-    asig_espacio(prog)
+    asig_espacio(bloque)
     $.tam = max_dir
     dir = dir_ant
     max_dir = max_dir_ant
     nivel -= 1
     
-asig_espacio2(dec_proc(id, pforms, prog)): // Deberia de ser aqui donde se hace todo, por el hecho de que igual tenemos despues de la declaracion del procedimiento una de claracion de tipo que se usa dentro
+asig_espacio2(dec_proc(id, pforms, bloque)): // Deberia de ser aqui donde se hace todo, por el hecho de que igual tenemos despues de la declaracion del procedimiento una de claracion de tipo que se usa dentro
     noop
 
 asig_espacio(pforms(si_pforms(pforms))):
@@ -196,14 +198,14 @@ asig_espacio(una_intr(intr)):
 asig_espacio(i_eval(exp)):
     noop // no hace asig_espacio(exp)
 
-asig_espacio(i_if(exp, prog, ielse)):
+asig_espacio(i_if(exp, bloque, ielse)):
     // no hace asig_espacio(exp)
-    asig_espacio(prog)
+    asig_espacio(bloque)
     asig_espacio(ielse)
 
-asig_espacio(i_while(exp, prog)):
+asig_espacio(i_while(exp, bloque)):
     // no hace asig_espacio(exp)
-    asig_espacio(prog)
+    asig_espacio(bloque)
 
 asig_espacio(i_read(exp)):
     noop // no hace asig_espacio(exp)
@@ -224,11 +226,11 @@ asig_espacio(i_delete(exp)):
 asig_espacio(i_call(id, preals)):
     noop // no hace asig_espacio(preals)
 
-asig_espacio(i_prog(prog)):
-    asig_espacio(prog)
+asig_espacio(i_bloque(bloque)):
+    asig_espacio(bloque)
 
-asig_espacio(si_else(prog)):
-    asig_espacio(prog)
+asig_espacio(si_else(bloque)):
+    asig_espacio(bloque)
 
 asig_espacio(no_else()):
     noop

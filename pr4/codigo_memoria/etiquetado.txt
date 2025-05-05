@@ -1,26 +1,31 @@
 var sub_pendientes=pila_vacia()
 var etq_final
 
-// TODO añadir el Nodo tipo Bloque y hacer las modificaciones pertinentes
+// TODO usar funciones genericas, no repetir tanto codigo, abstraer
 
-etiquetado(prog(decs,intrs)):
-	$.prim=etq_final
-	recolecta_subs(decs)
-	etiquetado(intrs)
+etiquetado(prog(bloque)):
+	$.prim = etq_final
+	etiquetado(bloque)
 	etq_final++
 	while ¬ es_vacia(sub_pendientes)
-		sub=cima(sub_pendientes)
+		sub = cima(sub_pendientes)
 		desapila(sub_pendientes)
-		let sub= dec_proc(id,pforms,prog) in
-			sub.prim=etq_final
+		let sub = dec_proc(id, pforms, bloque2) in
+			sub.prim = etq_final
 			etq_final++
 			recolecta_subs(pforms)
-			etiquetado(prog)
-			etq_final+=2
-			sub.sig=etq_final
+			etiquetado(bloque2)
+			etq_final += 2
+			sub.sig = etq_final
 		end let
 	end while
-	$.sig=etq_final
+	$.sig = etq_final
+
+etiquetado(bloque(decs, intrs)):
+	$.prim = etq_final	
+	recolecta_subs(decs)
+	etiquetado(intrs)
+	$.sig = etq_final
 
 recolecta_subs(si_decs(decs)):
 	recolecta_subs(decs)
@@ -41,7 +46,7 @@ recolecta_subs(dec_var(tipo, id)):
 recolecta_subs(dec_tipo(tipo, id)):
 	noop
 
-recolecta_subs(dec_proc(id, pforms, prog)):
+recolecta_subs(dec_proc(id, pforms, bloque)):
 	apila(sub_pendientes, $)
 
 etiquetado(si_intrs(intrs)):
@@ -51,57 +56,51 @@ etiquetado(no_intrs()):
 	noop
 
 etiquetado(mas_intrs(intrs,intr)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado(intrs)
 	etiquetado(intr)
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(una_intr(intr)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado(intr)
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(i_eval(exp)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado(exp)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
-etiquetado(i_if(exp,prog,i_else)):
-	$.prim=etq_final
+etiquetado(i_if(exp,bloque,i_else)):
+	$.prim = etq_final
 	etiquetado(exp)
 	if es_designador(exp) then
 		etq_final++
 	end if
 	etq_final++
-	etiquetado(prog)
+	etiquetado(bloque)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 	etiquetado(i_else)
 	$.fin=etq_final
 
-etiquetado_bloque(prog(decs, intrs)):
-	$.prim=etq_final	
-	recolecta_subs(decs)
-	etiquetado(intrs)
-	$.sig=etq_final
-
-etiquetado(i_while(exp,prog)):
-	$.prim=etq_final
+etiquetado(i_while(exp,bloque)):
+	$.prim = etq_final
 	etiquetado(exp)
 	if es_designador(exp) then
 		etq_final++
 	end if
 	etq_final++
-	etiquetado(prog)
+	etiquetado(bloque)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(i_read(exp)):
 	$.prim = etq_final
 	etiquetado(exp)
-	etq_final+=2
-	$.sig=etq_final
+	etq_final += 2
+	$.sig = etq_final
 
 etiquetado(i_write(exp)):
 	$.prim = etq_final
@@ -110,162 +109,163 @@ etiquetado(i_write(exp)):
 		etq_final++
 	end if
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(i_nl()):
 	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(i_new(exp)):
 	$.prim = etq_final
 	etiquetado(exp)
-	etq_final+=2
-	$.sig=etq_final
+	etq_final += 2
+	$.sig = etq_final
 
 etiquetado(i_delete(exp)):
 	$.prim = etq_final
 	etiquetado(exp)
-	etq_final+=2
-	$.sig=etq_final
+	etq_final += 2
+	$.sig = etq_final
 
+// TODO quitar el for y poner recursion
 etiquetado(i_call(id, preals)):
 	$.prim = etq_final
 	etq_final++
 	for preal in preals
 		etiquetado_paso_param(&.vinculo, preal)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
-etiquetado(i_prog(prog)):
+etiquetado(i_bloque(bloque)):
 	$.prim = etq_final
-	etiquetado(prog)
+	etiquetado(bloque)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
-etiquetado(si_else(prog)):
-	$.prim=etq_final
-	etiquetado_bloque(prog)
-	$.sig=etq_final
+etiquetado(si_else(bloque)):
+	$.prim = etq_final
+	etiquetado(bloque)
+	$.sig = etq_final
 
 etiquetado(no_else()):
 	noop
 
 etiquetado(e_asig(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado(opnd0)
 	etiquetado(opnd1)
 	if opnd0.tipo == t_real() and opnd1.tipo == t_int():
 		etq_final++
 	end if
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_comp(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_dist(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_lt(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_gt(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_leq(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_geq(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_suma(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_resta(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_and(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_or(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_mul(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_div(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_porcentaje(opnd0, opnd1)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_negativo(opnd)):
-	$.prim=etq_final
+	$.prim = etq_final
 	if es_designador(opnd) then
 		etq_final++
 	end if
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_negado(opnd)):
-	$.prim=etq_final
+	$.prim = etq_final
 	if es_designador(opnd) then
 		etq_final++
 	end if
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_campo(opnd, id)):
 	$.prim = etq_final
 	etiquetado(opnd)
-	etq_final+=2
-	$.sig=etq_final
+	etq_final += 2
+	$.sig = etq_final
 	
 etiquetado(e_puntero(opnd)):
 	$.prim = etq_final
 	etiquetado(opnd)
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_indexado(opnd0, opnd1)):
 	$.prim =etq_final
@@ -275,42 +275,42 @@ etiquetado(e_indexado(opnd0, opnd1)):
 		etq_final++
 	end if
 	etq_final+=3
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_lit_ent(num))
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_lit_real(num))
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_true()):
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_false()):
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_string(string)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(e_iden(id)):
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 etiquetado(_null()):
-	$.prim=etq_final
+	$.prim = etq_final
 	etq_final++
-	$.sig=etq_final
+	$.sig = etq_final
 
 //Funciones auxiliares
 
@@ -321,7 +321,7 @@ etiquetado_acc_id(dec_var(tipo, id)):
 		etq_final+= 3
 	end if
 
-etiquetado_paso_param(proc(id, pforms, prog), preal):
+etiquetado_paso_param(proc(id, pforms, bloque), preal):
 	etq_final+= 3
 	etiquetado(preal)
 	etq_final++

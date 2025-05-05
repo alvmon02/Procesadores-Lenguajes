@@ -1,8 +1,6 @@
 package asint;
 
 public class SintaxisAbstractaTiny {
-    // TODO Cambiar para que existan los bloques, y haya distincion entre uno y
-    // otro, por lo tanto tambien hay que cambiar en CUP y javacc
     private static void imprimeOpnd(Exp opnd, int np) {
         if (opnd.prioridad() < np) {
             System.out.println("(");

@@ -1,11 +1,6 @@
 var ts // La tabla de símbolos
 var noop = null
 
-// TODO quitar esto y que diferencie entre programa y bloque
-main(proc):
-    ts = creaTS()
-    vincula(proc)
-
 contiene_inserta(id):
     if contiene(ts,Id) then
         error
@@ -19,7 +14,11 @@ vinculaId(id):
         error
     end if
 
-vincula(prog(decs, intrs)):
+vincula(prog(bloque)):
+    ts = creaTS()
+    vincula(bloque)
+
+vincula(bloque(decs, intrs)):
     abreAmbito(ts)
     recolectaDecs(decs)
     vincula(intrs)
@@ -60,14 +59,14 @@ recolectaDec1(dec_tipo(tipo, id)):
 recolectaDec2(dec_tipo(tipo, id)):
     vincula2(tipo)
 
-recolectaDec1(dec_proc(id, pforms, prog)):
+recolectaDec1(dec_proc(id, pforms, bloque)):
     contiene_inserta(id)
     abreAmbito(ts)
     recolectaPForms(pforms)
-    vincula(prog)
+    vincula(bloque)
     cierraAmbito(ts)
 
-recolectaDec2(dec_proc(id, pforms, prog)):
+recolectaDec2(dec_proc(id, pforms, bloque)):
     noop
 
 recolectaPForms(si_pforms(pfroms)):
@@ -181,14 +180,14 @@ vincula(una_intr(intr)):
 vincula(i_eval(exp)):
     vincula(exp)
 
-vincula(i_if(exp, prog, ielse)):
+vincula(i_if(exp, bloque, ielse)):
     vincula(exp)
-    vincula(prog)
+    vincula(bloque)
     vincula(ielse)
 
-vincula(i_while(exp, prog)):
+vincula(i_while(exp, bloque)):
     vincula(exp)
-    vincula(prog)
+    vincula(bloque)
 
 vincula(i_read(exp)):
     vincula(exp)
@@ -209,11 +208,11 @@ vincula(i_call(id, preals)):
     vinculaId(id)
     vincula(preals)
 
-vincula(i_prog(prog)):
-    vincula(prog)
+vincula(i_prog(bloque)):
+    vincula(bloque)
 
-vincula(si_else(prog)):
-    vincula(prog)
+vincula(si_else(bloque)):
+    vincula(bloque)
 
 vincula(no_else()):
     noop
