@@ -250,84 +250,155 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Comp exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.comp()); // Emitimos la instrucción de comparación
     }
 
     public void procesa(Dist exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.dist()); // Emitimos la instrucción de distinción
     }
 
     public void procesa(Menor exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.lt()); // Emitimos la instrucción de menor que
     }
 
     public void procesa(Mayor exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd1().procesa(this);
+        }
 
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
+        }
         m.emit(m.gt()); // Emitimos la instrucción de mayor que
     }
 
     public void procesa(MenorIgual exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.leq()); // Emitimos la instrucción de menor o igual que
     }
 
     public void procesa(MayorIgual exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.geq()); // Emitimos la instrucción de mayor o igual que
@@ -341,6 +412,10 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd0().procesa(this);
         }
 
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
@@ -348,13 +423,8 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd1().procesa(this);
         }
 
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class) || claseDe(exp.opnd1().vinculo(), T_Real.class)) {
-            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
-            }
-            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_cima()); // Convertimos cima de int a real
-            }
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.suma()); // Emitimos la instrucción de suma
@@ -368,6 +438,10 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd0().procesa(this);
         }
 
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
@@ -375,41 +449,60 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd1().procesa(this);
         }
 
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class) ||claseDe(exp.opnd1().vinculo(), T_Real.class)) {
-            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
-            }
-            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_cima()); // Convertimos cima de int a real
-            }
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.resta()); // Emitimos la instrucción de resta
     }
 
     public void procesa(And exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.and()); // Emitimos la instrucción de AND
     }
 
     public void procesa(Or exp) {
-        exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
+        else{
+            exp.opnd0().procesa(this);
+        }
 
-        exp.opnd1().procesa(this);
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
+        }
+        else{
+            exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.or()); // Emitimos la instrucción de OR
@@ -423,6 +516,10 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd0().procesa(this);
         }
 
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
@@ -430,13 +527,8 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd1().procesa(this);
         }
 
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class) ||claseDe(exp.opnd1().vinculo(), T_Real.class)) {
-            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
-            }
-            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_cima()); // Convertimos cima de int a real
-            }
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.mul()); // Emitimos la instrucción de multiplicación
@@ -450,6 +542,10 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd0().procesa(this);
         }
 
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
@@ -457,13 +553,8 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd1().procesa(this);
         }
 
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class) ||claseDe(exp.opnd1().vinculo(), T_Real.class)) {
-            if (claseDe(exp.opnd0().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_subcima()); // Convertimos subcima de int a real
-            }
-            if (claseDe(exp.opnd1().vinculo(), T_Int.class)) {
-                m.emit(m.int2real_cima()); // Convertimos cima de int a real
-            }
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.div()); // Emitimos la instrucción de división
@@ -477,11 +568,19 @@ public class cod_maquina_p extends ProcesamientoDef{
             exp.opnd0().procesa(this);
         }
 
+        if (claseDe(exp.opnd0().vinculo(), T_Int.class) && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+            m.emit(m.int2real()); // Convertimos subcima de int a real
+        }
+
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
         else{
             exp.opnd1().procesa(this);
+        }
+
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+            m.emit(m.int2real()); // Convertimos cima de int a real
         }
 
         m.emit(m.porcentaje()); // Emitimos la instrucción de módulo
@@ -551,4 +650,6 @@ public class cod_maquina_p extends ProcesamientoDef{
     public void procesa(Null exp) {
         m.emit(m.apila_int(-1));
     }
+
+
 }
