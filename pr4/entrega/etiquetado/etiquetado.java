@@ -107,16 +107,6 @@ public class etiquetado extends ProcesamientoDef {
         una_pform.setSig(etqFinal);
     }
 
-    @Override
-    public void procesa(PForm_Valor pfv) {
-        // No necesita etiquetado
-    }
-
-    @Override
-    public void procesa(PForm_Ref pfr) {
-        // No necesita etiquetado
-    }
-
     // Procesamiento de instrucciones
     @Override
     public void procesa(Si_Intrs si_intrs) {
@@ -237,27 +227,27 @@ public class etiquetado extends ProcesamientoDef {
 
     // Procesamiento de parámetros reales
     @Override
-    public void procesa(Si_Preals si_preals) {
+    public void procesa(Si_PReals si_preals) {
         si_preals.preals().procesa(this);
     }
 
     @Override
-    public void procesa(Mas_Preals mas_preals) {
-        mas_preals.setPrim(etqFinal);
+    public void procesa(Mas_PReals mas_preals) {
+        mas_preals.ponPrim(etqFinal);
         mas_preals.preals().procesa(this);
         mas_preals.exp().procesa(this);
-        mas_preals.setSig(etqFinal);
+        mas_preals.ponSig(etqFinal);
     }
 
     @Override
-    public void procesa(Un_Preals un_preals) {
-        un_preals.setPrim(etqFinal);
+    public void procesa(Un_PReal un_preals) {
+        un_preals.ponPrim(etqFinal);
         un_preals.exp().procesa(this);
-        un_preals.setSig(nuevaEtiqueta());
+        un_preals.ponSig(nuevaEtiqueta());
     }
 
     @Override
-    public void procesa(No_Preals no_preals) {
+    public void procesa(No_PReals no_preals) {
         // No necesita etiquetado
     }
 
@@ -421,21 +411,21 @@ public class etiquetado extends ProcesamientoDef {
 
     // Procesamiento de literales y variables
     @Override
-    public void procesa(Entero exp) {
-        exp.setPrim(etqFinal);
-        exp.setSig(nuevaEtiqueta());
+    public void procesa(Lit_ent exp) {
+        exp.ponPrim(etqFinal);
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
-    public void procesa(Real exp) {
-        exp.setPrim(etqFinal);
-        exp.setSig(nuevaEtiqueta());
+    public void procesa(Lit_real exp) {
+        exp.ponPrim(etqFinal);
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Cadena exp) {
-        exp.setPrim(etqFinal);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponPrim(etqFinal);
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
@@ -457,7 +447,7 @@ public class etiquetado extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(Var exp) {
+    public void procesa(Exp exp) {
         exp.setPrim(etqFinal);
         if (esDesignador(exp)) {
             etqFinal++;
@@ -467,59 +457,50 @@ public class etiquetado extends ProcesamientoDef {
 
     // Procesamiento de tipos
     @Override
-    public void procesa(Tipo_Int tipo) {
+    public void procesa(T_Int tipo) {
         // No necesita etiquetado
     }
 
     @Override
-    public void procesa(Tipo_Real tipo) {
+    public void procesa(T_Real tipo) {
         // No necesita etiquetado
     }
 
     @Override
-    public void procesa(Tipo_Bool tipo) {
+    public void procesa(T_Bool tipo) {
         // No necesita etiquetado
     }
 
     @Override
-    public void procesa(Tipo_String tipo) {
+    public void procesa(T_String tipo) {
         // No necesita etiquetado
     }
 
     @Override
-    public void procesa(Tipo_Array tipo) {
+    public void procesa(T_Array tipo) {
         tipo.tipo().procesa(this);
     }
 
     @Override
-    public void procesa(Tipo_Pointer tipo) {
+    public void procesa(T_Puntero tipo) {
         tipo.tipo().procesa(this);
     }
 
     @Override
-    public void procesa(Tipo_Record tipo) {
-        tipo.campos().procesa(this);
-    }
-
-    @Override
-    public void procesa(Tipo_Id tipo) {
+    public void procesa(T_Iden tipo) {
         // No necesita etiquetado
     }
 
     // Procesamiento de campos
-    @Override
-    public void procesa(Sin_Campos campos) {
-        // No necesita etiquetado
-    }
 
     @Override
-    public void procesa(Mas_Campos campos) {
+    public void procesa(Mas_Cmp_S campos) {
         campos.campos().procesa(this);
         campos.campo().procesa(this);
     }
 
     @Override
-    public void procesa(Un_Campo campo) {
+    public void procesa(Un_Cmp_S campo) {
         campo.tipo().procesa(this);
     }
 }
