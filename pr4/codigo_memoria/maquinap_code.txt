@@ -65,10 +65,13 @@ gen_code(i_if(exp, prog, ielse)):
     gen_code(exp)
     gen_acc_valor(exp)
     
-    ir_f($.sig) // si es falso saltamos al else
+    emit ir_f($.sig) // si es falso saltamos al else
     gen_code_bloque(prog) //codigo del bloque if
     emit ir_a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
     gen_code(ielse) // codigo del bloque else
+
+gen_code(i_else(prog)):
+    gen_code_bloque(prog)
 
 gen_code(i_while(exp, prog)):
     gen_code(exp)
@@ -285,7 +288,7 @@ gen_code(i_call(id, preals)): //version mejorada abajo del todo
         pform = proc.pforms[id_pform]
 
         emit dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
-        apila_int(pform.dir) //apilamos el tamaño del parámetro
+        emit apila_int(pform.dir) //apilamos el tamaño del parámetro
         emit suma //tenemos en la cima la dirección de comienzo del parámetro
         gen_code(preal) //apilamos el valor/dir de comienzo del parámetro
 
@@ -310,6 +313,7 @@ gen_code_bloque(prog(decs, intrs)):
 gen_code(e_indexado(opnd0, opnd1)):
     gen_code(opnd0) // obtenemos la dirección del array
     gen_code(opnd1) // obtenemos el índice
+	gen_acc_valor(opnd1)
     emit apila_int(opnd0.tipo.tipo.tamaño) //apilamos el tamaño del tipo del array
     emit mul //apilamos el desplazamiento del índice
     emit suma // a la dirección de comenzo del array le sumamos el desplazamiento del índice
