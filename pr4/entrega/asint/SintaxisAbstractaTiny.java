@@ -145,6 +145,38 @@ public class SintaxisAbstractaTiny {
 
     public static class Prog extends Nodo {
 
+        private Bloque bloque;
+
+        public Prog(Bloque bloque) {
+            super();
+            this.bloque = bloque;
+        }
+
+        public String toString() {
+            return "prog(" + bloque + ")";
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        public Bloque bloque() {
+            return this.bloque;
+        }
+
+        @Override
+        public void imprime() {
+            bloque.imprime();
+        }
+
+        @Override
+        public void procesa2(Procesamiento p) {
+            p.procesa2(this);
+        }
+    }
+
+    public static class Bloque extends Nodo {
+
         public void procesa2(Procesamiento p) {
             p.procesa2(this);
         }
@@ -152,7 +184,7 @@ public class SintaxisAbstractaTiny {
         private DecsOpt decs;
         private IntrsOpt intrs;
 
-        public Prog(DecsOpt decs, IntrsOpt intrs) {
+        public Bloque(DecsOpt decs, IntrsOpt intrs) {
             super();
             this.decs = decs;
             this.intrs = intrs;
@@ -167,7 +199,7 @@ public class SintaxisAbstractaTiny {
         }
 
         public String toString() {
-            return "prog(" + decs + "," + intrs + ")";
+            return "bloque(" + decs + "," + intrs + ")";
         }
 
         public void procesa(Procesamiento p) {
@@ -180,16 +212,6 @@ public class SintaxisAbstractaTiny {
             decs.imprime();
             intrs.imprime();
             System.out.println("}");
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -310,16 +332,6 @@ public class SintaxisAbstractaTiny {
             System.out.println(";");
             dec.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Una_Dec extends LDecs {
@@ -351,16 +363,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             dec.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static abstract class Dec extends Nodo {
@@ -376,7 +378,7 @@ public class SintaxisAbstractaTiny {
             throw new UnsupportedOperationException();
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             throw new UnsupportedOperationException();
         }
     }
@@ -456,9 +458,9 @@ public class SintaxisAbstractaTiny {
 
         private String id;
         private PForms pforms;
-        private Prog prog;
+        private Bloque prog;
 
-        public Dec_Proc(String id, PForms pforms, Prog prog) {
+        public Dec_Proc(String id, PForms pforms, Bloque prog) {
             super();
             this.id = id;
             this.pforms = pforms;
@@ -473,7 +475,7 @@ public class SintaxisAbstractaTiny {
             return pforms;
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             return prog;
         }
 
@@ -492,16 +494,6 @@ public class SintaxisAbstractaTiny {
             pforms.imprime();
             System.out.println(")");
             prog.imprime();
-        }
-
-        public void setPrim(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -621,16 +613,6 @@ public class SintaxisAbstractaTiny {
             System.out.println(",");
             pform.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Una_PForm extends LPForms {
@@ -661,16 +643,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             pform.imprime();
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -1290,16 +1262,6 @@ public class SintaxisAbstractaTiny {
             System.out.println(";");
             intr.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Una_Intr extends LIntrs {
@@ -1331,16 +1293,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             intr.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static abstract class Intr extends Nodo {
@@ -1360,7 +1312,7 @@ public class SintaxisAbstractaTiny {
             throw new UnsupportedOperationException();
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             throw new UnsupportedOperationException();
         }
 
@@ -1399,16 +1351,6 @@ public class SintaxisAbstractaTiny {
             System.out.println("@");
             exp.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class I_If extends Intr {
@@ -1418,10 +1360,10 @@ public class SintaxisAbstractaTiny {
         }
 
         private Exp exp;
-        private Prog prog;
+        private Bloque prog;
         private I_Else i_else;
 
-        public I_If(Exp exp, Prog prog, I_Else i_else) {
+        public I_If(Exp exp, Bloque prog, I_Else i_else) {
             super();
             this.exp = exp;
             this.prog = prog;
@@ -1432,7 +1374,7 @@ public class SintaxisAbstractaTiny {
             return exp;
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             return prog;
         }
 
@@ -1455,16 +1397,6 @@ public class SintaxisAbstractaTiny {
             prog.imprime();
             i_else.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class I_While extends Intr {
@@ -1474,9 +1406,9 @@ public class SintaxisAbstractaTiny {
         }
 
         private Exp exp;
-        private Prog prog;
+        private Bloque prog;
 
-        public I_While(Exp exp, Prog prog) {
+        public I_While(Exp exp, Bloque prog) {
             super();
             this.exp = exp;
             this.prog = prog;
@@ -1486,7 +1418,7 @@ public class SintaxisAbstractaTiny {
             return exp;
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             return prog;
         }
 
@@ -1503,16 +1435,6 @@ public class SintaxisAbstractaTiny {
             System.out.println("<while>");
             exp.imprime();
             prog.imprime();
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -1546,16 +1468,6 @@ public class SintaxisAbstractaTiny {
             System.out.println("<read>");
             exp.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class I_Write extends Intr {
@@ -1588,16 +1500,6 @@ public class SintaxisAbstractaTiny {
             System.out.println("<write>");
             exp.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class I_NL extends Intr {
@@ -1621,16 +1523,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println("<nl>");
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -1664,16 +1556,6 @@ public class SintaxisAbstractaTiny {
             System.out.println("<new>");
             exp.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class I_Delete extends Intr {
@@ -1705,16 +1587,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             System.out.println("<delete>");
             exp.imprime();
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -1755,16 +1627,6 @@ public class SintaxisAbstractaTiny {
             System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
             preals.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class I_Prog extends Intr {
@@ -1773,14 +1635,14 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Prog prog;
+        private Bloque prog;
 
-        public I_Prog(Prog prog) {
+        public I_Prog(Bloque prog) {
             super();
             this.prog = prog;
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             return prog;
         }
 
@@ -1796,16 +1658,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             prog.imprime();
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static abstract class I_Else extends Nodo {
@@ -1813,7 +1665,7 @@ public class SintaxisAbstractaTiny {
             super();
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             throw new UnsupportedOperationException();
         }
     }
@@ -1824,14 +1676,14 @@ public class SintaxisAbstractaTiny {
             p.procesa2(this);
         }
 
-        private Prog prog;
+        private Bloque prog;
 
-        public Si_Else(Prog prog) {
+        public Si_Else(Bloque prog) {
             super();
             this.prog = prog;
         }
 
-        public Prog prog() {
+        public Bloque prog() {
             return prog;
         }
 
@@ -2113,16 +1965,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, "=", opnd1, 1, 0, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Comp extends ExpBin {
@@ -2151,16 +1993,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "==", opnd1, 1, 2, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2191,16 +2023,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, "!=", opnd1, 1, 2, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Menor extends ExpBin {
@@ -2229,16 +2051,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "<", opnd1, 1, 2, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2269,16 +2081,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, ">", opnd1, 1, 2, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class MenorIgual extends ExpBin {
@@ -2307,16 +2109,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "<=", opnd1, 1, 2, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2347,16 +2139,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, ">=", opnd1, 1, 2, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Suma extends ExpBin {
@@ -2385,16 +2167,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "+", opnd1, 2, 3, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2425,16 +2197,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, "-", opnd1, 3, 3, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class And extends ExpBin {
@@ -2463,16 +2225,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "<and>", opnd1, 4, 3, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2503,16 +2255,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, "<or>", opnd1, 4, 4, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Mul extends ExpBin {
@@ -2541,16 +2283,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "*", opnd1, 4, 5, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2581,16 +2313,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeExpBin(opnd0, "/", opnd1, 4, 5, leeFila(), leeCol());
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Porcentaje extends ExpBin {
@@ -2619,16 +2341,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeExpBin(opnd0, "%", opnd1, 4, 5, leeFila(), leeCol());
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2661,16 +2373,6 @@ public class SintaxisAbstractaTiny {
             imprimeOpnd(opnd, 5);
 
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Negado extends ExpUni {
@@ -2700,16 +2402,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             System.out.println("<not>$f:" + leeFila() + ",c:" + leeCol() + "$");
             imprimeOpnd(opnd, 5);
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2742,16 +2434,6 @@ public class SintaxisAbstractaTiny {
             System.out.println("[$f:" + leeFila() + ",c:" + leeCol() + "$");
             imprimeOpnd(opnd1, 0);
             System.out.println("]");
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2797,16 +2479,6 @@ public class SintaxisAbstractaTiny {
             System.out.println(".");
             System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class Indireccion extends ExpUni {
@@ -2836,16 +2508,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeOpnd(opnd, 6);
             System.out.println("^$f:" + leeFila() + ",c:" + leeCol() + "$");
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -2948,16 +2610,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             System.out.println("<true>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     public static class False extends Exp {
@@ -2986,16 +2638,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println("<false>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -3032,16 +2674,6 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println(string + "$f:" + leeFila() + ",c:" + leeCol() + "$");
-        }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
         }
     }
 
@@ -3108,21 +2740,15 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             System.out.println("<null>" + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
-
-        public void setPrim(int etqFinal) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setPrim'");
-        }
-
-        public void setSig(int nuevaEtiqueta) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'setSig'");
-        }
     }
 
     // Constructoras
-    public Prog prog(DecsOpt decs, IntrsOpt intrs) {
-        return new Prog(decs, intrs);
+    public Prog prog(Bloque bloque) {
+        return new Prog(bloque);
+    }
+
+    public Bloque bloque(DecsOpt decs, IntrsOpt intrs) {
+        return new Bloque(decs, intrs);
     }
 
     public DecsOpt si_decs(LDecs decs) {
@@ -3149,7 +2775,7 @@ public class SintaxisAbstractaTiny {
         return new Dec_Tipo(tipo, id);
     }
 
-    public Dec dec_proc(String id, PForms pforms, Prog prog) {
+    public Dec dec_proc(String id, PForms pforms, Bloque prog) {
         return new Dec_Proc(id, pforms, prog);
     }
 
@@ -3257,11 +2883,11 @@ public class SintaxisAbstractaTiny {
         return new I_Eval(exp);
     }
 
-    public Intr i_if(Exp exp, Prog prog, I_Else ielse) {
+    public Intr i_if(Exp exp, Bloque prog, I_Else ielse) {
         return new I_If(exp, prog, ielse);
     }
 
-    public Intr i_while(Exp exp, Prog prog) {
+    public Intr i_while(Exp exp, Bloque prog) {
         return new I_While(exp, prog);
     }
 
@@ -3289,11 +2915,11 @@ public class SintaxisAbstractaTiny {
         return new I_Call(id, preals);
     }
 
-    public Intr i_prog(Prog prog) {
+    public Intr i_prog(Bloque prog) {
         return new I_Prog(prog);
     }
 
-    public I_Else si_else(Prog prog) {
+    public I_Else si_else(Bloque prog) {
         return new Si_Else(prog);
     }
 

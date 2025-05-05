@@ -88,7 +88,8 @@ public class Main {
 		}
 
 		Vinculado vinculado = new Vinculado();
-		if (vinculado.vincula(prog).hayErrores()) {
+		prog.procesa(vinculado);
+		if (vinculado.hayErrores()) {
 			for (ErrorProcesamiento e : vinculado.errores()) {
 				System.out.println(e.toStringJuez());
 			}
@@ -96,7 +97,8 @@ public class Main {
 		}
 
 		Pretipado pretipado = new Pretipado();
-		if (pretipado.pretipa(prog).hayErrores()) {
+		prog.procesa(pretipado);
+		if (pretipado.hayErrores()) {
 			for (ErrorProcesamiento e : pretipado.errores()) {
 				System.out.println(e.toStringJuez());
 			}
@@ -104,7 +106,8 @@ public class Main {
 		}
 
 		Tipado tipado = new Tipado();
-		if (tipado.tipar(prog).hayErrores()) {
+		prog.procesa(tipado);
+		if (tipado.hayErrores()) {
 			for (ErrorProcesamiento e : tipado.errores()) {
 				System.out.println(e.toStringJuez());
 			}

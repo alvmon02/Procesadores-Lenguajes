@@ -14,11 +14,6 @@ import errores_procesamiento.ErrorTipado;
 
 public class Tipado extends ProcesamientoDef {
 
-    public Tipado tipar(Prog prog) {
-        prog.procesa(this);
-        return this;
-    }
-
     private static class Compatibilizador {
 
         private static Set<ParTipos> yaCompatibles;
@@ -153,9 +148,15 @@ public class Tipado extends ProcesamientoDef {
 
     @Override
     public void procesa(Prog prog) {
-        prog.decs().procesa(this);
-        prog.intrs().procesa(this);
-        prog.ponTipo(ambos_ok(prog.decs().tipo(), prog.intrs().tipo()));
+        prog.bloque().procesa(this);
+        prog.ponTipo(prog.bloque().tipo());
+    }
+
+    @Override
+    public void procesa(Bloque bloque) {
+        bloque.decs().procesa(this);
+        bloque.intrs().procesa(this);
+        bloque.ponTipo(ambos_ok(bloque.decs().tipo(), bloque.intrs().tipo()));
     }
 
     @Override

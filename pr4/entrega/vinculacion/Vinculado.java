@@ -79,16 +79,16 @@ public class Vinculado extends ProcesamientoDef {
         this.tablaSimbolos = new TablaSimbolos();
     }
 
-    public Vinculado vincula(Prog prog) {
-        procesa(prog);
-        return this;
+    @Override
+    public void procesa(Prog prog) {
+        prog.bloque().procesa(this);
     }
 
     @Override
-    public void procesa(Prog prog) {
+    public void procesa(Bloque bloque) {
         this.tablaSimbolos.abreAmbito();
-        prog.decs().procesa(this);
-        prog.intrs().procesa(this);
+        bloque.decs().procesa(this);
+        bloque.intrs().procesa(this);
         this.tablaSimbolos.cierraAmbito();
     }
 

@@ -37,15 +37,15 @@ public class Pretipado extends ProcesamientoDef {
         variablesDeclaradas.pop();
     }
 
-    public Pretipado pretipa(Prog prog) {
-        procesa(prog);
-        return this;
+    @Override
+    public void procesa(Prog prog) {
+        prog.bloque().procesa(this);
     }
 
     @Override
-    public void procesa(Prog prog) {
-        prog.decs().procesa(this);
-        prog.intrs().procesa(this);
+    public void procesa(Bloque bloque) {
+        bloque.decs().procesa(this);
+        bloque.intrs().procesa(this);
     }
 
     @Override

@@ -9,6 +9,12 @@ public class ProcesamientoDef implements Procesamiento {
     public void procesa2(Prog prog) {
     }
 
+    public void procesa(Bloque bloque) {
+    }
+
+    public void procesa2(Bloque bloque) {
+    }
+
     public void procesa(Si_Decs decs) {
     }
 
@@ -436,8 +442,7 @@ public class ProcesamientoDef implements Procesamiento {
     }
 
     @SuppressWarnings("rawtypes")
-    public
-    static boolean claseDe(Object o, Class c) {
+    public static boolean claseDe(Object o, Class c) {
         return o.getClass() == c;
     }
 }

@@ -7,6 +7,10 @@ public interface Procesamiento {
 
     void procesa2(Prog prog);
 
+    void procesa(Bloque bloque);
+
+    void procesa2(Bloque bloque);
+
     void procesa(Si_Decs decs);
 
     void procesa2(Si_Decs decs);
