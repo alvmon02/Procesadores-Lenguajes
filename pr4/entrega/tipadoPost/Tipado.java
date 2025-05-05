@@ -173,13 +173,18 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Mas_Decs decs) {
         decs.ldecs().procesa(this);
         decs.dec().procesa(this);
-        decs.ponTipo(ambos_ok(decs.ldecs().tipo(), decs.dec().tipo()));
+        decs.ponTipo(ambos_ok(decs.ldecs().tipo(),
+                claseDe(decs.dec().tipo(), T_Error.class) ? new T_Error() : new T_Ok()));
     }
 
     @Override
     public void procesa(Una_Dec dec) {
         dec.dec().procesa(this);
-        dec.ponTipo(dec.dec().tipo());
+        if (claseDe(dec.dec().tipo(), T_Error.class)) {
+            dec.ponTipo(new T_Error());
+        } else {
+            dec.ponTipo(new T_Ok());
+        }
     }
 
     @Override
@@ -729,5 +734,4 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Null exp) {
         exp.ponTipo(new T_Null());
     }
-
 }
