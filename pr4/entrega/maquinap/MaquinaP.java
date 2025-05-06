@@ -569,7 +569,7 @@ public class MaquinaP {
    public Instruccion and() {return IAND;}
    public Instruccion or() {return E_OR;}
    public Instruccion div() {return E_DIV;}
-   public Instruccion resto() {return E_PORCENTAJE;}
+   public Instruccion porcentaje() {return E_PORCENTAJE;}
    public Instruccion geq() {return E_GEQ;}
    public Instruccion leq() {return E_LEQ;}
    public Instruccion gt() {return E_GT;}
