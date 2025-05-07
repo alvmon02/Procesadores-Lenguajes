@@ -24,11 +24,11 @@ public class etiquetado extends ProcesamientoDef {
     private void procesarSubPendientes() {
         while (!subPendientes.empty()) {
             Dec_Proc sub = subPendientes.pop();
-            sub.setPrim(nuevaEtiqueta());
+            sub.ponPrim(nuevaEtiqueta());
             sub.pforms().procesa(this);
             sub.prog().procesa(this);
             etqFinal += 2;
-            sub.setSig(nuevaEtiqueta());
+            sub.ponSig(nuevaEtiqueta());
         }
     }
 
@@ -43,11 +43,11 @@ public class etiquetado extends ProcesamientoDef {
     // Procesamiento del programa principal
     @Override
     public void procesa(Prog prog) {
-        prog.setPrim(etqFinal);
-        recolectaSubs(prog.decs());
-        prog.intrs().procesa(this);
+        prog.ponPrim(etqFinal);
+        recolectaSubs(prog.bloque().decs());
+        prog.bloque().intrs().procesa(this);
         procesarSubPendientes();
-        prog.setSig(nuevaEtiqueta());
+        prog.ponSig(nuevaEtiqueta());
     }
 
     // Procesamiento de declaraciones
@@ -58,17 +58,17 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Mas_Decs mas_decs) {
-        mas_decs.setPrim(etqFinal);
+        mas_decs.ponPrim(etqFinal);
         mas_decs.ldecs().procesa(this);
         mas_decs.dec().procesa(this);
-        mas_decs.setSig(etqFinal);
+        mas_decs.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Una_Dec una_dec) {
-        una_dec.setPrim(etqFinal);
+        una_dec.ponPrim(etqFinal);
         una_dec.dec().procesa(this);
-        una_dec.setSig(etqFinal);
+        una_dec.ponSig(etqFinal);
     }
 
     @Override
@@ -94,17 +94,17 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Mas_PForms mas_pforms) {
-        mas_pforms.setPrim(etqFinal);
+        mas_pforms.ponPrim(etqFinal);
         mas_pforms.pforms().procesa(this);
         mas_pforms.pform().procesa(this);
-        mas_pforms.setSig(etqFinal);
+        mas_pforms.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Una_PForm una_pform) {
-        una_pform.setPrim(etqFinal);
+        una_pform.ponPrim(etqFinal);
         una_pform.pform().procesa(this);
-        una_pform.setSig(etqFinal);
+        una_pform.ponSig(etqFinal);
     }
 
     // Procesamiento de instrucciones
@@ -115,32 +115,32 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Mas_Intrs mas_intrs) {
-        mas_intrs.setPrim(etqFinal);
+        mas_intrs.ponPrim(etqFinal);
         mas_intrs.intrs().procesa(this);
         mas_intrs.intr().procesa(this);
-        mas_intrs.setSig(etqFinal);
+        mas_intrs.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Una_Intr una_intr) {
-        una_intr.setPrim(etqFinal);
+        una_intr.ponPrim(etqFinal);
         una_intr.intr().procesa(this);
-        una_intr.setSig(etqFinal);
+        una_intr.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(I_Eval i_eval) {
-        i_eval.setPrim(etqFinal);
+        i_eval.ponPrim(etqFinal);
         i_eval.exp().procesa(this);
         if (esDesignador(i_eval.exp())) {
             etqFinal++;
         }
-        i_eval.setSig(nuevaEtiqueta());
+        i_eval.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_If i_if) {
-        i_if.setPrim(etqFinal);
+        i_if.ponPrim(etqFinal);
         i_if.exp().procesa(this);
         if (esDesignador(i_if.exp())) {
             etqFinal++;
@@ -149,7 +149,7 @@ public class etiquetado extends ProcesamientoDef {
         etqFinal++;
         i_if.i_else().procesa(this);
         etqFinal++;
-        i_if.setSig(nuevaEtiqueta());
+        i_if.ponSig(nuevaEtiqueta());
     }
 
     @Override
@@ -164,65 +164,65 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(I_While i_while) {
-        i_while.setPrim(etqFinal);
+        i_while.ponPrim(etqFinal);
         i_while.exp().procesa(this);
         if (esDesignador(i_while.exp())) {
             etqFinal++;
         }
         i_while.prog().procesa(this);
         etqFinal++;
-        i_while.setSig(nuevaEtiqueta());
+        i_while.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_Read i_read) {
-        i_read.setPrim(etqFinal);
+        i_read.ponPrim(etqFinal);
         i_read.exp().procesa(this);
-        i_read.setSig(nuevaEtiqueta());
+        i_read.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_Write i_write) {
-        i_write.setPrim(etqFinal);
+        i_write.ponPrim(etqFinal);
         i_write.exp().procesa(this);
-        i_write.setSig(nuevaEtiqueta());
+        i_write.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_NL i_nl) {
-        i_nl.setPrim(etqFinal);
-        i_nl.setSig(nuevaEtiqueta());
+        i_nl.ponPrim(etqFinal);
+        i_nl.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_New i_new) {
-        i_new.setPrim(etqFinal);
+        i_new.ponPrim(etqFinal);
         i_new.exp().procesa(this);
-        i_new.setSig(nuevaEtiqueta());
+        i_new.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_Delete i_delete) {
-        i_delete.setPrim(etqFinal);
+        i_delete.ponPrim(etqFinal);
         i_delete.exp().procesa(this);
-        i_delete.setSig(nuevaEtiqueta());
+        i_delete.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_Call i_call) {
-        i_call.setPrim(etqFinal);
+        i_call.ponPrim(etqFinal);
         i_call.exp().procesa(this);
         etqFinal++;
         i_call.preals().procesa(this);
         etqFinal++;
-        i_call.setSig(nuevaEtiqueta());
+        i_call.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(I_Prog i_prog) {
-        i_prog.setPrim(etqFinal);
+        i_prog.ponPrim(etqFinal);
         i_prog.prog().procesa(this);
-        i_prog.setSig(nuevaEtiqueta());
+        i_prog.ponSig(nuevaEtiqueta());
     }
 
     // Procesamiento de parámetros reales
@@ -254,159 +254,159 @@ public class etiquetado extends ProcesamientoDef {
     // Procesamiento completo de expresiones
     @Override
     public void procesa(Asig exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Suma exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Resta exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Mul exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Div exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Porcentaje exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Index exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
         if (esDesignador(exp)) {
             etqFinal++;
         }
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Acceso exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         if (esDesignador(exp)) {
             etqFinal++;
         }
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Indireccion exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         if (esDesignador(exp)) {
             etqFinal++;
         }
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Negativo exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Negado exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Comp exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Dist exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Menor exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Mayor exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(MenorIgual exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(MayorIgual exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(And exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Or exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     // Procesamiento de literales y variables
@@ -430,29 +430,29 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(True exp) {
-        exp.setPrim(etqFinal);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponPrim(etqFinal);
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(False exp) {
-        exp.setPrim(etqFinal);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponPrim(etqFinal);
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Null exp) {
-        exp.setPrim(etqFinal);
-        exp.setSig(nuevaEtiqueta());
+        exp.ponPrim(etqFinal);
+        exp.ponSig(nuevaEtiqueta());
     }
 
     @Override
     public void procesa(Exp exp) {
-        exp.setPrim(etqFinal);
+        exp.ponPrim(etqFinal);
         if (esDesignador(exp)) {
             etqFinal++;
         }
-        exp.setSig(nuevaEtiqueta());
+        exp.ponSig(nuevaEtiqueta());
     }
 
     // Procesamiento de tipos
@@ -495,8 +495,8 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Mas_Cmp_S campos) {
-        campos.campos().procesa(this);
-        campos.campo().procesa(this);
+        campos.camposS().procesa(this);
+        campos.campoS().procesa(this);
     }
 
     @Override
