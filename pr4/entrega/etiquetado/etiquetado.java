@@ -81,11 +81,6 @@ public class etiquetado extends ProcesamientoDef {
         dec_var.tipo().procesa(this);
     }
 
-    @Override
-    public void procesa(Dec_Tipo dec_tipo) {
-        // No necesita etiquetado
-    }
-
     // Procesamiento de parámetros formales
     @Override
     public void procesa(Si_PForms si_pforms) {
@@ -254,50 +249,32 @@ public class etiquetado extends ProcesamientoDef {
     // Procesamiento completo de expresiones
     @Override
     public void procesa(Asig exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Suma exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Resta exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Mul exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Div exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Porcentaje exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
@@ -347,66 +324,42 @@ public class etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Comp exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Dist exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Menor exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Mayor exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(MenorIgual exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(MayorIgual exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(And exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     @Override
     public void procesa(Or exp) {
-        exp.ponPrim(etqFinal);
-        exp.opnd0().procesa(this);
-        exp.opnd1().procesa(this);
-        exp.ponSig(nuevaEtiqueta());
+        procesa_opnds(exp);
     }
 
     // Procesamiento de literales y variables
@@ -502,5 +455,12 @@ public class etiquetado extends ProcesamientoDef {
     @Override
     public void procesa(Un_Cmp_S campo) {
         campo.tipo().procesa(this);
+    }
+    //Funciones auxiliares
+    public void procesa_opnds(Exp exp){
+        exp.ponPrim(etqFinal);
+        exp.opnd0().procesa(this);
+        exp.opnd1().procesa(this);
+        exp.ponSig(nuevaEtiqueta());
     }
 }
