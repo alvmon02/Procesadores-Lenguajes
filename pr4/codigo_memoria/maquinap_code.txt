@@ -202,25 +202,38 @@ gen_code(i_call(id, preals)): //version mejorada abajo del todo
 
     id_pform = 0
 
-    for preal in preals:
-        pform = proc.pforms[id_pform]
 
-        emit dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
+    gen_code_params(proc.pforms, preals)
+    ir_a(proc.prim)
+
+gen_code_params(no_pforms(), no_preals()):
+    noop
+
+gen_code_params(si_pforms(pforms), si_preals(preals)):
+    gen_code_params(pforms, preals)
+
+gen_code_params(mas_pforms(pforms, pform), mas_preals(preals, exp)):
+    gen_code_params(pforms, preals)
+    gen_code_params(pform, exp)
+
+gen_code_params(una_pform(pform), un_preals(exp)):
+    gen_code_params(pform, exp)
+
+gen_code_params(pform(tipo, ref, id), exp):
+    emit dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
         emit apila_int(pform.dir) //apilamos el tamaño del parámetro
         emit suma //tenemos en la cima la dirección de comienzo del parámetro
-        gen_code(preal) //apilamos el valor/dir de comienzo del parámetro
+        gen_code(exp) //apilamos el valor/dir de comienzo del parámetro
 
-        if pform.ref == no_ref():
-            if es_designador(preal): // param formal por valor y real es designador
+        if ref == no_ref():
+            if es_designador(exp): // param formal por valor y real es designador
                 // TODO cuando pasamos un entero a un real hay que hacer lo de int2real
-                emit copia(pform.tipo.tamaño) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
+                emit copia(tipo.tamaño) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
             else:
                 emit desapila_ind() // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
         else:
             emit desapila_ind() // como ambos son punteros, en cima tenemos el valor apuntado por el preal, que se guarda en la dirección del pform 
-    
-        id_pform = id_pform + 1
-    ir_a(proc.prim)
+
 
 gen_code(i_bloque(bloque)):
     gen_code(bloque)
