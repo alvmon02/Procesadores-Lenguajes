@@ -162,82 +162,43 @@ etiquetado(e_asig(opnd0, opnd1)):
 	$.sig = etq_final
 
 etiquetado(e_comp(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_dist(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_lt(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_gt(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_leq(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_geq(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_suma(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_resta(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_and(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_or(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_mul(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_div(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_porcentaje(opnd0, opnd1)):
-	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_negativo(opnd)):
 	$.prim = etq_final
@@ -278,39 +239,25 @@ etiquetado(e_indexado(opnd0, opnd1)):
 	$.sig = etq_final
 
 etiquetado(e_lit_ent(num))
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e():
 
 etiquetado(e_lit_real(num))
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e():
 
 etiquetado(e_true()):
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e():
 
 etiquetado(e_false()):
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e():
 
 etiquetado(e_string(string)):
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e():
 
 etiquetado(e_iden(id)):
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	$etiquetado_e():
 
-etiquetado(_null()):
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+etiquetado(e_null()):
+	etiquetado_e():
 
 //Funciones auxiliares
 
@@ -325,3 +272,15 @@ etiquetado_paso_param(proc(id, pforms, bloque), preal):
 	etq_final+= 3
 	etiquetado(preal)
 	etq_final++
+
+etiquetado_opnds(opnd1,opnd2): 
+	$.prim = etq_final
+	etiquetado_operands(opnd0, opnd1)
+	etq_final++
+	$.sig = etq_final
+
+etiquetado_e():
+	$.prim = etq_final
+	etq_final++
+	$.sig = etq_final
+
