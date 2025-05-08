@@ -175,32 +175,75 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(I_Call i_Call) {
-        m.emit(m.activa(i_Call.vinculo().nivel(), i_Call.vinculo().tam(), i_Call.sig())); // Activamos el registro de activación, dejamos en la cima la direccion de comienzo del registro
+        Dec_Proc proc = (Dec_Proc) i_Call.vinculo();
+        m.emit(m.activa(proc.nivel(), proc.tam(), i_Call.sig())); // Activamos el registro de activación
 
-        for (PReals preal : Arrays.asList(i_Call.preals())) {
-            genPasoParam(i_Call.vinculo(), preal); // Generamos el paso de parámetros
-        }
+        genCodeParams(proc.pforms(), i_Call.preals());
 
-        m.emit(m.desapilad(i_Call.vinculo().nivel()));  //desapilamos una direccion de la pila de evaluación (dirección inicio datos) se guarda en display de nivel proc.nivel
-
-        m.emit(m.desactiva(i_Call.vinculo().nivel(), i_Call.vinculo().tam())); // desactivamos el registro de activación dejamos en la cima la dirección de retorno
-        m.emit(m.ir_ind()); // Saltamos a la dirección de retorno del resgistro de activación
+        m.emit(m.ir_a(proc.prim())); // Saltamos a la dirección de inicio del procedimiento
     }
 
-    private void genPasoParam(Proc proc, PReal preal) {
-        m.emit(m.dup()); // Duplicamos la cima (dir de comienzo de los datos del registro de activación) par mantener invariante de que la cima es la dirección de comienzo del registro de activación
-        m.emit(m.apila_int(preal.tamano())); // Apilamos el tamaño del parámetro
-        m.emit(m.suma()); // Tenemos en la cima la dirección de comienzo del parámetro
-        preal.procesa(this); // Generamos el código para el valor/dirección del parámetro
-
-        if (proc.pform().ref() instanceof No_Ref) {
-            if (es_designador(preal)) { // Parámetro formal por valor y real es designador
-                m.emit(m.copia(proc.pform().tipo().tamano())); //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
+    private void genCodeParams(PForms pforms, PReals preals) {
+        if (pforms instanceof No_PForms && preals instanceof No_PReals) {
+            handleNoPFormsAndNoPReals();
+        } else {
+            if (claseDe(pforms, Si_PForms.class) && claseDe(preals, Si_PReals.class)) {
+                handleSiPFormsAndSiPReals((Si_PForms) pforms, (Si_PReals) preals);
+            } else if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
+                handleMasPFormsAndMasPReals((Mas_PForms) pforms.pforms(), (Mas_PReals) preals.preals());
+            } else if (claseDe(pforms, Una_PForm.class) && claseDe(preals, Un_PReal.class)) {
+                handleUnaPFormAndUnPReal((Una_PForm) pforms.pforms(), (Un_PReal) preals.preals());
             } else {
-                m.emit(m.desapila_ind()); // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+                throw new IllegalArgumentException("Error: No se puede procesar la combinación de PForms y PReals.");
+            }
+        }
+    }
+
+    
+    private void genCodeParams(LPForms pforms, LPReals preals) {
+        if (claseDe(pforms, No_PForms.class) && claseDe(preals, No_PReals.class)) {
+            handleNoPFormsAndNoPReals();
+        } else if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
+            handleMasPFormsAndMasPReals((Mas_PForms) pforms, (Mas_PReals) preals);
+        } else if (claseDe(pforms, Una_PForm.class) && claseDe(preals, Un_PReal.class)) {
+            handleUnaPFormAndUnPReal((Una_PForm) pforms, (Un_PReal) preals);
+        } else {
+            throw new IllegalArgumentException("Error: No se puede procesar la combinación de PForms y PReals.");
+        }
+    }
+
+    private void handleNoPFormsAndNoPReals() {
+        //no hacemos nada
+    }
+
+    private void handleSiPFormsAndSiPReals(Si_PForms siPforms, Si_PReals siPreals) {
+        genCodeParams(siPforms.pforms(), siPreals.preals());
+    }
+
+
+    private void handleMasPFormsAndMasPReals(Mas_PForms masPforms, Mas_PReals masPreals) {
+        genCodeParams(masPforms.pforms(), masPreals.preals());
+        genCodeParams(masPforms.pform(), masPreals.exp());
+    }
+
+    private void handleUnaPFormAndUnPReal(Una_PForm unaPform, Un_PReal unPreal) {
+        genCodeParams(unaPform.pform(), unPreal.exp());
+    }
+
+    private void genCodeParams(PForm pform, Exp exp) {
+        m.emit(m.dup()); // Duplicamos la cima (dir de comienzo del registro de activación)
+        m.emit(m.apila_int(pform.dir())); // Apilamos la dirección del parámetro
+        m.emit(m.suma()); // Calculamos la dirección de comienzo del parámetro
+        exp.procesa(this); // Generamos el código para el valor/dirección del parámetro
+
+        if (pform.ref() instanceof No_Ref) {
+            if (es_designador(exp)) { // Parámetro formal por valor y real es designador
+                m.emit(m.copia(pform.tipo().tam())); // Copiamos el valor apuntado por el designador
+            } else {
+                m.emit(m.desapila_ind()); // Guardamos el valor en la dirección del parámetro
             }
         } else {
-            if (es_designador(preal)) { // Parámetro formal por referencia y real es designador
+            if (es_designador(exp)) { // Parámetro formal por referencia y real es designador
                 m.emit(m.desapila_ind()); // Guardamos el valor apuntado por el preal en la dirección del pform
             } else {
                 throw new IllegalArgumentException("Error: el parámetro formal es por referencia y el real no es designador.");
