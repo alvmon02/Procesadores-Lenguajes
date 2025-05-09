@@ -115,6 +115,7 @@ public interface ConstructorASTsTinyConstants {
     "<lit_ent>",
     "<lit_real>",
     "<cadena>",
+    "\"$$\"",
     "\"{\"",
     "\"}\"",
     "\"&&\"",

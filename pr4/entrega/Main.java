@@ -54,7 +54,7 @@ public class Main {
 	}
 
 	public static void main_archivo(String[] args) throws FileNotFoundException, IOException, Exception {
-		Reader input = new InputStreamReader(new FileInputStream(args[0]));
+		Reader input = new BISReader(new FileInputStream(args[0]));
 		ejecturarPrograma(input);
 	}
 

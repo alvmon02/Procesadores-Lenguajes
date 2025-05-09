@@ -4,15 +4,12 @@ import c_ast_ascendente.GestionErroresTiny.*;
 import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
 
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 
-		Reader input = new InputStreamReader((System.in));
+		Reader input = new BISReader((System.in));
 
 		if (input.read() == 97) { // Reconocer a
 

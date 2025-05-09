@@ -100,9 +100,11 @@ p_write = [wW][rR][iI][tT][eE]
 p_nl = [nN][lL]
 p_type = [tT][yY][pP][eE]
 p_call = [cC][aA][lL][lL]
+eof = \$
 %%
 {separador}               {}
 {comentario}              {}
+{eof}                    {return ops.unidadEof();}
 {p_int}                   {return ops.unidadP_Int();}
 {p_real}                  {return ops.unidadP_Real();}
 {p_bool}                  {return ops.unidadP_Bool();}

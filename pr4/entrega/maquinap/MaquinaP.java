@@ -151,7 +151,7 @@ public class MaquinaP {
 
         public void ejecuta(ValorStr opnd1, ValorStr opnd2) {
 
-        }
+        }                                                                                                                                                                                                                                                       
     }
 
     private class ISumaEj extends InstruccionBin {
