@@ -1904,7 +1904,7 @@ public class SintaxisAbstractaTiny {
         public abstract int prioridad();
     }
 
-    private static abstract class ExpUni extends Exp {
+    public static abstract class ExpUni extends Exp {
         protected Exp opnd;
 
         public ExpUni(Exp opnd) {
@@ -1917,7 +1917,7 @@ public class SintaxisAbstractaTiny {
         }
     }
 
-    private static abstract class ExpBin extends Exp {
+    public static abstract class ExpBin extends Exp {
         protected Exp opnd0;
         protected Exp opnd1;
 

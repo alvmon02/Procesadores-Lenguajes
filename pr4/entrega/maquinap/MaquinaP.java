@@ -1,7 +1,9 @@
 package maquinap;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Stack;
 
 public class MaquinaP {
@@ -19,6 +21,7 @@ public class MaquinaP {
 
     private GestorMemoriaDinamica gestorMemoriaDinamica;
     private GestorPilaActivaciones gestorPilaActivaciones;
+    private Reader reader;
 
     private abstract class Valor {
 
@@ -283,8 +286,12 @@ public class MaquinaP {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() >= opnd2.valorInt()));
             } else if (opnd1 instanceof ValorStr) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) >= 0));
-            } else {
-                // TODO valor bool
+            } else if(opnd1 instanceof ValorBool) {
+                if(opnd1.valorBool() == opnd2.valorBool() || opnd1.valorBool() == true) {
+                    pilaEvaluacion.push(new ValorBool(true));
+                } else {
+                    pilaEvaluacion.push(new ValorBool(false));
+                }          
             }
             pc++;
         }
@@ -302,10 +309,17 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorReal() <= opnd2.valorReal()));
-            } else {
+            } else if (opnd1 instanceof ValorInt) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() <= opnd2.valorInt()));
+            } else if (opnd1 instanceof ValorStr) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) <= 0));
+            } else if (opnd1 instanceof ValorBool) {
+                if (!opnd1.valorBool() || opnd1.valorBool() == opnd2.valorBool()) {
+                    pilaEvaluacion.push(new ValorBool(true));
+                } else {
+                    pilaEvaluacion.push(new ValorBool(false));
+                }
             }
-            // TODO valor str y valor bool
             pc++;
         }
 
@@ -322,10 +336,17 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorReal() > opnd2.valorReal()));
-            } else {
+            } else if (opnd1 instanceof ValorInt) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() > opnd2.valorInt()));
+            } else if (opnd1 instanceof ValorStr) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) > 0));
+            } else if (opnd1 instanceof ValorBool) {
+                if (opnd1.valorBool() && !opnd2.valorBool()) {
+                    pilaEvaluacion.push(new ValorBool(true));
+                } else {
+                    pilaEvaluacion.push(new ValorBool(false));
+                }
             }
-            // TODO valor str y valor bool
             pc++;
         }
 
@@ -342,10 +363,17 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
-            } else {
+            } else if (opnd1 instanceof ValorInt) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() < opnd2.valorInt()));
+            } else if (opnd1 instanceof ValorStr) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) < 0));
+            } else if (opnd1 instanceof ValorBool) {
+                if (!opnd1.valorBool() && opnd2.valorBool()) {
+                    pilaEvaluacion.push(new ValorBool(true));
+                } else {
+                    pilaEvaluacion.push(new ValorBool(false));
+                }
             }
-            // TODO valor str y valor bool
             pc++;
         }
 
@@ -362,10 +390,17 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorReal() != opnd2.valorReal()));
-            } else {
+            } else if (opnd1 instanceof ValorInt) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() != opnd2.valorInt()));
+            } else if (opnd1 instanceof ValorStr) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) != 0));
+            } else if (opnd1 instanceof ValorBool) {
+                if (opnd1.valorBool() != opnd2.valorBool()) {
+                    pilaEvaluacion.push(new ValorBool(true));
+                } else {
+                    pilaEvaluacion.push(new ValorBool(false));
+                }
             }
-            // TODO valor str y valor bool
             pc++;
         }
 
@@ -382,10 +417,17 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorReal() == opnd2.valorReal()));
-            } else {
+            } else if (opnd1 instanceof ValorInt) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() == opnd2.valorInt()));
+            } else if (opnd1 instanceof ValorStr) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) == 0));
+            } else if (opnd1 instanceof ValorBool) {
+                if (opnd1.valorBool() == opnd2.valorBool()) {
+                    pilaEvaluacion.push(new ValorBool(true));
+                } else {
+                    pilaEvaluacion.push(new ValorBool(false));
+                }
             }
-            // TODO valor str y valor bool
             pc++;
         }
 
@@ -442,17 +484,28 @@ public class MaquinaP {
 
     private class IRead implements Instruccion {
         public void ejecuta() {
-            int valor = 0;
+            String valor = "";
             try {
-                valor = System.in.read();
-                // TODO hay que poner un buffer para leer. Seccion A1 apartado 3 
+                try (Scanner scanner = new Scanner(reader)) {
+                    if (scanner.hasNextInt()) {
+                        valor = String.valueOf(scanner.nextInt());
+                        scanner.nextLine();
+                    } else if (scanner.hasNextFloat()) {
+                        valor = String.valueOf(scanner.nextFloat());
+                        scanner.nextLine();
+                    } else if (scanner.hasNextLine()) {
+                        String strValor = scanner.nextLine();
+                        valor = strValor;
+                    }
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            pilaEvaluacion.push(new ValorInt(valor));
+            pilaEvaluacion.push(new ValorStr(valor));
             pc++;
         }
-
+        
         public String toString() {
             return "read";
         };
@@ -463,7 +516,6 @@ public class MaquinaP {
     private class IWrite implements Instruccion {
         public void ejecuta() {
             Valor opnd = pilaEvaluacion.pop();
-            // TODO aqui lo mismo que en el reed
             System.out.println(opnd.toString());
             pc++;
         }
@@ -930,10 +982,11 @@ public class MaquinaP {
     private int tamheap;
     private int ndisplays;
 
-    public MaquinaP(int tamdatos, int tampila, int tamheap, int ndisplays) {
+    public MaquinaP(Reader buffer, int tamdatos, int tampila, int tamheap, int ndisplays) {
         this.tamdatos = tamdatos;
         this.tamheap = tamheap;
         this.ndisplays = ndisplays;
+        this.reader = buffer;
         this.codigoP = new ArrayList<>();
         pilaEvaluacion = new Stack<>();
         datos = new Valor[tamdatos + tampila + tamheap];
