@@ -1,4 +1,5 @@
 package cod_maquina_p;
+
 import java.util.Arrays;
 
 import asint.ProcesamientoDef;
@@ -6,14 +7,14 @@ import asint.SintaxisAbstractaTiny;
 import asint.SintaxisAbstractaTiny.*;
 import maquinap.*;
 
-public class cod_maquina_p extends ProcesamientoDef{
+public class cod_maquina_p extends ProcesamientoDef {
 
     private boolean es_designador(SintaxisAbstractaTiny.Exp exp) {
-        
+
         return false;
     }
 
-    private MaquinaP m = new MaquinaP(5,10,10,2); // habrá que inicializarla con los params correctos
+    private MaquinaP m = new MaquinaP(5, 10, 10, 2); // habrá que inicializarla con los params correctos
 
     public void procesa(Prog prog) {
         prog.bloque().procesa(this);
@@ -41,75 +42,8 @@ public class cod_maquina_p extends ProcesamientoDef{
         dec.procesa(this);
     }
 
-    public void procesa(Dec_Var dec_Var) {
-    }
-
-    public void procesa(Dec_Tipo dec_Tipo) {
-    }
-
-    public void procesa(Dec_Proc dec_Proc) {
-
-    }
-
-    public void procesa(Si_PForms si_PForms) {
-    }
-
-    public void procesa(No_PForms no_PForms) {
-    }
-
-    public void procesa(Mas_PForms mas_PForms) {
-    }
-
-    public void procesa(Una_PForm una_PForm) {
-    }
-
-    public void procesa(PForm pform) {
-    }
-
-    public void procesa(Si_Ref si_Ref) {
-    }
-
-    public void procesa(No_Ref no_Ref) {
-    }
-
-    public void procesa(T_Iden tIden) {
-    }
-
-    public void procesa(T_String tstring) {
-    }
-
-    public void procesa(T_Int tint) {
-    }
-
-    public void procesa(T_Bool tbool) {
-    }
-
-    public void procesa(T_Real treal) {
-    }
-
-    public void procesa(T_Array tArray) {
-    }
-
-    public void procesa(T_Puntero tPuntero) {
-    }
-
-    public void procesa(T_Struct tStruct) {
-    }
-
-    public void procesa(Mas_Cmp_S mas_Cmp_S) {
-    }
-
-    public void procesa(Un_Cmp_S un_Cmp_S) {
-    }
-
-    public void procesa(CampoS campoS) {
-    }
-
     public void procesa(Si_Intrs si_Intrs) {
         si_Intrs.intrs().procesa(this);
-    }
-
-    public void procesa(No_Intrs no_Intrs) {
     }
 
     public void procesa(Mas_Intrs mas_Intrs) {
@@ -130,8 +64,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         i_If.exp().procesa(this);
         if (es_designador(i_If.exp())) {
             m.emit(m.apila_ind());
-        }
-        else{
+        } else {
             m.emit(m.ir_f(i_If.sig()));
             i_If.prog().procesa(this);
             m.emit(m.ir_a(i_If.fin()));
@@ -143,8 +76,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         i_While.exp().procesa(this);
         if (es_designador(i_While.exp())) {
             m.emit(m.apila_ind());
-        }
-        else{
+        } else {
             m.emit(m.ir_f(i_While.sig()));
             i_While.prog().procesa(this);
             m.emit(m.ir_a(i_While.prim()));
@@ -154,29 +86,32 @@ public class cod_maquina_p extends ProcesamientoDef{
     public void procesa(I_Read i_Read) {
         i_Read.exp().procesa(this); // dirección de lectura se deja en la cima
         m.emit(m.read()); // lee el valor y se guarda en la cima
-        m.emit(m.desapila_ind()); //guarda la cima en la dirección de la subcima
+        m.emit(m.desapila_ind()); // guarda la cima en la dirección de la subcima
     }
 
     public void procesa(I_Write i_Write) {
-        i_Write.exp().procesa(this); //apilamos el valor a escribir
-        if(es_designador(i_Write.exp())){ // si el valor es una direccion
-            m.emit(m.apila_ind());  // apilamos el valor de la dirección
+        i_Write.exp().procesa(this); // apilamos el valor a escribir
+        if (es_designador(i_Write.exp())) { // si el valor es una direccion
+            m.emit(m.apila_ind()); // apilamos el valor de la dirección
         }
         m.emit(m.write()); // escribimos el valor de la cima
     }
 
     public void procesa(I_NL i_Nl) {
+        // TODO hay que ver si hace algo, puede que tenga que escribir un salto de línea
     }
 
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
-        m.emit(m.alloc(i_New.tipo().tam())); // se aisgna espacio desde la posicion de la cima. Tamaño asignado el del tipo
+        m.emit(m.alloc(i_New.tipo().tam())); // se aisgna espacio desde la posicion de la cima. Tamaño asignado el del
+                                             // tipo
     }
 
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         m.emit(m.apila_ind());
-        m.emit(m.dealloc(i_Delete.tipo().tam())); // desapila la cima que tiene la direccion de inicio y desde esa pos se libera el tamaño del tipo
+        m.emit(m.dealloc(i_Delete.tipo().tam())); // desapila la cima que tiene la direccion de inicio y desde esa pos
+                                                  // se libera el tamaño del tipo
     }
 
     public void procesa(I_Call i_Call) {
@@ -204,10 +139,9 @@ public class cod_maquina_p extends ProcesamientoDef{
         }
     }
 
-    
     private void genCodeParams(LPForms pforms, LPReals preals) {
         if (claseDe(pforms, No_PForms.class) && claseDe(preals, No_PReals.class)) {
-            handleNoPFormsAndNoPReals();
+            return; // no hacemos nada
         } else if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
             handleMasPFormsAndMasPReals((Mas_PForms) pforms, (Mas_PReals) preals);
         } else if (claseDe(pforms, Una_PForm.class) && claseDe(preals, Un_PReal.class)) {
@@ -217,14 +151,9 @@ public class cod_maquina_p extends ProcesamientoDef{
         }
     }
 
-    private void handleNoPFormsAndNoPReals() {
-        //no hacemos nada
-    }
-
     private void handleSiPFormsAndSiPReals(Si_PForms siPforms, Si_PReals siPreals) {
         genCodeParams(siPforms.pforms(), siPreals.preals());
     }
-
 
     private void handleMasPFormsAndMasPReals(Mas_PForms masPforms, Mas_PReals masPreals) {
         genCodeParams(masPforms.pforms(), masPreals.preals());
@@ -251,52 +180,46 @@ public class cod_maquina_p extends ProcesamientoDef{
             if (es_designador(exp)) { // Parámetro formal por referencia y real es designador
                 m.emit(m.desapila_ind()); // Guardamos el valor apuntado por el preal en la dirección del pform
             } else {
-                throw new IllegalArgumentException("Error: el parámetro formal es por referencia y el real no es designador.");
+                throw new IllegalArgumentException(
+                        "Error: el parámetro formal es por referencia y el real no es designador.");
             }
         }
     }
 
-
     public void procesa(I_Prog i_Prog) {
+        // TODO habra que hacer algo
     }
 
     public void procesa(Si_Else si_Else) {
-    }
-
-    public void procesa(No_Else no_Else) {
-    }
-
-    public void procesa(Si_PReals si_PReals) {
-    }
-
-    public void procesa(No_PReals no_PReals) {
-    }
-
-    public void procesa(Mas_PReals mas_PReals) {
-    }
-
-    public void procesa(Un_PReal un_PReal) {
+        // TODO habra que hacer algo
     }
 
     public void procesa(Asig exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
 
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) { //asignación de un int a un real
+        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) { // asignación
+                                                                                                           // de un int
+                                                                                                           // a un real
             if (es_designador(exp.opnd1())) { // si el real es un designador
-                m.emit(m.apila_ind()); //apilamos el valor apuntado por el designador
-                m.emit(m.int2real()); //convertimos el valor de la cima a real
-                m.emit(m.desapila_ind()); //guardamos el valor convertido a int en la dirección de opnd0
+                m.emit(m.apila_ind()); // apilamos el valor apuntado por el designador
+                m.emit(m.int2real()); // convertimos el valor de la cima a real
+                m.emit(m.desapila_ind()); // guardamos el valor convertido a int en la dirección de opnd0
             }
-        } else { 
+        } else {
             if (es_designador(exp.opnd1())) {
-                m.emit(m.copia(exp.opnd1().tipo().tam())); 
+                m.emit(m.copia(exp.opnd1().tipo().tam()));
             } else {
-                m.emit(m.desapila_ind()); // coge la cima(valor que se quiere asignar), la subcima (dirección de la exp0) y se le asigna el valor
+                m.emit(m.desapila_ind()); // coge la cima(valor que se quiere asignar), la subcima (dirección de la
+                                          // exp0) y se le asigna el valor
             }
         }
     }
 
+    // TODO hacer una funcion que sea preparar los dos operandos o algo similar que
+    // haga toda esa parte, que sino es muy repetitivo el código.
+    // TODO ademas, se puede comprobar en todo si es entero/real porque si no lo
+    // soporta esa operacion, ya hemos dado error en tipado
     public void procesa(Comp exp) {
         exp.opnd0().procesa(this);
 
@@ -320,6 +243,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.comp()); // Emitimos la instrucción de comparación
     }
 
+    // TODO
     public void procesa(Dist exp) {
         exp.opnd0().procesa(this);
 
@@ -343,6 +267,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.dist()); // Emitimos la instrucción de distinción
     }
 
+    // TODO
     public void procesa(Menor exp) {
         exp.opnd0().procesa(this);
 
@@ -366,11 +291,11 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.lt()); // Emitimos la instrucción de menor que
     }
 
+    // TODO
     public void procesa(Mayor exp) {
         if (es_designador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
-        }
-        else{
+        } else {
             exp.opnd0().procesa(this);
         }
 
@@ -380,8 +305,7 @@ public class cod_maquina_p extends ProcesamientoDef{
 
         if (es_designador(exp.opnd1())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
-        }
-        else{
+        } else {
             exp.opnd1().procesa(this);
         }
 
@@ -391,6 +315,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.gt()); // Emitimos la instrucción de mayor que
     }
 
+    // TODO
     public void procesa(MenorIgual exp) {
         exp.opnd0().procesa(this);
 
@@ -414,6 +339,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.leq()); // Emitimos la instrucción de menor o igual que
     }
 
+    // TODO
     public void procesa(MayorIgual exp) {
         exp.opnd0().procesa(this);
 
@@ -437,6 +363,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.geq()); // Emitimos la instrucción de mayor o igual que
     }
 
+    // TODO
     public void procesa(Suma exp) {
         exp.opnd0().procesa(this);
 
@@ -460,6 +387,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.suma()); // Emitimos la instrucción de suma
     }
 
+    // TODO
     public void procesa(Resta exp) {
         exp.opnd0().procesa(this);
 
@@ -483,6 +411,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.resta()); // Emitimos la instrucción de resta
     }
 
+    // TODO
     public void procesa(And exp) {
         exp.opnd0().procesa(this);
 
@@ -506,6 +435,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.and()); // Emitimos la instrucción de AND
     }
 
+    // TODO
     public void procesa(Or exp) {
         exp.opnd0().procesa(this);
 
@@ -529,6 +459,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.or()); // Emitimos la instrucción de OR
     }
 
+    // TODO
     public void procesa(Mul exp) {
         exp.opnd0().procesa(this);
 
@@ -551,6 +482,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.mul()); // Emitimos la instrucción de multiplicación
     }
 
+    // TODO
     public void procesa(Div exp) {
         exp.opnd0().procesa(this);
 
@@ -574,6 +506,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.div()); // Emitimos la instrucción de división
     }
 
+    // TODO
     public void procesa(Porcentaje exp) {
         exp.opnd0().procesa(this);
 
@@ -597,6 +530,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.porcentaje()); // Emitimos la instrucción de módulo
     }
 
+    // TODO Lo mismo que en la binaria, pero con un solo operando
     public void procesa(Negativo exp) {
         exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
@@ -605,6 +539,7 @@ public class cod_maquina_p extends ProcesamientoDef{
         m.emit(m.negativo()); // Negamos el valor de la cima
     }
 
+    // TODO Lo mismo que en la binaria, pero con un solo operando
     public void procesa(Negado exp) {
         exp.opnd0().procesa(this);
         if (es_designador(exp.opnd0())) {
@@ -616,6 +551,8 @@ public class cod_maquina_p extends ProcesamientoDef{
     public void procesa(Index exp) {
         exp.opnd0().procesa(this); // Obtenemos la dirección del array
         exp.opnd1().procesa(this); // Obtenemos el índice
+        // TODO En caso de que sea una designador que pasa?, le estariamos sumando la
+        // direccion hay que acceder al valor
         m.emit(m.apila_int(exp.opnd0().tipo().tam())); // Apilamos el tamaño del tipo del array
         m.emit(m.mul()); // Apilamos el desplazamiento del índice
         m.emit(m.suma()); // Sumamos el desplazamiento del índice a la dirección de comienzo del array
@@ -656,11 +593,11 @@ public class cod_maquina_p extends ProcesamientoDef{
     }
 
     public void procesa(Iden exp) {
+        // TODO algo habra que hacer aquí hacer lo de procesa_acceso_id de la memoria
     }
 
     public void procesa(Null exp) {
         m.emit(m.apila_int(-1));
     }
-
 
 }
