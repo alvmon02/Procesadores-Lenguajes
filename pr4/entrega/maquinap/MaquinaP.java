@@ -286,12 +286,12 @@ public class MaquinaP {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() >= opnd2.valorInt()));
             } else if (opnd1 instanceof ValorStr) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) >= 0));
-            } else if(opnd1 instanceof ValorBool) {
-                if(opnd1.valorBool() == opnd2.valorBool() || opnd1.valorBool() == true) {
+            } else if (opnd1 instanceof ValorBool) {
+                if (opnd1.valorBool() == opnd2.valorBool() || opnd1.valorBool() == true) {
                     pilaEvaluacion.push(new ValorBool(true));
                 } else {
                     pilaEvaluacion.push(new ValorBool(false));
-                }          
+                }
             }
             pc++;
         }
@@ -494,7 +494,7 @@ public class MaquinaP {
                         valor = String.valueOf(scanner.nextFloat());
                         scanner.nextLine();
                     } else if (scanner.hasNextLine()) {
-                        String strValor = scanner.nextLine();
+                        String strValor = scanner.nextLine(); // TODO revisar que no haya que quitar el \n
                         valor = strValor;
                     }
                 }
@@ -505,7 +505,7 @@ public class MaquinaP {
             pilaEvaluacion.push(new ValorStr(valor));
             pc++;
         }
-        
+
         public String toString() {
             return "read";
         };
