@@ -120,10 +120,8 @@ public class MaquinaP {
         public void ejecuta() {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
-            if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorReal(val1 + val2));
+            if (opnd1 instanceof ValorReal) {
+                pilaEvaluacion.push(new ValorReal(opnd1.valorReal() + opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorInt(opnd1.valorInt() + opnd2.valorInt()));
             }
@@ -141,10 +139,8 @@ public class MaquinaP {
         public void ejecuta() {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
-            if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorReal(val1 * val2));
+            if (opnd1 instanceof ValorReal) {
+                pilaEvaluacion.push(new ValorReal(opnd1.valorReal() * opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorInt(opnd1.valorInt() * opnd2.valorInt()));
             }
@@ -243,10 +239,8 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd2.valorInt() == 0)
                 throw new EAccesoIlegitimo();
-            if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorReal(val1 / val2));
+            if (opnd1 instanceof ValorReal) {
+                pilaEvaluacion.push(new ValorReal(opnd1.valorReal() / opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorInt(opnd1.valorInt() / opnd2.valorInt()));
             }
@@ -264,10 +258,8 @@ public class MaquinaP {
         public void ejecuta() {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
-            if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorReal(val1 - val2));
+            if (opnd1 instanceof ValorReal) {
+                pilaEvaluacion.push(new ValorReal(opnd1.valorReal() - opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorInt(opnd1.valorInt() - opnd2.valorInt()));
             }
@@ -285,12 +277,14 @@ public class MaquinaP {
         public void ejecuta() {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
-            if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorBool(val1 >= val2));
-            } else {
+            if (opnd1 instanceof ValorReal) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() >= opnd2.valorReal()));
+            } else if (opnd1 instanceof ValorInt) {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() >= opnd2.valorInt()));
+            } else if (opnd1 instanceof ValorStr) {
+                pilaEvaluacion.push(new ValorBool(opnd1.valorStr().compareTo(opnd2.valorStr()) >= 0));
+            } else {
+                // TODO valor bool
             }
             pc++;
         }
@@ -307,12 +301,11 @@ public class MaquinaP {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorBool(val1 <= val2));
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() <= opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() <= opnd2.valorInt()));
             }
+            // TODO valor str y valor bool
             pc++;
         }
 
@@ -328,12 +321,11 @@ public class MaquinaP {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorBool(val1 > val2));
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() > opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() > opnd2.valorInt()));
             }
+            // TODO valor str y valor bool
             pc++;
         }
 
@@ -349,12 +341,11 @@ public class MaquinaP {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorBool(val1 < val2));
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() < opnd2.valorInt()));
             }
+            // TODO valor str y valor bool
             pc++;
         }
 
@@ -370,12 +361,11 @@ public class MaquinaP {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorBool(val1 != val2));
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() != opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() != opnd2.valorInt()));
             }
+            // TODO valor str y valor bool
             pc++;
         }
 
@@ -391,12 +381,11 @@ public class MaquinaP {
             Valor opnd2 = pilaEvaluacion.pop();
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorReal || opnd2 instanceof ValorReal) {
-                float val1 = (opnd1 instanceof ValorReal) ? opnd1.valorReal() : opnd1.valorInt();
-                float val2 = (opnd2 instanceof ValorReal) ? opnd2.valorReal() : opnd2.valorInt();
-                pilaEvaluacion.push(new ValorBool(val1 == val2));
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() == opnd2.valorReal()));
             } else {
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() == opnd2.valorInt()));
             }
+            // TODO valor str y valor bool
             pc++;
         }
 
@@ -404,6 +393,8 @@ public class MaquinaP {
             return "comp";
         };
     }
+
+    private int2real INT2REAL;
 
     private class int2real implements Instruccion {
         public void ejecuta() {
@@ -416,6 +407,8 @@ public class MaquinaP {
             return "int2real";
         };
     }
+
+    private desapila DESAPILA;
 
     private class desapila implements Instruccion {
         public void ejecuta() {
@@ -445,11 +438,14 @@ public class MaquinaP {
         };
     }
 
+    private IRead IREAD;
+
     private class IRead implements Instruccion {
         public void ejecuta() {
             int valor = 0;
             try {
                 valor = System.in.read();
+                // TODO hay que poner un buffer para leer. Seccion A1 apartado 3 
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -462,9 +458,12 @@ public class MaquinaP {
         };
     }
 
+    private IWrite IWRITE;
+
     private class IWrite implements Instruccion {
         public void ejecuta() {
             Valor opnd = pilaEvaluacion.pop();
+            // TODO aqui lo mismo que en el reed
             System.out.println(opnd.toString());
             pc++;
         }
@@ -836,11 +835,11 @@ public class MaquinaP {
     }
 
     public Instruccion read() {
-        return new IRead();
+        return IREAD;
     }
 
     public Instruccion write() {
-        return new IWrite();
+        return IWRITE;
     }
 
     public Instruccion apila_int(int val) {
@@ -860,11 +859,11 @@ public class MaquinaP {
     } // NUEVO
 
     public Instruccion int2real() {
-        return new int2real();
+        return INT2REAL;
     }
 
     public Instruccion desapila() {
-        return new desapila();
+        return DESAPILA;
     }
 
     public Instruccion apilad(int nivel) {
