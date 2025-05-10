@@ -25,8 +25,12 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(Prog prog){
-        prog.decs().procesa(this);
-        prog.intrs().procesa(this);
+        prog.bloque().procesa(this);
+    }
+
+    public void procesa(Bloque bloque){
+        bloque.decs().procesa(this);
+        bloque.intrs().procesa(this);
     }
 
     @Override

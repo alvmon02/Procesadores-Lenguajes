@@ -478,6 +478,17 @@ public class MaquinaP {
         };
     }
 
+    private class desapila implements Instruccion {
+        public void ejecuta() {
+            pilaEvaluacion.pop();
+            pc++;
+        }
+
+        public String toString() {
+            return "desapila";
+        };
+    }
+
     private class IApilaInt implements Instruccion {
         private int valor;
 
@@ -492,6 +503,35 @@ public class MaquinaP {
 
         public String toString() {
             return "apila-int(" + valor + ")";
+        };
+    }
+
+    private class IRead implements Instruccion {
+        public void ejecuta() {
+            int valor = 0;
+            try {
+                valor = System.in.read();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            pilaEvaluacion.push(new ValorInt(valor));
+            pc++;
+        }
+
+        public String toString() {
+            return "read";
+        };
+    }
+
+    private class IWrite implements Instruccion {
+        public void ejecuta() {
+            Valor opnd = pilaEvaluacion.pop();
+            System.out.println(opnd.toString());
+            pc++;
+        }
+
+        public String toString() {
+            return "write";
         };
     }
 
@@ -856,6 +896,14 @@ public class MaquinaP {
         return E_NEGADO;
     }
 
+    public Instruccion read() {
+        return new IRead();
+    }
+
+    public Instruccion write() {
+        return new IWrite();
+    }
+
     public Instruccion apila_int(int val) {
         return new IApilaInt(val);
     }
@@ -874,6 +922,10 @@ public class MaquinaP {
 
     public Instruccion int2real() {
         return new int2real();
+    }
+
+    public Instruccion desapila() {
+        return new desapila();
     }
 
     public Instruccion apilad(int nivel) {
