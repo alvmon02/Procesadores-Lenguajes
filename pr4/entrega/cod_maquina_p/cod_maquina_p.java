@@ -16,7 +16,12 @@ public class cod_maquina_p extends ProcesamientoDef{
     private MaquinaP m = new MaquinaP(5,10,10,2); // habrá que inicializarla con los params correctos
 
     public void procesa(Prog prog) {
+        prog.bloque().procesa(this);
+    }
 
+    public void procesa(Bloque bloque) {
+        bloque.decs().procesa(this);
+        bloque.intrs().procesa(this);
     }
 
     public void procesa(Si_Decs decs) {
