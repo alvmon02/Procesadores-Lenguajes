@@ -451,4 +451,11 @@ public class ProcesamientoDef implements Procesamiento {
     public static boolean claseDe(Object o, Class c) {
         return o.getClass() == c;
     }
+    
+    public static Tipo refenciar(Tipo tipo) {
+        if (claseDe(tipo, T_Iden.class))
+            return refenciar(tipo.vinculo().tipo());
+        else
+            return tipo;
+    }
 }

@@ -139,13 +139,6 @@ public class Tipado extends ProcesamientoDef {
         }
     }
 
-    public static Tipo refenciar(Tipo tipo) {
-        if (claseDe(tipo, T_Iden.class))
-            return refenciar(tipo.vinculo().tipo());
-        else
-            return tipo;
-    }
-
     @Override
     public void procesa(Prog prog) {
         prog.bloque().procesa(this);
