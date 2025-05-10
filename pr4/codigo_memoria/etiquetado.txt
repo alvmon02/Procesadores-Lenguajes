@@ -1,8 +1,6 @@
 var sub_pendientes=pila_vacia()
 var etq_final
 
-// TODO usar funciones genericas, no repetir tanto codigo, abstraer
-
 etiquetado(prog(bloque)):
 	$.prim = etq_final
 	etiquetado(bloque)
@@ -62,15 +60,10 @@ etiquetado(mas_intrs(intrs,intr)):
 	$.sig = etq_final
 
 etiquetado(una_intr(intr)):
-	$.prim = etq_final
-	etiquetado(intr)
-	$.sig = etq_final
+	etiquetado_std_noAdd(intr)
 
 etiquetado(i_eval(exp)):
-	$.prim = etq_final
-	etiquetado(exp)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e1(exp)
 
 etiquetado(i_if(exp,bloque,i_else)):
 	$.prim = etq_final
@@ -97,36 +90,19 @@ etiquetado(i_while(exp,bloque)):
 	$.sig = etq_final
 
 etiquetado(i_read(exp)):
-	$.prim = etq_final
-	etiquetado(exp)
-	etq_final += 2
-	$.sig = etq_final
+	etiquetado_e2(exp)
 
 etiquetado(i_write(exp)):
-	$.prim = etq_final
-	etiquetado(exp)
-	if es_designador(exp) then
-		etq_final++
-	end if
-	etq_final++
-	$.sig = etq_final
+	etiquetado_des(exp)
 
 etiquetado(i_nl()):
-	$.prim = etq_final
-	etq_final++
-	$.sig = etq_final
+	etiquetado_lit()
 
 etiquetado(i_new(exp)):
-	$.prim = etq_final
-	etiquetado(exp)
-	etq_final += 2
-	$.sig = etq_final
+	etiquetado_e2(exp)
 
 etiquetado(i_delete(exp)):
-	$.prim = etq_final
-	etiquetado(exp)
-	etq_final += 2
-	$.sig = etq_final
+	etiquetado_e2(exp)
 
 etiquetado(i_call(id, preals)):
 	$.prim = etq_final
@@ -135,30 +111,12 @@ etiquetado(i_call(id, preals)):
 	etq_final++
 	$.sig = etq_final
 
-etiquetado_paso_param(no_pforms(), no_preals()):
-	noop
-
-etiquetado_paso_param(si_pforms(pforms), si_preals(preals)):
-	etiquetado_paso_param(pforms, preals)
-
-etiquetado_paso_param(mas_pforms(pforms, pform), mas_preals(preals, exp)):
-	etiquetado_paso_param(pforms, preals)
-	etiquetado_paso_param(pform, exp)
-
-etiquetado_paso_param(una_pform(pform), un_preals(exp)):
-	etiquetado_paso_param(pform, exp)
 
 etiquetado(i_prog(bloque)):
-	$.prim = etq_final
-	etiquetado(bloque)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_e1(bloque)
 
-// TODO revisar esto
 etiquetado(si_else(bloque)):
-	$.prim = etq_final
-	etiquetado(bloque)
-	$.sig = etq_final
+	etiquetado_std_noAdd(bloque)
 
 etiquetado(no_else()):
 	noop
@@ -213,63 +171,49 @@ etiquetado(e_porcentaje(opnd0, opnd1)):
 	etiquetado_opnds(opnd1,opnd2)
 
 etiquetado(e_negativo(opnd)):
-	$.prim = etq_final
-	if es_designador(opnd) then
-		etq_final++
-	end if
-	etq_final++
-	$.sig = etq_final
+	etiquetado_des(opnd)
 
 etiquetado(e_negado(opnd)):
-	$.prim = etq_final
-	if es_designador(opnd) then
-		etq_final++
-	end if
-	etq_final++
-	$.sig = etq_final
-
-etiquetado(e_campo(opnd, id)):
-	$.prim = etq_final
-	etiquetado(opnd)
-	etq_final += 2
-	$.sig = etq_final
-	
-etiquetado(e_puntero(opnd)):
-	$.prim = etq_final
-	etiquetado(opnd)
-	etq_final++
-	$.sig = etq_final
+	etiquetado_des(opnd)
 
 etiquetado(e_indexado(opnd0, opnd1)):
 	$.prim =etq_final
 	etiquetado(opnd0)
 	etiquetado(opnd1)
-	if es_designador(exp) then
+	if es_designador(opnd1) then
 		etq_final++
 	end if
 	etq_final+=3
 	$.sig = etq_final
 
+etiquetado(e_campo(opnd, id)):
+	etiquetado_e2(opnd)
+
+etiquetado(e_puntero(opnd)):
+	etiquetado_e1(opnd)
+
 etiquetado(e_lit_ent(num))
-	etiquetado_e():
+	etiquetado_lit():
 
 etiquetado(e_lit_real(num))
-	etiquetado_e():
+	etiquetado_lit():
 
 etiquetado(e_true()):
-	etiquetado_e():
+	etiquetado_lit():
 
 etiquetado(e_false()):
-	etiquetado_e():
+	etiquetado_lit():
 
 etiquetado(e_string(string)):
-	etiquetado_e():
+	etiquetado_lit():
 
 etiquetado(e_iden(id)):
-	$etiquetado_e():
+	$.prim = etq_final
+	etiquetado_acc_id(id)
+	$.sig = etq_final
 
 etiquetado(e_null()):
-	etiquetado_e():
+	etiquetado_lit():
 
 //Funciones auxiliares
 
@@ -284,15 +228,66 @@ etiquetado_paso_param(proc(id, pforms, bloque), exp):
 	etq_final+= 3
 	etiquetado(exp)
 	etq_final++
-// TODO falta la funcion etiquetado_operands
+
 etiquetado_opnds(opnd1,opnd2): 
 	$.prim = etq_final
-	etiquetado_operands(opnd0, opnd1)
+
+	etiquetado(opnd0)
+	if es_designador(opnd0) then:
+		etq_final++
+	if opnd0.tipo == t_int() and opnd1.tipo == t_real() then:
+		etq_final++
+	end if
+
+	etiquetado(opnd1)
+	if es_designador(opnd1) then:
+		etq_final++
+	if opnd0.tipo == t_real() and opnd1.tipo == t_int() then:
+		etq_final++
+	end if
+
 	etq_final++
 	$.sig = etq_final
 
-etiquetado_e():
+etiquetado_lit():
 	$.prim = etq_final
 	etq_final++
 	$.sig = etq_final
 
+etiquetado_std_noAdd(elem):
+	$.prim = etq_final
+	etiquetado(elem)
+	$.sig = etq_final
+
+etiquetado_e1(elem):
+	$.prim = etq_final
+	etiquetado(elem)
+	etq_final++
+	$.sig = etq_final
+
+etiquetado_e2(elem):
+	$.prim = etq_final
+	etiquetado(elem)
+	etq_final+=2
+	$.sig = etq_final
+
+etiquetado_des(elem):
+	$.prim = etq_final
+	if es_designador(elem) then
+		etq_final++
+	end if
+	etq_final++
+	$.sig = etq_final
+
+etiquetado_paso_param(no_pforms(), no_preals()):
+	noop
+
+etiquetado_paso_param(si_pforms(pforms), si_preals(preals)):
+	etiquetado_paso_param(pforms, preals)
+
+etiquetado_paso_param(mas_pforms(pforms, pform), mas_preals(preals, exp)):
+	etiquetado_paso_param(pforms, preals)
+	etiquetado_paso_param(pform, exp)
+
+etiquetado_paso_param(una_pform(pform), un_preals(exp)):
+	etiquetado_paso_param(pform, exp)
