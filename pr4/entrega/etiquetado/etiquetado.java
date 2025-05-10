@@ -6,7 +6,7 @@ import java.util.Stack;
 
 import javax.lang.model.element.VariableElement;
 
-public class etiquetado extends ProcesamientoDef {
+public class Etiquetado extends ProcesamientoDef {
     private int etqFinal = 0;
     private Stack<Dec_Proc> subPendientes = new Stack<>();
 

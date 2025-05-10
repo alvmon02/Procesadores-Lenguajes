@@ -128,21 +128,33 @@ etiquetado(i_delete(exp)):
 	etq_final += 2
 	$.sig = etq_final
 
-// TODO quitar el for y poner recursion
 etiquetado(i_call(id, preals)):
 	$.prim = etq_final
 	etq_final++
-	for preal in preals
-		etiquetado_paso_param(&.vinculo, preal)
+	etiquetado_paso_param($.vinculo.pforms, preals)
 	etq_final++
 	$.sig = etq_final
 
-etiquetado(i_bloque(bloque)):
+etiquetado_paso_param(no_pforms(), no_preals()):
+	noop
+
+etiquetado_paso_param(si_pforms(pforms), si_preals(preals)):
+	etiquetado_paso_param(pforms, preals)
+
+etiquetado_paso_param(mas_pforms(pforms, pform), mas_preals(preals, exp)):
+	etiquetado_paso_param(pforms, preals)
+	etiquetado_paso_param(pform, exp)
+
+etiquetado_paso_param(una_pform(pform), un_preals(exp)):
+	etiquetado_paso_param(pform, exp)
+
+etiquetado(i_prog(bloque)):
 	$.prim = etq_final
 	etiquetado(bloque)
 	etq_final++
 	$.sig = etq_final
 
+// TODO revisar esto
 etiquetado(si_else(bloque)):
 	$.prim = etq_final
 	etiquetado(bloque)
@@ -268,9 +280,9 @@ etiquetado_acc_id(dec_var(tipo, id)):
 		etq_final+= 3
 	end if
 
-etiquetado_paso_param(proc(id, pforms, bloque), preal):
+etiquetado_paso_param(proc(id, pforms, bloque), exp):
 	etq_final+= 3
-	etiquetado(preal)
+	etiquetado(exp)
 	etq_final++
 
 etiquetado_opnds(opnd1,opnd2): 

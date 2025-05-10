@@ -22,8 +22,6 @@ public class MaquinaP {
 
     private abstract class Valor {
 
-        public abstract void ejecuta(InstruccionBin iBin, Valor v);
-
         public int valorInt() {
             throw new EAccesoIlegitimo();
         }
@@ -55,11 +53,6 @@ public class MaquinaP {
         public String toString() {
             return String.valueOf(valor);
         }
-
-        @Override
-        public void ejecuta(InstruccionBin iBin, Valor v) {
-            iBin.ejecuta(this, (ValorInt) v);
-        }
     }
 
     private class ValorBool extends Valor {
@@ -75,11 +68,6 @@ public class MaquinaP {
 
         public String toString() {
             return String.valueOf(valor);
-        }
-
-        @Override
-        public void ejecuta(InstruccionBin iBin, Valor v) {
-            iBin.ejecuta(this, (ValorBool) v);
         }
     }
 
@@ -99,11 +87,6 @@ public class MaquinaP {
         public String toString() {
             return valor;
         }
-
-        @Override
-        public void ejecuta(InstruccionBin iBin, Valor v) {
-            iBin.ejecuta(this, (ValorStr) v);
-        }
     }
 
     private class ValorReal extends Valor {
@@ -120,11 +103,6 @@ public class MaquinaP {
         public String toString() {
             return String.valueOf(valor);
         }
-
-        @Override
-        public void ejecuta(InstruccionBin iBin, Valor v) {
-            iBin.ejecuta(this, (ValorReal) v);
-        }
     }
 
     private List<Instruccion> codigoP;
@@ -134,45 +112,6 @@ public class MaquinaP {
 
     public interface Instruccion {
         void ejecuta();
-    }
-
-    private abstract class InstruccionBin implements Instruccion {
-        public void ejecuta(ValorInt opnd1, ValorInt opnd2) {
-
-        }
-
-        public void ejecuta(ValorBool opnd1, ValorBool opnd2) {
-
-        }
-
-        public void ejecuta(ValorReal opnd1, ValorReal opnd2) {
-
-        }
-
-        public void ejecuta(ValorStr opnd1, ValorStr opnd2) {
-
-        }                                                                                                                                                                                                                                                       
-    }
-
-    private class ISumaEj extends InstruccionBin {
-
-        @Override
-        public void ejecuta() {
-            Valor opnd2 = pilaEvaluacion.pop();
-            Valor opnd1 = pilaEvaluacion.pop();
-            opnd1.ejecuta(this, opnd2);
-            pc++;
-        }
-
-        @Override
-        public void ejecuta(ValorInt opnd1, ValorInt opnd2) {
-            pilaEvaluacion.push(new ValorInt(opnd1.valorInt() + opnd2.valorInt()));
-        }
-
-        @Override
-        public void ejecuta(ValorReal opnd1, ValorReal opnd2) {
-            pilaEvaluacion.push(new ValorReal(opnd1.valorReal() + opnd2.valorReal()));
-        }
     }
 
     private ISuma ISUMA;
