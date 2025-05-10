@@ -218,160 +218,193 @@ public class Etiquetado2 extends ProcesamientoDef {
         si_Else.ponSig(etqFinal);
     }
 
+    private void procesa_op_bin(Exp exp) {
+        exp.ponPrim(etqFinal);
+        procesa_acc_valor(exp.opnd0());
+        procesa_conversion(exp.opnd0(), exp.opnd1());
+        procesa_acc_valor(exp.opnd1());
+        procesa_conversion(exp.opnd1(), exp.opnd0());
+        etqFinal++;
+        exp.ponSig(etqFinal);
+    }
+
+    private void procesa_conversion(Exp opnd0, Exp opnd1) {
+        if (claseDe(refenciar(opnd0.tipo()), T_Int.class) && claseDe(refenciar(opnd1.tipo()), T_Real.class)) {
+            etqFinal++;
+        }
+    }
+
     @Override
     public void procesa(Asig exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponPrim(etqFinal);
+        exp.opnd0().procesa(this);
+        if (claseDe(refenciar(exp.opnd0().tipo()), T_Int.class)
+                && claseDe(refenciar(exp.opnd1().tipo()), T_Real.class)) {
+            procesa_acc_valor(exp.opnd1());
+            etqFinal += 2;
+        } else {
+            exp.opnd1().procesa(this);
+            etqFinal++;
+        }
+        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Comp exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Dist exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Menor exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Mayor exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(MenorIgual exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(MayorIgual exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Suma exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Resta exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(And exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Or exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Mul exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Div exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
     }
 
     @Override
     public void procesa(Porcentaje exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_bin(exp);
+    }
+
+    private void procesa_op_un(Exp exp) {
+        exp.ponPrim(etqFinal);
+        procesa_acc_valor(exp.opnd0());
+        etqFinal++;
+        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Negativo exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_un(exp);
     }
 
     @Override
     public void procesa(Negado exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_op_un(exp);
     }
 
     @Override
     public void procesa(Index exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponPrim(etqFinal);
+        exp.opnd0().procesa(this);
+        procesa_acc_valor(exp.opnd1());
+        etqFinal += 3;
+        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Acceso exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponPrim(etqFinal);
+        exp.opnd0().procesa(this);
+        etqFinal += 2;
+        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Indireccion exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponPrim(etqFinal);
+        procesa_acc_valor(exp.opnd0());
+        etqFinal++;
+        exp.ponSig(etqFinal);
+    }
+
+    private void procesa_lit(Exp exp) {
+        exp.ponPrim(etqFinal);
+        etqFinal++;
+        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Lit_ent exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_lit(exp);
     }
 
     @Override
     public void procesa(True exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_lit(exp);
     }
 
     @Override
     public void procesa(False exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_lit(exp);
     }
 
     @Override
     public void procesa(Lit_real exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_lit(exp);
     }
 
     @Override
     public void procesa(Cadena exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_lit(exp);
     }
 
     @Override
     public void procesa(Iden exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        exp.ponPrim(etqFinal);
+        procesa_acc_iden((Dec_Var) exp.vinculo());
+        exp.ponSig(etqFinal);
+    }
+
+    private void procesa_acc_iden(Dec_Var dec_Var) {
+        if (dec_Var.nivel() == 0) {
+            etqFinal++;
+        } else {
+            etqFinal += 3;
+        }
     }
 
     @Override
     public void procesa(Null exp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        procesa_lit(exp);
     }
 
 }

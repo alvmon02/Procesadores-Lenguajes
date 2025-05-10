@@ -284,7 +284,7 @@ etiquetado_paso_param(proc(id, pforms, bloque), exp):
 	etq_final+= 3
 	etiquetado(exp)
 	etq_final++
-
+// TODO falta la funcion etiquetado_operands
 etiquetado_opnds(opnd1,opnd2): 
 	$.prim = etq_final
 	etiquetado_operands(opnd0, opnd1)
