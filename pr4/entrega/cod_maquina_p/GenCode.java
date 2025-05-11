@@ -20,7 +20,7 @@ public class GenCode extends ProcesamientoDef {
     }
 
     Reader reader = new InputStreamReader(System.in); // Inicializa el lector de entrada
-    private MaquinaP m = new MaquinaP(reader, 1000, 1000, 1000, 10); // habrá que inicializarla con los params correctos
+    private MaquinaP m = new MaquinaP(reader, 500, 5000, 5000, 10);
 
     private void procesarSubPendientes() {
         while (!subPendientes.empty()) {
