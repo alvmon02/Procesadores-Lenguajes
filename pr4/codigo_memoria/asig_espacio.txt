@@ -142,7 +142,7 @@ asig_espacio1(t_puntero(tipo)):
     $.tam = 1
 
 asig_espacio2(t_puntero(tipo)):
-    if tipo = ref(_) then 
+    if tipo == ref(_) then 
         let tipo.vinculo = dec_tipo(T, _) in
             tipo.tam = T.tam
     else
@@ -156,28 +156,28 @@ asig_espacio1(t_struct(camposs)):
     $.tam = dir
     dir = dirAux
 
+asig_espacio2(t_struct(camposs)):
+    asig_espacio2(camposs)
+
 asig_espacio1(mas_cmp_s(camposs, campos)):
     asig_espacio1(camposs)
     asig_espacio1(campos)
 
+asig_espacio2(mas_cmp_s(camposs, campos)):
+    asig_espacio2(camposs)
+    asig_espacio2(campos)
+
 asig_espacio1(un_cmp_s(campos)):
     asig_espacio1(campos)
+
+asig_espacio2(un_cmp_s(campos)):
+    asig_espacio2(campos)
 
 asig_espacio1(cmp_s(tipo, id)):
     $.dir = dir
     asig_espacio1(tipo)
     $.tam = tipo.tam // Mirar si el tamaño solo lo tienen los tipos y simplemente hay que hacer += a la dir
     dir += $.tam
-
-asig_espacio2(t_struct(camposs)):
-    asig_espacio2(camposs)
-
-asig_espacio2(mas_cmp_s(camposs, campos)):
-    asig_espacio2(camposs)
-    asig_espacio2(campos)
-
-asig_espacio2(un_cmp_s(campos)):
-    asig_espacio2(campos)
 
 asig_espacio2(cmp_s(tipo, id)):
     asig_espacio2(tipo)
