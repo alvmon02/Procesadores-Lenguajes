@@ -1,4 +1,4 @@
-Errores_tipado fila:23 col:7
-Errores_tipado fila:24 col:7
-Errores_tipado fila:24 col:15
-Errores_tipado fila:24 col:27
+23,7:el numero de parametros reales no coincide con el numero de parametros formales
+24,7:l1 no es un subprograma
+24,15:tipos incompatibles en operacion:t_bool() t_int()
+24,27:tipos incompatibles en operacion:t_string() t_bool()

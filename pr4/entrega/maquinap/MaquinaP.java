@@ -117,7 +117,7 @@ public class MaquinaP {
         void ejecuta();
     }
 
-    private ISuma ISUMA;
+    private ISuma ISUMA = new ISuma();
 
     private class ISuma implements Instruccion {
         public void ejecuta() {
@@ -136,7 +136,7 @@ public class MaquinaP {
         };
     }
 
-    private IMul IMUL;
+    private IMul IMUL = new IMul();
 
     private class IMul implements Instruccion {
         public void ejecuta() {
@@ -155,7 +155,7 @@ public class MaquinaP {
         };
     }
 
-    private IAnd IAND;
+    private IAnd IAND = new IAnd();
 
     private class IAnd implements Instruccion {
         public void ejecuta() {
@@ -172,7 +172,7 @@ public class MaquinaP {
 
     // ############### NUEVAS CLASES INSTRUCCION OPERACIONES ###############
 
-    private e_negado E_NEGADO;
+    private e_negado E_NEGADO = new e_negado();
 
     private class e_negado implements Instruccion {
         public void ejecuta() {
@@ -186,7 +186,7 @@ public class MaquinaP {
         };
     }
 
-    private e_negativo E_NEGATIVO;
+    private e_negativo E_NEGATIVO = new e_negativo();
 
     private class e_negativo implements Instruccion {
         public void ejecuta() {
@@ -204,7 +204,7 @@ public class MaquinaP {
         };
     }
 
-    private e_or E_OR;
+    private e_or E_OR = new e_or();
 
     private class e_or implements Instruccion {
         public void ejecuta() {
@@ -219,7 +219,7 @@ public class MaquinaP {
         };
     }
 
-    private e_porcentaje E_PORCENTAJE;
+    private e_porcentaje E_PORCENTAJE = new e_porcentaje();
 
     private class e_porcentaje implements Instruccion {
         public void ejecuta() {
@@ -234,7 +234,7 @@ public class MaquinaP {
         };
     }
 
-    private e_div E_DIV;
+    private e_div E_DIV = new e_div();
 
     private class e_div implements Instruccion {
         public void ejecuta() {
@@ -255,7 +255,7 @@ public class MaquinaP {
         };
     }
 
-    private e_resta E_RESTA;
+    private e_resta E_RESTA = new e_resta();
 
     private class e_resta implements Instruccion {
         public void ejecuta() {
@@ -274,7 +274,7 @@ public class MaquinaP {
         };
     }
 
-    private e_geq E_GEQ;
+    private e_geq E_GEQ = new e_geq();
 
     private class e_geq implements Instruccion {
         public void ejecuta() {
@@ -301,7 +301,7 @@ public class MaquinaP {
         };
     }
 
-    private e_leq E_LEQ;
+    private e_leq E_LEQ = new e_leq();
 
     private class e_leq implements Instruccion {
         public void ejecuta() {
@@ -328,7 +328,7 @@ public class MaquinaP {
         };
     }
 
-    private e_gt E_GT;
+    private e_gt E_GT = new e_gt();
 
     private class e_gt implements Instruccion {
         public void ejecuta() {
@@ -355,7 +355,7 @@ public class MaquinaP {
         };
     }
 
-    private e_lt E_LT;
+    private e_lt E_LT = new e_lt();
 
     private class e_lt implements Instruccion {
         public void ejecuta() {
@@ -382,7 +382,7 @@ public class MaquinaP {
         };
     }
 
-    private e_dist E_DIST;
+    private e_dist E_DIST = new e_dist();
 
     private class e_dist implements Instruccion {
         public void ejecuta() {
@@ -409,7 +409,7 @@ public class MaquinaP {
         };
     }
 
-    private e_comp E_COMP;
+    private e_comp E_COMP = new e_comp();
 
     private class e_comp implements Instruccion {
         public void ejecuta() {
@@ -436,7 +436,7 @@ public class MaquinaP {
         };
     }
 
-    private int2real INT2REAL;
+    private int2real INT2REAL = new int2real();
 
     private class int2real implements Instruccion {
         public void ejecuta() {
@@ -450,11 +450,12 @@ public class MaquinaP {
         };
     }
 
-    private desapila DESAPILA;
+    private desapila DESAPILA = new desapila();
 
     private class desapila implements Instruccion {
         public void ejecuta() {
-            pilaEvaluacion.pop();
+            if (!pilaEvaluacion.isEmpty())
+                pilaEvaluacion.pop();
             pc++;
         }
 
@@ -480,7 +481,7 @@ public class MaquinaP {
         };
     }
 
-    private IRead IREAD;
+    private IRead IREAD = new IRead();
 
     private class IRead implements Instruccion {
         public void ejecuta() {
@@ -494,7 +495,7 @@ public class MaquinaP {
                         valor = String.valueOf(scanner.nextFloat());
                         scanner.nextLine();
                     } else if (scanner.hasNextLine()) {
-                        String strValor = scanner.nextLine(); // TODO revisar que no haya que quitar el \n
+                        String strValor = scanner.nextLine();
                         valor = strValor;
                     }
                 }
@@ -511,12 +512,12 @@ public class MaquinaP {
         };
     }
 
-    private IWrite IWRITE;
+    private IWrite IWRITE = new IWrite();
 
     private class IWrite implements Instruccion {
         public void ejecuta() {
             Valor opnd = pilaEvaluacion.pop();
-            System.out.println(opnd.toString());
+            System.out.print(opnd.toString());
             pc++;
         }
 
@@ -637,7 +638,7 @@ public class MaquinaP {
         };
     }
 
-    private IApilaind IAPILAIND;
+    private IApilaind IAPILAIND = new IApilaind();
 
     private class IApilaind implements Instruccion {
         public void ejecuta() {
@@ -655,7 +656,7 @@ public class MaquinaP {
         };
     }
 
-    private IDesapilaind IDESAPILAIND;
+    private IDesapilaind IDESAPILAIND = new IDesapilaind();
 
     private class IDesapilaind implements Instruccion {
         public void ejecuta() {
@@ -771,7 +772,7 @@ public class MaquinaP {
         }
     }
 
-    private IDup IDUP;
+    private IDup IDUP = new IDup();
 
     private class IDup implements Instruccion {
         public void ejecuta() {
@@ -784,7 +785,7 @@ public class MaquinaP {
         }
     }
 
-    private Instruccion ISTOP;
+    private Instruccion ISTOP = new IStop();
 
     private class IStop implements Instruccion {
         public void ejecuta() {
@@ -814,7 +815,7 @@ public class MaquinaP {
 
     }
 
-    private Instruccion IIRIND;
+    private Instruccion IIRIND = new IIrind();
 
     private class IIrind implements Instruccion {
         public void ejecuta() {
@@ -826,7 +827,7 @@ public class MaquinaP {
         }
     }
 
-    private Instruccion NL;
+    private Instruccion NL = new NL();
 
     private class NL implements Instruccion {
         public void ejecuta() {
@@ -1022,7 +1023,10 @@ public class MaquinaP {
 
     public void ejecuta() {
         while (pc != codigoP.size()) {
-            codigoP.get(pc).ejecuta();
+            if (pc >= codigoP.size())
+                System.err.println("Se ha intentado acceder a la posicion " + pc + " de " + codigoP.size());
+            else
+                codigoP.get(pc).ejecuta();
         }
     }
 

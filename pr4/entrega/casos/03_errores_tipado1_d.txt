@@ -1,29 +1,53 @@
-Errores_tipado fila:57 col:5
-Errores_tipado fila:58 col:5
-Errores_tipado fila:59 col:7
-Errores_tipado fila:60 col:20
-Errores_tipado fila:61 col:5
-Errores_tipado fila:62 col:5
-Errores_tipado fila:63 col:6
-Errores_tipado fila:64 col:5
-Errores_tipado fila:65 col:3
-Errores_tipado fila:66 col:5
-Errores_tipado fila:67 col:4
-Errores_tipado fila:68 col:4
-Errores_tipado fila:69 col:5
-Errores_tipado fila:70 col:11
-Errores_tipado fila:71 col:16
-Errores_tipado fila:72 col:12
-Errores_tipado fila:73 col:11
-Errores_tipado fila:74 col:7
-Errores_tipado fila:75 col:7
-Errores_tipado fila:76 col:6
-Errores_tipado fila:77 col:13
-Errores_tipado fila:78 col:9
-Errores_tipado fila:79 col:16
-Errores_tipado fila:80 col:8
-Errores_tipado fila:81 col:6
-Errores_tipado fila:82 col:7
-Errores_tipado fila:83 col:4
-Errores_tipado fila:84 col:7
-Errores_tipado fila:87 col:10
+15,9:esperado tipo puntero
+34,4:esperado tipo puntero
+38,13:esperado tipo puntero
+39,9:esperado tipo puntero
+39,11:tipo incompatible con tipo de parametro formal:t_int() asint.SintaxisAbstractaTiny$T_Error@7c53a9eb
+39,17:esperado tipo puntero
+39,17:tipo incompatible con tipo de parametro formal:t_int() asint.SintaxisAbstractaTiny$T_Error@2a33fae0
+40,10:esperado tipo puntero
+40,10:tipo incompatible con tipo de parametro formal:t_real() asint.SintaxisAbstractaTiny$T_Error@11028347
+43,14:esperado tipo puntero
+43,14:valor no legible
+44,15:esperado tipo puntero
+44,17:valor no imprimible
+57,5:tipos incompatibles en asignacion:t_real() t_bool()
+58,5:tipos incompatibles en operacion:t_int() t_bool()
+59,7:tipos incompatibles en operacion:t_real() t_bool()
+60,20:tipos incompatibles en operacion:t_bool() t_string()
+61,9:esperado tipo puntero
+62,5:tipos incompatibles en operacion:t_int() t_string()
+63,4:esperado tipo puntero
+64,5:tipos incompatibles en operacion:t_string()
+65,3:tipos incompatibles en operacion:asint.SintaxisAbstractaTiny$T_Null@4cc77c2e
+66,5:campo inexistente:x
+67,4:tipos incompatibles en indexacion:t_struct(mas_cmp_s(un_cmp_s(campo_s(t_array(t_puntero(t_int()),30[8,8]),ps[8,12])),campo_s(t_int(),c[9,7]))) t_int()
+68,4:tipos incompatibles en indexacion:t_array(t_int(),20[6,5]) t_bool()
+69,5:se trata de acceder a un campo de un objeto que no es un registro:t_array(t_int(),20[6,5]) acceso(iden(a[69,3]),x[69,5]) t_array(t_int(),20[6,5])
+70,9:esperado tipo puntero
+70,11:tipo incompatible con tipo de parametro formal:t_int() asint.SintaxisAbstractaTiny$T_Error@39a054a5
+70,19:esperado tipo puntero
+70,19:tipo incompatible con tipo de parametro formal:t_int() asint.SintaxisAbstractaTiny$T_Error@71bc1ae4
+71,9:esperado tipo puntero
+71,11:tipo incompatible con tipo de parametro formal:t_int() asint.SintaxisAbstractaTiny$T_Error@2437c6dc
+71,16:tipo incompatible con tipo de parametro formal:t_int() t_real()
+72,12:esperado tipo puntero
+72,12:el tipo debe ser real
+73,11:se esperaba un designador
+74,7:p no es variable ni parametro
+75,7:tr2 no es variable ni parametro
+76,4:esperado tipo puntero
+77,13:esperado tipo puntero
+77,13:esperado tipo puntero
+78,9:esperado tipo puntero
+78,9:esperado tipo puntero
+79,14:esperado tipo puntero
+79,16:designador esperado
+80,11:esperado tipo puntero
+80,8:la parte izquierda debe ser un designador
+81,6:valor no legible
+82,7:valor no imprimible
+83,4:esperada expresion booleana
+84,7:esperado tipo puntero
+84,7:esperada expresion booleana
+87,10:esperada expresion booleana

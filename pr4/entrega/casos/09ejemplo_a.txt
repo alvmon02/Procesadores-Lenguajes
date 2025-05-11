@@ -1,3 +1,29 @@
-Errores_tipado fila:49 col:7
-Errores_tipado fila:85 col:28
-Errores_tipado fila:91 col:28
+50,16:esperado tipo puntero
+51,16:esperado tipo puntero
+51,29:esperado tipo puntero
+64,13:esperado tipo puntero
+64,22:esperada expresion booleana
+65,21:esperado tipo puntero
+68,21:esperado tipo puntero
+68,30:esperada expresion booleana
+69,29:esperado tipo puntero
+76,22:esperado tipo puntero
+76,31:esperada expresion booleana
+84,22:esperado tipo puntero
+84,31:esperada expresion booleana
+85,26:esperado tipo puntero
+85,28:esperado tipo puntero
+86,24:esperado tipo puntero
+87,24:esperado tipo puntero
+87,42:esperado tipo puntero
+91,26:esperado tipo puntero
+91,28:esperado tipo puntero
+92,24:esperado tipo puntero
+93,24:esperado tipo puntero
+93,41:esperado tipo puntero
+115,30:esperado tipo puntero
+115,32:tipo incompatible con tipo de parametro formal:tipo(tArbol[113,24]) asint.SintaxisAbstractaTiny$T_Error@4fccd51b
+116,15:esperado tipo puntero
+116,17:valor no imprimible
+117,30:esperado tipo puntero
+117,32:tipo incompatible con tipo de parametro formal:tipo(tArbol[113,24]) asint.SintaxisAbstractaTiny$T_Error@44e81672

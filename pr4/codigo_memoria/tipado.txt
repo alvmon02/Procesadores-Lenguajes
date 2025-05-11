@@ -136,7 +136,7 @@ tipado(i_nl()):
 
 tipado(i_new(exp)):
     tipado(exp)
-    if ref!(exp.tipo) == t_punter() then
+    if ref!(exp.tipo) == t_punter() || exp.vinculo() == pform(_, si_ref(), _)then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -144,7 +144,7 @@ tipado(i_new(exp)):
 
 tipado(i_delete(exp)):
     tipado(exp)
-    if ref!(exp.tipo) == t_punter() then
+    if ref!(exp.tipo) == t_punter() || exp.vinculo() == pform(_, si_ref(), _)then
         $.tipo = OK
     else
         $.tipo = ERROR
@@ -393,7 +393,7 @@ busquedaCampo(idCampo, un_cmp_s(cmp_s(tipo, id))):
 tipado(e_puntero(opnd)):
     tipado(opnd)
     tipo = ref!(opnd.tipo)
-    if tipo == t_punter(tb) then
+    if tipo == t_punter(tb) || exp.vinculo() == pform(tb, si_ref(), _) then
         $.tipo = tb
     else
         error("Se esta intentando desreferenciar un puntero a un tipo no puntero")

@@ -1,1 +1,1 @@
-Errores_tipado fila:22 col:9
+22,9:tipos incompatibles en asignacion:tipo(Tipo3[19,5]) tipo(Tipo1[20,5])

@@ -1,0 +1,4 @@
+11,13:esperado tipo puntero
+11,22:valor no legible
+12,14:esperado tipo puntero
+12,23:valor no imprimible

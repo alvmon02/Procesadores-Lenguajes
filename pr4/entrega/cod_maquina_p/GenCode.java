@@ -12,6 +12,10 @@ public class GenCode extends ProcesamientoDef {
 
     private Stack<Dec_Proc> subPendientes = new Stack<>();
 
+    public GenCode(MaquinaP m) {
+        this.m = m;
+    }
+
     private boolean esDesignador(Exp exp) {
         return claseDe(exp, Index.class) ||
                 claseDe(exp, Acceso.class) ||
@@ -20,7 +24,7 @@ public class GenCode extends ProcesamientoDef {
     }
 
     Reader reader = new InputStreamReader(System.in); // Inicializa el lector de entrada
-    private MaquinaP m = new MaquinaP(reader, 1000, 1000, 1000, 10); // habrá que inicializarla con los params correctos
+    private MaquinaP m;
 
     private void procesarSubPendientes() {
         while (!subPendientes.empty()) {
@@ -30,6 +34,10 @@ public class GenCode extends ProcesamientoDef {
             m.emit(m.desactiva(sub.nivel(), sub.tam()));
             m.emit(m.ir_ind());
         }
+    }
+
+    public void ejecutar() {
+        m.ejecuta();
     }
 
     @Override

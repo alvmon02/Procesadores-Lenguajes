@@ -13,6 +13,7 @@ import c_ast_descendente.TokenMgrError;
 import cod_maquina_p.GenCode;
 import errores_procesamiento.ErrorProcesamiento;
 import etiquetado.Etiquetado;
+import maquinap.MaquinaP;
 import pretipado.Pretipado;
 import tipadoPost.Tipado;
 import vinculacion.Vinculado;
@@ -121,7 +122,7 @@ public class Main {
 		prog.procesa(tipado);
 		if (tipado.hayErrores()) {
 			for (ErrorProcesamiento e : tipado.errores()) {
-				System.out.println(e.toStringJuez());
+				System.out.println(e.toString());
 			}
 			return;
 		}
@@ -132,7 +133,8 @@ public class Main {
 		Etiquetado etiquetado = new Etiquetado();
 		prog.procesa(etiquetado);
 
-		GenCode genCode = new GenCode();
+		GenCode genCode = new GenCode(new MaquinaP(input, 1000, 1000, 1000, 10));
 		prog.procesa(genCode);
+		genCode.ejecutar();
 	}
 }

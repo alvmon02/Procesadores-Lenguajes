@@ -289,7 +289,9 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
         Tipo tipoExp = i_New.exp().tipo();
-        if (claseDe(tipoExp, T_Puntero.class)) {
+        if (claseDe(tipoExp, T_Puntero.class)
+                || (i_New.exp().vinculo() != null && claseDe(i_New.exp().vinculo(), PForm.class)
+                        && claseDe(((PForm) i_New.exp().vinculo()).ref(), Si_Ref.class))) {
             i_New.ponTipo(new T_Ok());
         } else {
             errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_New.exp().leeFila(), i_New.exp().leeCol()));
@@ -301,7 +303,9 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         Tipo tipoExp = i_Delete.exp().tipo();
-        if (claseDe(tipoExp, T_Puntero.class)) {
+        if (claseDe(tipoExp, T_Puntero.class)
+                || (i_Delete.exp().vinculo() != null && claseDe(i_Delete.exp().vinculo(), PForm.class)
+                        && claseDe(((PForm) i_Delete.exp().vinculo()).ref(), Si_Ref.class))) {
             i_Delete.ponTipo(new T_Ok());
         } else {
             errorProcesamientos.add(ErrorTipado.errorTipoPuntero(i_Delete.exp().leeFila(), i_Delete.exp().leeCol()));
@@ -679,8 +683,11 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Indireccion exp) {
         exp.opnd0().procesa(this);
         Tipo tipo = referenciar(exp.opnd0().tipo());
-        if (claseDe(tipo, T_Puntero.class)) {
+        if (claseDe(exp, T_Puntero.class)) {
             exp.ponTipo(tipo.tipo());
+        } else if (exp.vinculo() != null && claseDe(exp.vinculo(), PForm.class)
+                && claseDe(((PForm) exp.vinculo()).ref(), Si_Ref.class)) {
+            exp.ponTipo(tipo);
         } else {
             if (!claseDe(tipo, T_Error.class)) {
                 errorProcesamientos.add(ErrorTipado.errorTipoPuntero(exp.leeFila(), exp.leeCol()));
