@@ -22,8 +22,10 @@ public class asig_espacio extends ProcesamientoDef {
     }
 
     public void procesa(Bloque bloque) {
+        int dir_ant = dir;
         bloque.decs().procesa(this);
         bloque.intrs().procesa(this);
+        dir = dir_ant;
     }
 
     @Override
@@ -57,9 +59,9 @@ public class asig_espacio extends ProcesamientoDef {
     @Override
     public void procesa(Dec_Var dec_Var) {
         dec_Var.ponDir(dir);
-        dec_Var.ponNivel(nivel); // todo
+        dec_Var.ponNivel(nivel);
         dec_Var.tipo().procesa(this);
-        inc_dir(dec_Var.tipo().tam()); // todo
+        inc_dir(dec_Var.tipo().tam());
     }
 
     @Override
@@ -93,10 +95,11 @@ public class asig_espacio extends ProcesamientoDef {
         nivel--;
     }
 
+    // TODO Creo que no es necesario
     @Override
     public void procesa2(Dec_Proc dec_proc) {
-        dec_proc.pforms().procesa2(this);
-        dec_proc.prog().procesa2(this);
+        // dec_proc.pforms().procesa2(this);
+        // dec_proc.prog().procesa2(this);
     }
 
     @Override
@@ -116,53 +119,46 @@ public class asig_espacio extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(T_Iden t_iden) {
-        t_iden.ponTam(t_iden.vinculo().tipo().tam()); // todo
+    public void procesa(PForm pform) {
+        pform.tipo().procesa(this);
+        pform.ponDir(dir);
+        pform.ponNivel(nivel);
+        if (claseDe(pform.ref(), Si_Ref.class)) {
+            inc_dir(1);
+
+        }
+        else {
+            inc_dir(pform.tipo().tam());
+        }
     }
 
     @Override
-    public void procesa2(T_Iden t_iden) {
+    public void procesa(T_Iden t_iden) {
+        t_iden.ponTam(t_iden.vinculo().tipo().tam());
     }
 
     @Override
     public void procesa(T_String t_string) {
-        t_string.ponTam(1); // todo
-    }
-
-    @Override
-    public void procesa2(T_String t_string) {
+        t_string.ponTam(1);
     }
 
     @Override
     public void procesa(T_Int t_int) {
-        t_int.ponTam(1); // todo
-    }
-
-    @Override
-    public void procesa2(T_Int t_int) {
+        t_int.ponTam(1);
     }
 
     @Override
     public void procesa(T_Bool t_bool) {
-        t_bool.ponTam(1); // todo
-    }
-
-    @Override
-    public void procesa2(T_Bool t_bool) {
+        t_bool.ponTam(1);
     }
 
     @Override
     public void procesa(T_Real t_real) {
-        t_real.ponTam(1); // todo
-    }
-
-    @Override
-    public void procesa2(T_Real t_real) {
+        t_real.ponTam(1);
     }
 
     @Override
     public void procesa(T_Array t_array) {
-        t_array.ponDir(dir); // todo
         t_array.tipo().procesa(this);
         t_array.ponTam(t_array.tipo().tam() * Integer.parseInt(t_array.ent())); 
     }
@@ -174,7 +170,7 @@ public class asig_espacio extends ProcesamientoDef {
 
     @Override
     public void procesa(T_Puntero t_puntero) {
-        if (!(t_puntero.tipo() instanceof T_Iden)) {
+        if (!claseDe(t_puntero.tipo(), T_Iden.class)) {
             t_puntero.tipo().procesa(this);
         }
         t_puntero.ponTam(1);
@@ -182,12 +178,8 @@ public class asig_espacio extends ProcesamientoDef {
 
     @Override
     public void procesa2(T_Puntero t_puntero) {
-        if (t_puntero.tipo() instanceof T_Iden) {
-            T_Iden tipoIden = (T_Iden) t_puntero.tipo();
-            if (tipoIden.vinculo() instanceof Dec_Tipo) {
-                Dec_Tipo decTipo = (Dec_Tipo) tipoIden.vinculo();
-                tipoIden.ponTam(decTipo.tipo().tam());
-            }
+        if (claseDe(t_puntero.tipo(), T_Iden.class)) {
+            t_puntero.tipo().ponTam(t_puntero.tipo().vinculo().tam());
         } else {
             t_puntero.tipo().procesa2(this);
         }
@@ -210,20 +202,36 @@ public class asig_espacio extends ProcesamientoDef {
     @Override
     public void procesa(Mas_Cmp_S mas_cmp_s) {
         mas_cmp_s.camposS().procesa(this);
+        mas_cmp_s.campoS().procesa(this);
+    }
+
+    @Override
+    public void procesa2(Mas_Cmp_S mas_cmp_s) {
+        mas_cmp_s.camposS().procesa2(this);
         mas_cmp_s.campoS().procesa2(this);
     }
 
     @Override
     public void procesa(Un_Cmp_S una_cmp_s) {
+        una_cmp_s.campoS().procesa(this);
+    }
+    
+    @Override
+    public void procesa2(Un_Cmp_S una_cmp_s) {
         una_cmp_s.campoS().procesa2(this);
     }
 
     @Override
     public void procesa(CampoS campoS) {
-        campoS.ponDir(dir); // todo
+        campoS.ponDir(dir);
         campoS.tipo().procesa(this);
-        campoS.ponTam(campoS.tipo().tam()); // todo
-        dir += campoS.tam(); // todo
+        // campoS.ponTam(campoS.tipo().tam()); // TODO: Revisar si es necesario
+        dir += campoS.tipo().tam();
+    }
+
+    @Override
+    public void procesa2(CampoS campoS) {
+        campoS.tipo().procesa2(this);
     }
 
     @Override
@@ -243,13 +251,7 @@ public class asig_espacio extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(I_Eval i_eval) {
-        i_eval.exp().procesa(this);
-    }
-
-    @Override
     public void procesa(I_If i_if) {
-        i_if.exp().procesa(this);
         i_if.prog().procesa(this);
         i_if.i_else().procesa(this);
     }
@@ -261,36 +263,6 @@ public class asig_espacio extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(I_Read i_read) {
-        i_read.exp().procesa(this);
-    }
-
-    @Override
-    public void procesa(I_Write i_write) {
-        i_write.exp().procesa(this);
-    }
-
-    @Override
-    public void procesa(I_NL i_nl) {
-
-    }
-
-    @Override
-    public void procesa(I_New i_new) {
-        i_new.exp().procesa(this);
-    }
-
-    @Override
-    public void procesa(I_Delete i_delete) {
-        i_delete.exp().procesa(this);
-    }
-
-    @Override
-    public void procesa(I_Call i_call) {
-        i_call.preals().procesa(this);
-    }
-
-    @Override
     public void procesa(I_Prog i_prog) {
         i_prog.prog().procesa(this);
     }
@@ -298,141 +270,5 @@ public class asig_espacio extends ProcesamientoDef {
     @Override
     public void procesa(Si_Else si_else) {
         si_else.prog().procesa(this);
-    }
-
-    @Override
-    public void procesa(No_Else no_else) {
-        // No operation
-    }
-
-    @Override
-    public void procesa(Si_PReals si_preals) {
-        si_preals.preals().procesa(this);
-    }
-
-    @Override
-    public void procesa(No_PReals no_preals) {
-        // No operation
-    }
-
-    @Override
-    public void procesa(Mas_PReals mas_preals) {
-        mas_preals.preals().procesa(this);
-        mas_preals.exp().procesa(this);
-    }
-
-    @Override
-    public void procesa(Un_PReal un_preals) {
-        un_preals.exp().procesa(this);
-    }
-
-    @Override
-    public void procesa(Asig e_asig) {
-        e_asig.opnd0().procesa(this);
-        e_asig.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Comp e_comp) {
-        e_comp.opnd0().procesa(this);
-        e_comp.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Dist e_dist) {
-        e_dist.opnd0().procesa(this);
-        e_dist.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Menor e_lt) {
-        e_lt.opnd0().procesa(this);
-        e_lt.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Mayor e_gt) {
-        e_gt.opnd0().procesa(this);
-        e_gt.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(MenorIgual e_leq) {
-        e_leq.opnd0().procesa(this);
-        e_leq.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(MayorIgual e_geq) {
-        e_geq.opnd0().procesa(this);
-        e_geq.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Suma e_suma) {
-        e_suma.opnd0().procesa(this);
-        e_suma.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Resta e_resta) {
-        e_resta.opnd0().procesa(this);
-        e_resta.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(And e_and) {
-        e_and.opnd0().procesa(this);
-        e_and.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Or e_or) {
-        e_or.opnd0().procesa(this);
-        e_or.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Mul e_mul) {
-        e_mul.opnd0().procesa(this);
-        e_mul.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Div e_div) {
-        e_div.opnd0().procesa(this);
-        e_div.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Porcentaje e_porcentaje) {
-        e_porcentaje.opnd0().procesa(this);
-        e_porcentaje.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Negativo e_negativo) {
-        e_negativo.opnd0().procesa(this);
-    }
-
-    @Override
-    public void procesa(Negado e_negado) {
-        e_negado.opnd0().procesa(this);
-    }
-
-    @Override
-    public void procesa(Index e_indexado) {
-        e_indexado.opnd0().procesa(this);
-        e_indexado.opnd1().procesa(this);
-    }
-
-    @Override
-    public void procesa(Acceso e_campo) {
-        e_campo.opnd0().procesa(this);
-    }
-
-    @Override
-    public void procesa(Indireccion e_puntero) {
-        e_puntero.opnd0().procesa(this);
     }
 }
