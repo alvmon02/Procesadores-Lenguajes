@@ -2481,6 +2481,8 @@ public class SintaxisAbstractaTiny {
             System.out.println(".");
             System.out.println(id + "$f:" + leeFila() + ",c:" + leeCol() + "$");
         }
+
+        
     }
 
     public static class Indireccion extends ExpUni {

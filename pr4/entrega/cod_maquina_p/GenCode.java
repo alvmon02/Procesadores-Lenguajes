@@ -343,12 +343,23 @@ public class GenCode extends ProcesamientoDef {
     }
 
     public void procesa(Acceso exp) {
-        exp.opnd0().procesa(this); // Determinamos la dirección de E
-        int d = exp.desplazamiento(); // Obtenemos el indice que se pide
-        int tam_tipo = exp.opnd0().tipo().tam(); // Obtenemos el tamaño del tipo de E
-        m.emit(m.apila_int(tam_tipo)); // Apilamos el tamaño del tipo de E
-        m.emit(m.suma()); // Sumamos el desplazamiento del campo a la dirección de comienzo de E
-        m.emit(m.acceso()); // Emitimos la instrucción de acceso al campo
+        //Generamos código para obtener la dirección base de la estructura
+        exp.opnd0().procesa(this); 
+        
+        // si designador sacamos el valor apuntado
+        if (esDesignador(exp.opnd0()) && !claseDe(exp.opnd0(), Iden.class)) {
+            m.emit(m.apila_ind());
+        }
+        
+        //calulamos la dirección del campo
+        Tipo tipoRegistro = exp.opnd0().vinculo().tipo();
+        int desplazamiento = calcularDesplazamientoCampo(exp.id(), tipoRegistro.camposS());
+        
+        //apilamos el desplazamiento calculado
+        m.emit(m.apila_int(desplazamiento));
+        
+        //sumamos el desplazamiento a la dirección base para obtener la dirección del campo
+        m.emit(m.suma());
     }
 
     public void procesa(Indireccion exp) {
@@ -377,11 +388,43 @@ public class GenCode extends ProcesamientoDef {
     }
 
     public void procesa(Iden exp) {
-        // TODO algo habra que hacer aquí hacer lo de procesa_acceso_id de la memoria
+        Dec dec = (Dec) exp.vinculo();
+        
+        // Verificamos qué tipo de declaración es
+        if (claseDe(dec, Dec_Var.class)) {
+            // Es una variable local
+            Dec_Var decVar = (Dec_Var) dec;
+            int nivel = decVar.nivel();
+            int dir = decVar.dir();
+
+            m.emit(m.apilad(nivel));
+
+            m.emit(m.apila_int(dir));
+            
+            m.emit(m.suma());
+        }
+        else if (claseDe(dec, Dec_Proc.class)) {
+            // Es un procedimiento, apilamos su dirección
+            Dec_Proc decProc = (Dec_Proc) dec;
+            m.emit(m.apila_int(decProc.prim()));
+        }
     }
 
     public void procesa(Null exp) {
         m.emit(m.apila_int(-1));
     }
 
+
+    private int calcularDesplazamientoCampo(String id, CamposS camposS) {
+        if (id.equals(camposS.campoS().id())) {
+            return 0; // Este es el campo que buscamos
+        } else {
+            int tamCampoActual = camposS.campoS().tipo().tam();
+            if (claseDe(camposS, Mas_Cmp_S.class)) {
+                return tamCampoActual + calcularDesplazamientoCampo(id, camposS.camposS());
+            } else {
+                throw new RuntimeException("Campo no encontrado: " + id);
+            }
+        }
+}
 }
