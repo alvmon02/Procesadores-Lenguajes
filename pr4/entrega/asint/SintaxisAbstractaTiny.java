@@ -968,6 +968,10 @@ public class SintaxisAbstractaTiny {
             tipo.imprime();
             System.out.printf("[\n" + ent + "\n]$f:" + leeFila() + ",c:" + leeCol() + "$\n");
         }
+
+        public int numelems() {
+            return Integer.parseInt(ent);
+        }   
     }
 
     public static class T_Puntero extends Tipo {
