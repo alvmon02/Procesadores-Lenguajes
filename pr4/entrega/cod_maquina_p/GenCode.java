@@ -13,9 +13,11 @@ import java.io.Reader;
 
 public class GenCode extends ProcesamientoDef {
 
-    private boolean es_designador(SintaxisAbstractaTiny.Exp exp) {
-
-        return false;
+    private boolean esDesignador(Exp exp) {
+        return claseDe(exp, Index.class) ||
+                claseDe(exp, Acceso.class) ||
+                claseDe(exp, Indireccion.class) ||
+                claseDe(exp, Iden.class);
     }
 
     Reader reader = new InputStreamReader(System.in); // Inicializa el lector de entrada
@@ -67,7 +69,7 @@ public class GenCode extends ProcesamientoDef {
 
     public void procesa(I_If i_If) {
         i_If.exp().procesa(this);
-        if (es_designador(i_If.exp())) {
+        if (esDesignador(i_If.exp())) {
             m.emit(m.apila_ind());
         } else {
             m.emit(m.ir_f(i_If.sig()));
@@ -79,7 +81,7 @@ public class GenCode extends ProcesamientoDef {
 
     public void procesa(I_While i_While) {
         i_While.exp().procesa(this);
-        if (es_designador(i_While.exp())) {
+        if (esDesignador(i_While.exp())) {
             m.emit(m.apila_ind());
         } else {
             m.emit(m.ir_f(i_While.sig()));
@@ -96,7 +98,7 @@ public class GenCode extends ProcesamientoDef {
 
     public void procesa(I_Write i_Write) {
         i_Write.exp().procesa(this); // apilamos el valor a escribir
-        if (es_designador(i_Write.exp())) { // si el valor es una direccion
+        if (esDesignador(i_Write.exp())) { // si el valor es una direccion
             m.emit(m.apila_ind()); // apilamos el valor de la dirección
         }
         m.emit(m.write()); // escribimos el valor de la cima
@@ -180,13 +182,13 @@ public class GenCode extends ProcesamientoDef {
         exp.procesa(this); // Generamos el código para el valor/dirección del parámetro
 
         if (pform.ref() instanceof No_Ref) {
-            if (es_designador(exp)) { // Parámetro formal por valor y real es designador
+            if (esDesignador(exp)) { // Parámetro formal por valor y real es designador
                 m.emit(m.copia(pform.tipo().tam())); // Copiamos el valor apuntado por el designador
             } else {
                 m.emit(m.desapila_ind()); // Guardamos el valor en la dirección del parámetro
             }
         } else {
-            if (es_designador(exp)) { // Parámetro formal por referencia y real es designador
+            if (esDesignador(exp)) { // Parámetro formal por referencia y real es designador
                 m.emit(m.desapila_ind()); // Guardamos el valor apuntado por el preal en la dirección del pform
             } else {
                 throw new IllegalArgumentException(
@@ -210,13 +212,13 @@ public class GenCode extends ProcesamientoDef {
         if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) { // asignación
                                                                                                            // de un int
                                                                                                            // a un real
-            if (es_designador(exp.opnd1())) { // si el real es un designador
+            if (esDesignador(exp.opnd1())) { // si el real es un designador
                 m.emit(m.apila_ind()); // apilamos el valor apuntado por el designador
                 m.emit(m.int2real()); // convertimos el valor de la cima a real
                 m.emit(m.desapila_ind()); // guardamos el valor convertido a int en la dirección de opnd0
             }
         } else {
-            if (es_designador(exp.opnd1())) {
+            if (esDesignador(exp.opnd1())) {
                 m.emit(m.copia(exp.opnd1().tipo().tam()));
             } else {
                 m.emit(m.desapila_ind()); // coge la cima(valor que se quiere asignar), la subcima (dirección de la
@@ -230,7 +232,7 @@ public class GenCode extends ProcesamientoDef {
     private void prepararOperandos(final ExpBin exp) {
         // operando 0
         exp.opnd0().procesa(this);
-        if (es_designador(exp.opnd0())) {
+        if (esDesignador(exp.opnd0())) {
             m.emit(m.apila_ind());
         }
         // conversión antes de segundo operando
@@ -241,7 +243,7 @@ public class GenCode extends ProcesamientoDef {
 
         // operando 1
         exp.opnd1().procesa(this);
-        if (es_designador(exp.opnd1())) {
+        if (esDesignador(exp.opnd1())) {
             m.emit(m.apila_ind());
         }
         // conversión tras segundo operando
@@ -253,7 +255,7 @@ public class GenCode extends ProcesamientoDef {
 
     private void prepararOperando(final ExpUni exp) {
         exp.opnd0().procesa(this);
-        if (es_designador(exp.opnd0())) {
+        if (esDesignador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
     }
@@ -337,7 +339,7 @@ public class GenCode extends ProcesamientoDef {
     public void procesa(Index exp) {
         exp.opnd0().procesa(this); // Obtenemos la dirección del array
         exp.opnd1().procesa(this); // Obtenemos el índice
-        if (es_designador(exp.opnd0())) {
+        if (esDesignador(exp.opnd0())) {
             m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
         }
         m.emit(m.apila_int(exp.opnd0().tipo().tam())); // Apilamos el tamaño del tipo del array
