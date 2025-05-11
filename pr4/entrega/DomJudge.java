@@ -24,7 +24,7 @@ public class DomJudge {
 			procesa_prog(prog);
 	}
 
-	private static Prog construye_ast (Reader input) throws Exception {
+	private static Prog construye_ast(Reader input) throws Exception {
 		
 		int constructor_type = input.read();
 		
@@ -32,20 +32,7 @@ public class DomJudge {
 			try {
 				AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
 				c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTiny(alex);
-				//System.out.println("CONSTRUCCION AST ASCENDENTE");
-				//Prog prog = (Prog) asint.debug_parse().value;
 				Prog prog = (Prog) asint.parse().value;
-
-				/*
-				System.out.println("IMPRESION RECURSIVA");
-				new recursiva.Impresion().imprime(prog);
-
-				System.out.println("IMPRESION INTERPRETE");
-				prog.imprime();
-
-				System.out.println("IMPRESION VISITANTE");
-				prog.procesa(new visitante.Impresion());
-				*/
 				
 				return prog;
 			} catch (ErrorLexico e) {
@@ -57,22 +44,9 @@ public class DomJudge {
 
 			try {
 				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTiny(input);
-				//System.out.println("CONSTRUCCION AST DESCENDENTE");
-				//Prog prog = asint.analiza();
+
 				asint.disable_tracing();
-				Prog prog = asint.analiza();
-				
-				/*
-				System.out.println("IMPRESION RECURSIVA");
-				new recursiva.Impresion().imprime(prog);
-
-				System.out.println("IMPRESION INTERPRETE");
-				prog.imprime();
-
-				System.out.println("IMPRESION VISITANTE");
-				prog.procesa(new visitante.Impresion());
-				*/
-
+				return asint.analiza();
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
 			} catch (ParseException e) {
