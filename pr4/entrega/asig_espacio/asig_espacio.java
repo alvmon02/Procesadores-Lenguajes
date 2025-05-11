@@ -1,6 +1,5 @@
 package asig_espacio;
 
-
 import java.util.Collection;
 
 import java.util.List;
@@ -10,13 +9,13 @@ import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 import errores_procesamiento.*;
 
-public class asig_espacio extends ProcesamientoDef{
-    
+public class asig_espacio extends ProcesamientoDef {
+
     private int dir = 0;
     private int nivel = 0;
     private int max_dir = 0;
 
-    private void inc_dir(int tam){
+    private void inc_dir(int tam) {
         dir += tam;
         if (dir > max_dir) {
             max_dir = dir;
@@ -24,70 +23,68 @@ public class asig_espacio extends ProcesamientoDef{
     }
 
     @Override
-    public void procesa(Prog prog){
+    public void procesa(Prog prog) {
         prog.bloque().procesa(this);
     }
 
-    public void procesa(Bloque bloque){
+    public void procesa(Bloque bloque) {
         bloque.decs().procesa(this);
         bloque.intrs().procesa(this);
     }
 
     @Override
-    public void procesa(Si_Decs decs){
+    public void procesa(Si_Decs decs) {
         decs.ldecs().procesa(this);
         decs.ldecs().procesa2(this);
     }
 
     @Override
-    public void procesa(Mas_Decs decs){
+    public void procesa(Mas_Decs decs) {
         decs.ldecs().procesa(this);
         decs.dec().procesa(this);
     }
 
-
     @Override
-    public void procesa2(Mas_Decs decs){
+    public void procesa2(Mas_Decs decs) {
         decs.ldecs().procesa2(this);
         decs.dec().procesa2(this);
     }
 
-
     @Override
-    public void procesa(Una_Dec dec){
+    public void procesa(Una_Dec dec) {
         dec.dec().procesa(this);
     }
 
     @Override
-    public void procesa2(Una_Dec dec){
+    public void procesa2(Una_Dec dec) {
         dec.dec().procesa2(this);
     }
 
     @Override
-    public void procesa (Dec_Var dec_Var){
+    public void procesa(Dec_Var dec_Var) {
         dec_Var.ponDir(dir);
-        dec_Var.ponNivel(nivel); //todo
+        dec_Var.ponNivel(nivel); // todo
         dec_Var.tipo().procesa(this);
-        inc_dir(dec_Var.tipo().tam()); //todo
+        inc_dir(dec_Var.tipo().tam()); // todo
     }
 
     @Override
-    public void procesa2(Dec_Var dec_var){
+    public void procesa2(Dec_Var dec_var) {
         dec_var.tipo().procesa(this);
     }
 
     @Override
-    public void procesa(Dec_Tipo dec_tipo){
+    public void procesa(Dec_Tipo dec_tipo) {
         dec_tipo.tipo().procesa(this);
     }
 
     @Override
-    public void procesa2(Dec_Tipo dec_tipo){
+    public void procesa2(Dec_Tipo dec_tipo) {
         dec_tipo.tipo().procesa2(this);
     }
 
     @Override
-    public void procesa(Dec_Proc dec_proc){
+    public void procesa(Dec_Proc dec_proc) {
         int dir_ant = dir;
         int max_dir_ant = max_dir;
         nivel++;
@@ -103,85 +100,85 @@ public class asig_espacio extends ProcesamientoDef{
     }
 
     @Override
-    public void procesa2(Dec_Proc dec_proc){
+    public void procesa2(Dec_Proc dec_proc) {
         dec_proc.pforms().procesa2(this);
         dec_proc.prog().procesa2(this);
     }
 
     @Override
-    public void procesa(Si_PForms si_pforms){
+    public void procesa(Si_PForms si_pforms) {
         si_pforms.pforms().procesa(this);
     }
 
     @Override
-    public void procesa(Mas_PForms mas_pforms){
+    public void procesa(Mas_PForms mas_pforms) {
         mas_pforms.pforms().procesa(this);
         mas_pforms.pform().procesa(this);
     }
 
     @Override
-    public void procesa(Una_PForm una_pform){
+    public void procesa(Una_PForm una_pform) {
         una_pform.pform().procesa(this);
     }
 
     @Override
-    public void procesa(T_Iden t_iden){
-        t_iden.ponTam(t_iden.vinculo().tipo().tam()); //todo
+    public void procesa(T_Iden t_iden) {
+        t_iden.ponTam(t_iden.vinculo().tipo().tam()); // todo
     }
 
     @Override
-    public void procesa2(T_Iden t_iden){
+    public void procesa2(T_Iden t_iden) {
     }
 
     @Override
-    public void procesa(T_String t_string){
-        t_string.ponTam(1); //todo
+    public void procesa(T_String t_string) {
+        t_string.ponTam(1); // todo
     }
 
     @Override
-    public void procesa2(T_String t_string){
+    public void procesa2(T_String t_string) {
     }
 
     @Override
-    public void procesa(T_Int t_int){
-        t_int.ponTam(1); //todo
+    public void procesa(T_Int t_int) {
+        t_int.ponTam(1); // todo
     }
 
     @Override
-    public void procesa2(T_Int t_int){
+    public void procesa2(T_Int t_int) {
     }
 
     @Override
-    public void procesa(T_Bool t_bool){
-        t_bool.ponTam(1); //todo
+    public void procesa(T_Bool t_bool) {
+        t_bool.ponTam(1); // todo
     }
 
     @Override
-    public void procesa2(T_Bool t_bool){
+    public void procesa2(T_Bool t_bool) {
     }
 
     @Override
-    public void procesa(T_Real t_real){
-        t_real.ponTam(1); //todo
+    public void procesa(T_Real t_real) {
+        t_real.ponTam(1); // todo
     }
 
     @Override
-    public void procesa2(T_Real t_real){
+    public void procesa2(T_Real t_real) {
     }
 
     @Override
-    public void procesa(T_Array t_array){
-        t_array.ponDir(dir); //todo
+    public void procesa(T_Array t_array) {
+        t_array.ponDir(dir); // todo
         t_array.tipo().procesa(this);
-        t_array.ponTam(t_array.tipo().tam() * t_array.numelems()); //todo
+        t_array.ponTam(t_array.tipo().tam() * Integer.parseInt(t_array.ent())); 
     }
 
     @Override
-    public void procesa2(T_Array t_array){
+    public void procesa2(T_Array t_array) {
     }
 
     @Override
-    public void procesa(T_Puntero t_puntero){
+    public void procesa(T_Puntero t_puntero) {
         if (!(t_puntero.tipo() instanceof T_Iden)) {
             t_puntero.tipo().procesa(this);
         }
@@ -189,7 +186,7 @@ public class asig_espacio extends ProcesamientoDef{
     }
 
     @Override
-    public void procesa2(T_Puntero t_puntero){
+    public void procesa2(T_Puntero t_puntero) {
         if (t_puntero.tipo() instanceof T_Iden) {
             T_Iden tipoIden = (T_Iden) t_puntero.tipo();
             if (tipoIden.vinculo() instanceof Dec_Tipo) {
@@ -202,43 +199,42 @@ public class asig_espacio extends ProcesamientoDef{
     }
 
     @Override
-    public void procesa(T_Struct t_struct){
+    public void procesa(T_Struct t_struct) {
         t_struct.camposS().procesa(this);
     }
 
     @Override
-    public void procesa(Mas_Cmp_S mas_cmp_s){
+    public void procesa(Mas_Cmp_S mas_cmp_s) {
         mas_cmp_s.camposS().procesa(this);
         mas_cmp_s.campoS().procesa2(this);
     }
 
     @Override
-    public void procesa(Un_Cmp_S una_cmp_s){
+    public void procesa(Un_Cmp_S una_cmp_s) {
         una_cmp_s.campoS().procesa2(this);
     }
 
     @Override
-    public void procesa(CampoS campoS){
-        campoS.ponDir(dir); //todo
+    public void procesa(CampoS campoS) {
+        campoS.ponDir(dir); // todo
         campoS.procesa(this);
-        campoS.ponTam(campoS.tipo().tam()); //todo
-        dir += campoS.tam(); //todo
+        campoS.ponTam(campoS.tipo().tam()); // todo
+        dir += campoS.tam(); // todo
     }
 
-
     @Override
-    public void procesa(Si_Intrs si_intrs){
+    public void procesa(Si_Intrs si_intrs) {
         si_intrs.intrs().procesa(this);
     }
 
     @Override
-    public void procesa(Mas_Intrs mas_intrs){
+    public void procesa(Mas_Intrs mas_intrs) {
         mas_intrs.intrs().procesa(this);
         mas_intrs.intr().procesa(this);
     }
 
     @Override
-    public void procesa(Una_Intr una_intr){
+    public void procesa(Una_Intr una_intr) {
         una_intr.intr().procesa(this);
     }
 
@@ -272,7 +268,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(I_NL i_nl) {
-        
+
     }
 
     @Override
