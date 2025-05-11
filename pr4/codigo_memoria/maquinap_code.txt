@@ -283,16 +283,16 @@ gen_code(e_iden(id)):
 
 gen_acc_id(dec_var(tipo, id)):
     if $.nivel == 0: // variable global
-        emit apila_int($.vinculo.dir) //apilamos la dirección de la variable
+        emit apila_int($.dir) //apilamos la dirección de la variable
     else:
         emit apilad($.nivel) //apilamos el display de nivel $.nivel
-        emit apila_int($.vinculo.dir) //apilamos la dirección de la variable
+        emit apila_int($.dir) //apilamos la dirección de la variable
         emit suma //apilamos la dirección de la variable (display + dir var)
     end if
 
 gen_acc_id(pform(tipo, ref, id)):
     emit apilad($.nivel) //apilamos el display de nivel $.nivel
-    emit apila_int($.vinculo.dir) //apilamos la dirección de la variable
+    emit apila_int($.dir) //apilamos la dirección de la variable
     emit suma //apilamos la dirección de la variable (display + dir var)
     if ref == si_ref() then:
         emit apila_ind()

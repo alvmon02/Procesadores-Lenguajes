@@ -235,16 +235,16 @@ public class GenCode extends ProcesamientoDef {
         // operando 0
         procesa_exp(exp.opnd0());
         // conversión antes de segundo operando
-        if (claseDe(exp.opnd0().vinculo(), T_Int.class)
-                && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+        if (claseDe(referenciar(exp.opnd0().tipo()), T_Int.class)
+                && claseDe(referenciar(exp.opnd1().tipo()), T_Real.class)) {
             m.emit(m.int2real());
         }
 
         // operando 1
         procesa_exp(exp.opnd1());
         // conversión tras segundo operando
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class)
-                && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+        if (claseDe(referenciar(exp.opnd0().tipo()), T_Real.class)
+                && claseDe(referenciar(exp.opnd1().tipo()), T_Int.class)) {
             m.emit(m.int2real());
         }
     }
@@ -343,7 +343,8 @@ public class GenCode extends ProcesamientoDef {
     public void procesa(Index exp) {
         exp.opnd0().procesa(this); // Obtenemos la dirección del array
         procesa_exp(exp.opnd1()); // Obtenemos el índice
-        m.emit(m.apila_int(exp.opnd0().tipo().tipo().tam())); // Apilamos el tamaño del tipo del array
+        m.emit(m.apila_int(referenciar(referenciar(exp.opnd0().tipo()).tipo()).tam())); // Apilamos el tamaño del tipo
+                                                                                        // del array
         m.emit(m.mul()); // Apilamos el desplazamiento del índice
         m.emit(m.suma()); // Sumamos el desplazamiento del índice a la dirección de comienzo del array
     }
@@ -352,11 +353,6 @@ public class GenCode extends ProcesamientoDef {
     public void procesa(Acceso exp) {
         // Generamos código para obtener la dirección base de la estructura
         exp.opnd0().procesa(this);
-
-        // si designador sacamos el valor apuntado
-        if (esDesignador(exp.opnd0()) && !claseDe(exp.opnd0(), Iden.class)) {
-            m.emit(m.apila_ind());
-        }
 
         // calulamos la dirección del campo
         Tipo tipoRegistro = referenciar(exp.opnd0().tipo());
@@ -407,23 +403,20 @@ public class GenCode extends ProcesamientoDef {
 
         // Verificamos qué tipo de declaración es
         if (claseDe(dec, Dec_Var.class)) {
-            // Es una variable local
             if (dec.nivel() == 0) {
-
+                m.emit(m.apila_int(dec.dir()));
+            } else {
+                m.emit(m.apilad(dec.nivel()));
+                m.emit(m.apila_int(dec.dir()));
+                m.emit(m.suma());
             }
-            Dec_Var decVar = (Dec_Var) dec;
-            int nivel = decVar.nivel();
-            int dir = decVar.dir();
-
-            m.emit(m.apilad(nivel));
-
-            m.emit(m.apila_int(dir));
-
-            m.emit(m.suma());
         } else if (claseDe(dec, PForm.class)) {
-            // Es un procedimiento, apilamos su dirección
-            PForm decProc = (PForm) dec;
-            m.emit(m.apila_int(decProc.prim()));
+            m.emit(m.apilad(dec.nivel()));
+            m.emit(m.apila_int(dec.dir()));
+            m.emit(m.suma());
+            if (claseDe(((PForm) dec).ref(), Si_Ref.class)) {
+                m.emit(m.apila_ind());
+            }
         }
     }
 
@@ -434,12 +427,11 @@ public class GenCode extends ProcesamientoDef {
 
     private int calcularDesplazamientoCampo(String id, CamposS camposS) {
         if (id.equals(camposS.campoS().id())) {
-            return 0; // Este es el campo que buscamos
+            return camposS.campoS().dir(); // Este es el campo que buscamos
         } else {
-            int tamCampoActual = camposS.campoS().tipo().tam();
             if (claseDe(camposS, Mas_Cmp_S.class)) {
-                return tamCampoActual + calcularDesplazamientoCampo(id, camposS.camposS());
-            } else {
+                return calcularDesplazamientoCampo(id, camposS.camposS());
+            } else { // No deberia de llegar aqui
                 throw new RuntimeException("Campo no encontrado: " + id);
             }
         }
