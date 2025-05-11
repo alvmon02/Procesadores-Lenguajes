@@ -7,10 +7,9 @@ gen_code(prog(bloque))
     while not es_vacia(sub_pendientes)
         sub = cima(sub_pendientes)
         desapila(sub_pendientes)
-        let sub = dec_proc(id, param, decs, Is) in 
+        let sub = dec_proc(id, param, prog) in 
             emit desapilad(sub.nivel)
-            recolecta_subs(Decs)
-            gen_code(Is)
+            gen_code(prog)
             emit desactiva(sub.nivel, sub.tam)
             emit ir_ind()
         end let
@@ -71,7 +70,7 @@ gen_code(i_prog(bloque)):
     gen_code(bloque)
 
 gen_code(si_else(bloque)):
-    emit ir_a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
+    emit ir_a($.sig) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
     gen_code(bloque)
 
 gen_code(no_else(bloque)):
@@ -200,8 +199,6 @@ gen_code(i_call(id, preals)):
     proc = $.vinculo
     //preparar el resgistro de activación
     emit activa(proc.nivel, proc.tam, $.sig) //en la cima tenemos la dirección de comienzo del registro de activación
-
-    id_pform = 0
 
     gen_code_params(proc.pforms, preals)
     emit ir_a(proc.prim)

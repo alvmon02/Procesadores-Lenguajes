@@ -1,16 +1,16 @@
 package cod_maquina_p;
 
-import java.util.Arrays;
-
 import asint.ProcesamientoDef;
-import asint.SintaxisAbstractaTiny;
 import asint.SintaxisAbstractaTiny.*;
 import maquinap.*;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Stack;
 
 public class GenCode extends ProcesamientoDef {
+
+    private Stack<Dec_Proc> subPendientes = new Stack<>();
 
     private boolean esDesignador(Exp exp) {
         return claseDe(exp, Index.class) ||
@@ -20,105 +20,136 @@ public class GenCode extends ProcesamientoDef {
     }
 
     Reader reader = new InputStreamReader(System.in); // Inicializa el lector de entrada
-    private MaquinaP m = new MaquinaP(reader, 5, 10, 10, 2); // habrá que inicializarla con los params correctos
+    private MaquinaP m = new MaquinaP(reader, 1000, 1000, 1000, 10); // habrá que inicializarla con los params correctos
 
-    public void procesa(Prog prog) {
-        prog.bloque().procesa(this);
+    private void procesarSubPendientes() {
+        while (!subPendientes.empty()) {
+            Dec_Proc sub = subPendientes.pop();
+            m.emit(m.apilad(sub.nivel()));
+            sub.prog().procesa(this);
+            m.emit(m.desactiva(sub.nivel(), sub.tam()));
+            m.emit(m.ir_ind());
+        }
     }
 
+    @Override
+    public void procesa(Prog prog) {
+        prog.bloque().procesa(this);
+        m.emit(m.stop());
+        procesarSubPendientes();
+    }
+
+    @Override
     public void procesa(Bloque bloque) {
         bloque.decs().procesa(this);
         bloque.intrs().procesa(this);
     }
 
+    @Override
     public void procesa(Si_Decs decs) {
         decs.ldecs().procesa(this);
     }
 
-    public void procesa(No_Decs decs) {
-    }
-
+    @Override
     public void procesa(Mas_Decs decs) {
         decs.ldecs().procesa(this);
         decs.dec().procesa(this);
     }
 
+    @Override
     public void procesa(Una_Dec dec) {
         dec.dec().procesa(this);
     }
 
+    @Override
+    public void procesa(Dec_Proc dec_Proc) {
+        subPendientes.push(dec_Proc);
+    }
+
+    @Override
     public void procesa(Si_Intrs si_Intrs) {
         si_Intrs.intrs().procesa(this);
     }
 
+    @Override
     public void procesa(Mas_Intrs mas_Intrs) {
         mas_Intrs.intrs().procesa(this);
         mas_Intrs.intr().procesa(this);
     }
 
+    @Override
     public void procesa(Una_Intr una_Intr) {
         una_Intr.intr().procesa(this);
     }
 
+    @Override
     public void procesa(I_Eval i_Eval) {
         i_Eval.exp().procesa(this);
         m.emit(m.desapila());
     }
 
+    private void procesa_exp(Exp exp) {
+        exp.procesa(this);
+        procesa_acc(exp);
+    }
+
+    private void procesa_acc(Exp exp) {
+        if (esDesignador(exp)) {
+            m.emit(m.apila_ind());
+        }
+    }
+
+    @Override
     public void procesa(I_If i_If) {
-        i_If.exp().procesa(this);
-        if (esDesignador(i_If.exp())) {
-            m.emit(m.apila_ind());
-        } else {
-            m.emit(m.ir_f(i_If.sig()));
-            i_If.prog().procesa(this);
-            m.emit(m.ir_a(i_If.fin()));
-            i_If.i_else().procesa(this);
-        }
+        procesa_exp(i_If.exp());
+        m.emit(m.ir_f(i_If.sig()));
+        i_If.prog().procesa(this);
+        i_If.i_else().procesa(this);
     }
 
+    @Override
     public void procesa(I_While i_While) {
-        i_While.exp().procesa(this);
-        if (esDesignador(i_While.exp())) {
-            m.emit(m.apila_ind());
-        } else {
-            m.emit(m.ir_f(i_While.sig()));
-            i_While.prog().procesa(this);
-            m.emit(m.ir_a(i_While.prim()));
-        }
+        procesa_exp(i_While.exp());
+        m.emit(m.ir_f(i_While.sig()));
+        i_While.prog().procesa(this);
+        m.emit(m.ir_a(i_While.prim()));
     }
 
+    @Override
     public void procesa(I_Read i_Read) {
         i_Read.exp().procesa(this); // dirección de lectura se deja en la cima
         m.emit(m.read()); // lee el valor y se guarda en la cima
         m.emit(m.desapila_ind()); // guarda la cima en la dirección de la subcima
     }
 
+    @Override
     public void procesa(I_Write i_Write) {
-        i_Write.exp().procesa(this); // apilamos el valor a escribir
-        if (esDesignador(i_Write.exp())) { // si el valor es una direccion
-            m.emit(m.apila_ind()); // apilamos el valor de la dirección
-        }
+        procesa_exp(i_Write.exp());
         m.emit(m.write()); // escribimos el valor de la cima
     }
 
+    @Override
     public void procesa(I_NL i_Nl) {
-        // TODO hay que ver si hace algo, puede que tenga que escribir un salto de línea
+        m.emit(m.nl()); // escribimos un salto de línea
     }
 
+    @Override
     public void procesa(I_New i_New) {
         i_New.exp().procesa(this);
-        m.emit(m.alloc(i_New.tipo().tam())); // se aisgna espacio desde la posicion de la cima. Tamaño asignado el del
-                                             // tipo
+        m.emit(m.alloc(i_New.exp().tipo().tipo().tam())); // se aisgna espacio desde la posicion de la cima.
+                                                          // Tamaño asignado el del tipo
+        m.emit(m.desapila_ind());
     }
 
+    @Override
     public void procesa(I_Delete i_Delete) {
         i_Delete.exp().procesa(this);
         m.emit(m.apila_ind());
-        m.emit(m.dealloc(i_Delete.tipo().tam())); // desapila la cima que tiene la direccion de inicio y desde esa pos
-                                                  // se libera el tamaño del tipo
+        m.emit(m.dealloc(i_Delete.exp().tipo().tipo().tam())); // desapila la cima que tiene la direccion de inicio y
+                                                               // desde esa pos se libera el tamaño del tipo
     }
 
+    @Override
     public void procesa(I_Call i_Call) {
         Dec_Proc proc = (Dec_Proc) i_Call.vinculo();
         m.emit(m.activa(proc.nivel(), proc.tam(), i_Call.sig())); // Activamos el registro de activación
@@ -129,48 +160,16 @@ public class GenCode extends ProcesamientoDef {
     }
 
     private void genCodeParams(PForms pforms, PReals preals) {
-        if (pforms instanceof No_PForms && preals instanceof No_PReals) {
-            handleNoPFormsAndNoPReals();
-        } else {
-            if (claseDe(pforms, Si_PForms.class) && claseDe(preals, Si_PReals.class)) {
-                handleSiPFormsAndSiPReals((Si_PForms) pforms, (Si_PReals) preals);
-            } else if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
-                handleMasPFormsAndMasPReals((Mas_PForms) pforms.pforms(), (Mas_PReals) preals.preals());
-            } else if (claseDe(pforms, Una_PForm.class) && claseDe(preals, Un_PReal.class)) {
-                handleUnaPFormAndUnPReal((Una_PForm) pforms.pforms(), (Un_PReal) preals.preals());
-            } else {
-                throw new IllegalArgumentException("Error: No se puede procesar la combinación de PForms y PReals.");
-            }
+        if (claseDe(pforms, Si_PForms.class)) {
+            genCodeParams(pforms.pforms(), preals.preals());
         }
-    }
-
-    private void handleNoPFormsAndNoPReals() {
-        // No hacemos nada, ya que no hay parámetros formales ni reales
     }
 
     private void genCodeParams(LPForms pforms, LPReals preals) {
-        if (claseDe(pforms, No_PForms.class) && claseDe(preals, No_PReals.class)) {
-            return; // no hacemos nada
-        } else if (claseDe(pforms, Mas_PForms.class) && claseDe(preals, Mas_PReals.class)) {
-            handleMasPFormsAndMasPReals((Mas_PForms) pforms, (Mas_PReals) preals);
-        } else if (claseDe(pforms, Una_PForm.class) && claseDe(preals, Un_PReal.class)) {
-            handleUnaPFormAndUnPReal((Una_PForm) pforms, (Un_PReal) preals);
-        } else {
-            throw new IllegalArgumentException("Error: No se puede procesar la combinación de PForms y PReals.");
+        if (claseDe(pforms, Mas_PForms.class)) {
+            genCodeParams(pforms.pforms(), preals.preals());
         }
-    }
-
-    private void handleSiPFormsAndSiPReals(Si_PForms siPforms, Si_PReals siPreals) {
-        genCodeParams(siPforms.pforms(), siPreals.preals());
-    }
-
-    private void handleMasPFormsAndMasPReals(Mas_PForms masPforms, Mas_PReals masPreals) {
-        genCodeParams(masPforms.pforms(), masPreals.preals());
-        genCodeParams(masPforms.pform(), masPreals.exp());
-    }
-
-    private void handleUnaPFormAndUnPReal(Una_PForm unaPform, Un_PReal unPreal) {
-        genCodeParams(unaPform.pform(), unPreal.exp());
+        genCodeParams(pforms.pform(), preals.exp());
     }
 
     private void genCodeParams(PForm pform, Exp exp) {
@@ -179,8 +178,13 @@ public class GenCode extends ProcesamientoDef {
         m.emit(m.suma()); // Calculamos la dirección de comienzo del parámetro
         exp.procesa(this); // Generamos el código para el valor/dirección del parámetro
 
-        if (pform.ref() instanceof No_Ref) {
-            if (esDesignador(exp)) { // Parámetro formal por valor y real es designador
+        if (claseDe(pform.ref(), No_Ref.class)) {
+            if (claseDe(referenciar(pform.tipo()), T_Real.class)
+                    && claseDe(referenciar(exp.tipo()), T_Int.class)) { // Parámetro formal por valor y real es int
+                procesa_acc(exp);
+                m.emit(m.int2real()); // Convertimos el valor de la cima a real
+                m.emit(m.desapila_ind()); // Guardamos el valor convertido a real en la dirección del parámetro
+            } else if (esDesignador(exp)) { // Parámetro formal por valor y real es designador
                 m.emit(m.copia(pform.tipo().tam())); // Copiamos el valor apuntado por el designador
             } else {
                 m.emit(m.desapila_ind()); // Guardamos el valor en la dirección del parámetro
@@ -195,14 +199,18 @@ public class GenCode extends ProcesamientoDef {
         }
     }
 
+    @Override
     public void procesa(I_Prog i_Prog) {
         i_Prog.prog().procesa(this);
     }
 
+    @Override
     public void procesa(Si_Else si_Else) {
+        m.emit(m.ir_a(si_Else.sig()));
         si_Else.prog().procesa(this);
     }
 
+    @Override
     public void procesa(Asig exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
@@ -210,11 +218,9 @@ public class GenCode extends ProcesamientoDef {
         if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) { // asignación
                                                                                                            // de un int
                                                                                                            // a un real
-            if (esDesignador(exp.opnd1())) { // si el real es un designador
-                m.emit(m.apila_ind()); // apilamos el valor apuntado por el designador
-                m.emit(m.int2real()); // convertimos el valor de la cima a real
-                m.emit(m.desapila_ind()); // guardamos el valor convertido a int en la dirección de opnd0
-            }
+            procesa_acc(exp.opnd1());
+            m.emit(m.int2real()); // convertimos el valor de la cima a real
+            m.emit(m.desapila_ind()); // guardamos el valor convertido a int en la dirección de opnd0
         } else {
             if (esDesignador(exp.opnd1())) {
                 m.emit(m.copia(exp.opnd1().tipo().tam()));
@@ -227,10 +233,7 @@ public class GenCode extends ProcesamientoDef {
 
     private void prepararOperandos(final ExpBin exp) {
         // operando 0
-        exp.opnd0().procesa(this);
-        if (esDesignador(exp.opnd0())) {
-            m.emit(m.apila_ind());
-        }
+        procesa_exp(exp.opnd0());
         // conversión antes de segundo operando
         if (claseDe(exp.opnd0().vinculo(), T_Int.class)
                 && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
@@ -238,10 +241,7 @@ public class GenCode extends ProcesamientoDef {
         }
 
         // operando 1
-        exp.opnd1().procesa(this);
-        if (esDesignador(exp.opnd1())) {
-            m.emit(m.apila_ind());
-        }
+        procesa_exp(exp.opnd1());
         // conversión tras segundo operando
         if (claseDe(exp.opnd0().vinculo(), T_Real.class)
                 && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
@@ -249,150 +249,168 @@ public class GenCode extends ProcesamientoDef {
         }
     }
 
-    private void prepararOperando(final ExpUni exp) {
-        exp.opnd0().procesa(this);
-        if (esDesignador(exp.opnd0())) {
-            m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
-        }
-    }
-
+    @Override
     public void procesa(Comp exp) {
         prepararOperandos(exp);
         m.emit(m.comp()); // Emitimos la instrucción de comparación
     }
 
+    @Override
     public void procesa(Dist exp) {
         prepararOperandos(exp);
         m.emit(m.dist()); // Emitimos la instrucción de distinto
     }
 
+    @Override
     public void procesa(Menor exp) {
         prepararOperandos(exp);
         m.emit(m.lt()); // Emitimos la instrucción de menor que
     }
 
+    @Override
     public void procesa(Mayor exp) {
         prepararOperandos(exp);
         m.emit(m.gt()); // Emitimos la instrucción de mayor que
     }
 
+    @Override
     public void procesa(MenorIgual exp) {
         prepararOperandos(exp);
         m.emit(m.leq()); // Emitimos la instrucción de menor o igual que
     }
 
+    @Override
     public void procesa(MayorIgual exp) {
         prepararOperandos(exp);
         m.emit(m.geq()); // Emitimos la instrucción de mayor o igual que
     }
 
+    @Override
     public void procesa(Suma exp) {
         prepararOperandos(exp);
         m.emit(m.suma()); // Emitimos la instrucción de suma
     }
 
+    @Override
     public void procesa(Resta exp) {
         prepararOperandos(exp);
         m.emit(m.resta()); // Emitimos la instrucción de resta (suma con el negativo del segundo operando)
     }
 
+    @Override
     public void procesa(And exp) {
         prepararOperandos(exp);
         m.emit(m.and()); // Emitimos la instrucción de AND
     }
 
+    @Override
     public void procesa(Or exp) {
         prepararOperandos(exp);
         m.emit(m.or()); // Emitimos la instrucción de OR
     }
 
+    @Override
     public void procesa(Mul exp) {
         prepararOperandos(exp);
         m.emit(m.mul()); // Emitimos la instrucción de multiplicación
     }
 
+    @Override
     public void procesa(Div exp) {
         prepararOperandos(exp);
         m.emit(m.div()); // Emitimos la instrucción de división
     }
 
+    @Override
     public void procesa(Porcentaje exp) {
         prepararOperandos(exp);
         m.emit(m.porcentaje()); // Emitimos la instrucción de módulo
     }
 
+    @Override
     public void procesa(Negativo exp) {
-        prepararOperando(exp); // Preparamos el operando
+        procesa_exp(exp); // Preparamos el operando
         m.emit(m.negativo()); // Negamos el valor de la cima
     }
 
+    @Override
     public void procesa(Negado exp) {
-        prepararOperando(exp);
+        procesa_exp(exp);
         m.emit(m.negado()); // Negamos el valor de la cima
     }
 
+    @Override
     public void procesa(Index exp) {
         exp.opnd0().procesa(this); // Obtenemos la dirección del array
-        exp.opnd1().procesa(this); // Obtenemos el índice
-        if (esDesignador(exp.opnd0())) {
-            m.emit(m.apila_ind()); // Apilamos el valor apuntado por el designador
-        }
-        m.emit(m.apila_int(exp.opnd0().tipo().tam())); // Apilamos el tamaño del tipo del array
+        procesa_exp(exp.opnd1()); // Obtenemos el índice
+        m.emit(m.apila_int(exp.opnd0().tipo().tipo().tam())); // Apilamos el tamaño del tipo del array
         m.emit(m.mul()); // Apilamos el desplazamiento del índice
         m.emit(m.suma()); // Sumamos el desplazamiento del índice a la dirección de comienzo del array
     }
 
+    @Override // TODO revisar acceso esta mal
     public void procesa(Acceso exp) {
-        //Generamos código para obtener la dirección base de la estructura
-        exp.opnd0().procesa(this); 
-        
+        // Generamos código para obtener la dirección base de la estructura
+        exp.opnd0().procesa(this);
+
         // si designador sacamos el valor apuntado
         if (esDesignador(exp.opnd0()) && !claseDe(exp.opnd0(), Iden.class)) {
             m.emit(m.apila_ind());
         }
-        
-        //calulamos la dirección del campo
-        Tipo tipoRegistro = exp.opnd0().vinculo().tipo();
+
+        // calulamos la dirección del campo
+        Tipo tipoRegistro = referenciar(exp.opnd0().tipo());
         int desplazamiento = calcularDesplazamientoCampo(exp.id(), tipoRegistro.camposS());
-        
-        //apilamos el desplazamiento calculado
+
+        // apilamos el desplazamiento calculado
         m.emit(m.apila_int(desplazamiento));
-        
-        //sumamos el desplazamiento a la dirección base para obtener la dirección del campo
+
+        // sumamos el desplazamiento a la dirección base para obtener la dirección del
+        // campo
         m.emit(m.suma());
     }
 
+    @Override
     public void procesa(Indireccion exp) {
         exp.opnd0().procesa(this); // Determinamos dirección de E
         m.emit(m.apila_ind()); // Apilamos la dirección a la que apunta el puntero
     }
 
+    @Override
     public void procesa(Lit_ent exp) {
         m.emit(m.apila_int(Integer.parseInt(exp.num()))); // Apilamos el valor entero
     }
 
+    @Override
     public void procesa(True exp) {
         m.emit(m.apila_bool(true));
     }
 
+    @Override
     public void procesa(False exp) {
         m.emit(m.apila_bool(false));
     }
 
+    @Override
     public void procesa(Lit_real exp) {
         m.emit(m.apila_real(Float.parseFloat(exp.num()))); // Apilamos el valor real
     }
 
+    @Override
     public void procesa(Cadena exp) {
         m.emit(m.apila_str(exp.string())); // Apilamos la cadena
     }
 
+    @Override
     public void procesa(Iden exp) {
-        Dec dec = (Dec) exp.vinculo();
-        
+        Nodo dec = exp.vinculo();
+
         // Verificamos qué tipo de declaración es
         if (claseDe(dec, Dec_Var.class)) {
             // Es una variable local
+            if (dec.nivel() == 0) {
+
+            }
             Dec_Var decVar = (Dec_Var) dec;
             int nivel = decVar.nivel();
             int dir = decVar.dir();
@@ -400,20 +418,19 @@ public class GenCode extends ProcesamientoDef {
             m.emit(m.apilad(nivel));
 
             m.emit(m.apila_int(dir));
-            
+
             m.emit(m.suma());
-        }
-        else if (claseDe(dec, Dec_Proc.class)) {
+        } else if (claseDe(dec, PForm.class)) {
             // Es un procedimiento, apilamos su dirección
-            Dec_Proc decProc = (Dec_Proc) dec;
+            PForm decProc = (PForm) dec;
             m.emit(m.apila_int(decProc.prim()));
         }
     }
 
+    @Override
     public void procesa(Null exp) {
         m.emit(m.apila_int(-1));
     }
-
 
     private int calcularDesplazamientoCampo(String id, CamposS camposS) {
         if (id.equals(camposS.campoS().id())) {
@@ -426,5 +443,5 @@ public class GenCode extends ProcesamientoDef {
                 throw new RuntimeException("Campo no encontrado: " + id);
             }
         }
-}
+    }
 }

@@ -826,6 +826,19 @@ public class MaquinaP {
         }
     }
 
+    private Instruccion NL;
+
+    private class NL implements Instruccion {
+        public void ejecuta() {
+            System.out.println();
+            pc++;
+        }
+
+        public String toString() {
+            return "NL";
+        }
+    }
+
     public Instruccion suma() {
         return ISUMA;
     }
@@ -974,6 +987,10 @@ public class MaquinaP {
         return ISTOP;
     }
 
+    public Instruccion nl() {
+        return NL;
+    }
+
     public void emit(Instruccion i) {
         codigoP.add(i);
     }
@@ -1036,35 +1053,35 @@ public class MaquinaP {
     }
 
     // public static void main(String[] args) {
-    //     MaquinaP m = new MaquinaP(5, 10, 10, 2);
+    // MaquinaP m = new MaquinaP(5, 10, 10, 2);
 
-    //     /*
-    //      * int x;
-    //      * proc store(int v) {
-    //      * x = v
-    //      * }
-    //      * &&
-    //      * call store(5)
-    //      */
+    // /*
+    // * int x;
+    // * proc store(int v) {
+    // * x = v
+    // * }
+    // * &&
+    // * call store(5)
+    // */
 
-    //     m.emit(m.activa(1, 1, 8));
-    //     m.emit(m.dup());
-    //     m.emit(m.apila_int(0));
-    //     m.emit(m.suma());
-    //     m.emit(m.apila_int(5));
-    //     m.emit(m.desapila_ind());
-    //     m.emit(m.desapilad(1));
-    //     m.emit(m.ir_a(9));
-    //     m.emit(m.stop());
-    //     m.emit(m.apila_int(0));
-    //     m.emit(m.apilad(1));
-    //     m.emit(m.apila_int(0));
-    //     m.emit(m.suma());
-    //     m.emit(m.copia(1));
-    //     m.emit(m.desactiva(1, 1));
-    //     m.emit(m.ir_ind());
-    //     m.muestraCodigo();
-    //     m.ejecuta();
-    //     m.muestraEstado();
+    // m.emit(m.activa(1, 1, 8));
+    // m.emit(m.dup());
+    // m.emit(m.apila_int(0));
+    // m.emit(m.suma());
+    // m.emit(m.apila_int(5));
+    // m.emit(m.desapila_ind());
+    // m.emit(m.desapilad(1));
+    // m.emit(m.ir_a(9));
+    // m.emit(m.stop());
+    // m.emit(m.apila_int(0));
+    // m.emit(m.apilad(1));
+    // m.emit(m.apila_int(0));
+    // m.emit(m.suma());
+    // m.emit(m.copia(1));
+    // m.emit(m.desactiva(1, 1));
+    // m.emit(m.ir_ind());
+    // m.muestraCodigo();
+    // m.ejecuta();
+    // m.muestraEstado();
     // }
 }
