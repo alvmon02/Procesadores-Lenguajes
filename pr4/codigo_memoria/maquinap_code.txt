@@ -1,7 +1,5 @@
 var sub_pendientes = pila_vacia()
 
-// TODO Abstraer mas, e igualar con gen_code
-
 gen_code(prog(bloque))
     gen_code(bloque)
     emit stop()
@@ -45,8 +43,6 @@ recolecta_subs(dec_tipo(tipo, id)):
 recolecta_subs(dec_proc(id, pforms, bloque)):
     apila(sub_pendientes, $)
 
-
-
 gen_code(si_intrs(intrs)):
     gen_code(intrs)
 
@@ -67,13 +63,19 @@ gen_code(i_eval(exp)):
 gen_code(i_if(exp, bloque, ielse)):
     gen_code_exp(exp)
     
-    emit ir_f($.sig) // si es falso saltamos al else
+    emit ir_f($.sig) // si es falso saltamos al else o final del if en caso de no haber else
     gen_code(bloque) //codigo del bloque if
-    emit ir_a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
     gen_code(ielse) // codigo del bloque else
 
-gen_code(i_else(bloque)):
+gen_code(i_prog(bloque)):
     gen_code(bloque)
+
+gen_code(si_else(bloque)):
+    emit ir_a($.fin) // Hemos ejecutado el bloque del if, saltamos incondicionalmente al final (no se ejecuta else)
+    gen_code(bloque)
+
+gen_code(no_else(bloque)):
+    noop
 
 gen_code(i_while(exp, bloque)):
     gen_code_exp(exp)
@@ -111,8 +113,8 @@ gen_code_exp(exp):
     gen_acc_valor(exp)
 
 gen_code(e_asig(opnd0, opnd1)):
-   gen_code(opnd0) 
-   gen_code(opnd1) 
+   gen_code(opnd0)
+   gen_code(opnd1)
 
     if opnd0.tipo == t_real() and opnd1.tipo == t_int():
         gen_acc_valor(opnd1)
@@ -194,17 +196,15 @@ gen_code(e_negado(opnd)):
     gen_code_exp(opnd)
     emit not //negamos el valor de la cima
 
-    // TODO Hacer que sea recursivo sin el for
-gen_code(i_call(id, preals)): //version mejorada abajo del todo
+gen_code(i_call(id, preals)):
     proc = $.vinculo
     //preparar el resgistro de activación
     emit activa(proc.nivel, proc.tam, $.sig) //en la cima tenemos la dirección de comienzo del registro de activación
 
     id_pform = 0
 
-
     gen_code_params(proc.pforms, preals)
-    ir_a(proc.prim)
+    emit ir_a(proc.prim)
 
 gen_code_params(no_pforms(), no_preals()):
     noop
@@ -221,18 +221,21 @@ gen_code_params(una_pform(pform), un_preals(exp)):
 
 gen_code_params(pform(tipo, ref, id), exp):
     emit dup //duplicamos la cima (dir de comienzo de los datos del resgistro de activación)
-        emit apila_int(pform.dir) //apilamos el tamaño del parámetro
-        emit suma //tenemos en la cima la dirección de comienzo del parámetro
-        gen_code(exp) //apilamos el valor/dir de comienzo del parámetro
-
-        if ref == no_ref():
-            if es_designador(exp): // param formal por valor y real es designador
-                // TODO cuando pasamos un entero a un real hay que hacer lo de int2real
-                emit copia(tipo.tamaño) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
-            else:
-                emit desapila_ind() // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+    emit apila_int(pform.dir) //apilamos el tamaño del parámetro
+    emit suma //tenemos en la cima la dirección de comienzo del parámetro
+    gen_code(exp) //apilamos el valor/dir de comienzo del parámetro
+    
+    if ref == no_ref():
+        if tipo == t_real() and exp.tipo == t_int():
+            gen_acc_valor(exp)
+            emit int2real //convertimos el valor a real
+            emit desapila_ind // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+        else if es_designador(exp): // param formal por valor y real es designador
+            emit copia(tipo.tamaño) //cima (dir apuntada preal) subcima (dir inicio del param en el registro activacion) se realiza copia del tamaño del tipo
         else:
-            emit desapila_ind() // como ambos son punteros, en cima tenemos el valor apuntado por el preal, que se guarda en la dirección del pform 
+            emit desapila_ind // cima es el valor y subcima la dirección de comienzo del parámetro guardamos el valor en la dirección del param
+    else:
+        emit desapila_ind // como ambos son punteros, en cima tenemos el valor apuntado por el preal, que se guarda en la dirección del pform 
 
 
 gen_code(i_bloque(bloque)):
@@ -250,7 +253,6 @@ gen_code(e_indexado(opnd0, opnd1)):
     emit mul //apilamos el desplazamiento del índice
     emit suma // a la dirección de comenzo del array le sumamos el desplazamiento del índice
 
-// TODO Creo que está pero revisar porque está el TODO
 gen_code(e_campo(opnd, id)):
     gen_code(opnd) //determinamos la dirección de E
     d = desplazamiento(opnd.tipo, id) //obtenemos el desplazamiento del campo id, se calcula en asignacion de espacio
@@ -307,9 +309,16 @@ gen_acc_valor(exp):
 desplazamiento(t_struct(camposs), idCampo):
     return desplazamiento(camposs, idCampo)
 
-asig_espacio(mas_cmp_s(camposs, cmp_s(tipo, id)), idCampo):
+desplazamiento(mas_cmp_s(camposs, cmp_s(tipo, id)), idCampo):
     if idCampo == id then:
         return cmp_s.dir
     else
-        return asig_espacio(camposs, idCampo)
+        return desplazamiento(camposs, idCampo)
+    end if
+
+desplazamiento(un_cmp_s(cmp_s(tipo, id)), idCampo):
+    if idCampo == id then:
+        return cmp_s.dir
+    else
+        return error // No deberia de ocurrir
     end if
