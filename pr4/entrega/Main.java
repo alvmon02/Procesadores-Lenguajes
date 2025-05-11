@@ -1,13 +1,18 @@
 
+import asint.SintaxisAbstractaTiny.Asig;
 import asint.SintaxisAbstractaTiny.Prog;
 import c_ast_ascendente.AnalizadorLexicoTiny;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+
+import asig_espacio.AsigEspacio;
 import c_ast_ascendente.GestionErroresTiny.*;
 import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
+import cod_maquina_p.GenCode;
 import errores_procesamiento.ErrorProcesamiento;
+import etiquetado.Etiquetado;
 import pretipado.Pretipado;
 import tipadoPost.Tipado;
 import vinculacion.Vinculado;
@@ -58,33 +63,40 @@ public class Main {
 		ejecturarPrograma(input);
 	}
 
-	private static void ejecturarPrograma(Reader input) throws FileNotFoundException, IOException, Exception {
-		Prog prog = null;
+	private static Prog construirAST(Reader input) throws FileNotFoundException, IOException, Exception {
 		if (input.read() == 97) { // Reconocer a
 			try {
 				AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
 				c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
-				prog = (Prog) asint.parse().value;
+				return (Prog) asint.parse().value;
 			} catch (ErrorLexico e) {
 				System.out.println("ERROR_LEXICO");
-				return;
+				return null;
 			} catch (ErrorSintactico e) {
 				System.out.println("ERROR_SINTACTICO");
-				return;
+				return null;
 			}
 		} else { // si no es a(en su defecto, es decir, d)
 			try {
 				c_ast_descendente.ConstructorASTsTiny asint = new c_ast_descendente.ConstructorASTsTinyDJ(
 						input);
 				asint.disable_tracing();
-				prog = asint.analiza();
+				return asint.analiza();
 			} catch (TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
-				return;
+				return null;
 			} catch (ParseException e) {
 				System.out.println("ERROR_SINTACTICO");
-				return;
+				return null;
 			}
+		}
+	}
+
+	private static void ejecturarPrograma(Reader input) throws FileNotFoundException, IOException, Exception {
+		Prog prog = construirAST(input);
+
+		if (prog == null) {
+			return;
 		}
 
 		Vinculado vinculado = new Vinculado();
@@ -113,5 +125,14 @@ public class Main {
 			}
 			return;
 		}
+
+		AsigEspacio asigEspacio = new AsigEspacio();
+		prog.procesa(asigEspacio);
+
+		Etiquetado etiquetado = new Etiquetado();
+		prog.procesa(etiquetado);
+
+		GenCode genCode = new GenCode();
+		prog.procesa(genCode);
 	}
 }

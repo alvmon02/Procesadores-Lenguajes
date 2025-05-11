@@ -63,7 +63,7 @@ public class Tipado extends ProcesamientoDef {
         }
 
         private static boolean unificables(Tipo t0, Tipo t1) {
-            Tipo t0p = refenciar(t0), t1p = refenciar(t1);
+            Tipo t0p = referenciar(t0), t1p = referenciar(t1);
 
             if ((claseDe(t0p, T_Int.class) && claseDe(t1p, T_Int.class)) ||
                     (claseDe(t0p, T_Real.class) && (claseDe(t1p, T_Int.class) || claseDe(t1p, T_Real.class))) ||
@@ -107,7 +107,7 @@ public class Tipado extends ProcesamientoDef {
         }
 
         private static boolean son_campos_unificables(CampoS campos0, CampoS campos1) {
-            return son_unificables(refenciar(campos0.tipo()), refenciar(campos1.tipo()));
+            return son_unificables(referenciar(campos0.tipo()), referenciar(campos1.tipo()));
         }
     }
 
@@ -444,7 +444,7 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Asig exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if (!asignable(exp.opnd0())) {
             errorProcesamientos.add(ErrorTipado.errorDesignadorIzq(exp.leeFila(), exp.leeCol()));
             exp.ponTipo(new T_Error());
@@ -462,7 +462,7 @@ public class Tipado extends ProcesamientoDef {
     private Tipo tipado_comp(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if (((claseDe(t0, T_Puntero.class) || claseDe(t0, T_Null.class))
                 && (claseDe(t1, T_Puntero.class) || claseDe(t1, T_Null.class))) ||
                 (claseDe(t0, T_String.class) && claseDe(t1, T_String.class)) ||
@@ -481,7 +481,7 @@ public class Tipado extends ProcesamientoDef {
     private Tipo tipado_comp_ord(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if ((claseDe(t0, T_String.class) && claseDe(t1, T_String.class)) ||
                 (claseDe(t0, T_Bool.class) && claseDe(t1, T_Bool.class)) ||
                 ((claseDe(t0, T_Int.class) || claseDe(t0, T_Real.class))
@@ -498,7 +498,7 @@ public class Tipado extends ProcesamientoDef {
     private Tipo tipado_arit(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if ((claseDe(t0, T_Int.class) || claseDe(t0, T_Real.class))
                 && (claseDe(t1, T_Int.class) || claseDe(t1, T_Real.class))) {
             return (claseDe(t0, T_Real.class) || claseDe(t1, T_Real.class)) ? new T_Real() : new T_Int();
@@ -513,7 +513,7 @@ public class Tipado extends ProcesamientoDef {
     private Tipo tipado_and_or(Exp exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if (claseDe(t0, T_Bool.class) && claseDe(t1, T_Bool.class)) {
             return new T_Bool();
         } else {
@@ -588,7 +588,7 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Porcentaje exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if (claseDe(t0, T_Int.class) && claseDe(t1, T_Int.class)) {
             exp.ponTipo(new T_Int());
         } else {
@@ -602,7 +602,7 @@ public class Tipado extends ProcesamientoDef {
     @Override
     public void procesa(Negativo exp) {
         exp.opnd0().procesa(this);
-        Tipo tipo = refenciar(exp.opnd0().tipo());
+        Tipo tipo = referenciar(exp.opnd0().tipo());
         if (claseDe(tipo, T_Int.class) || claseDe(tipo, T_Real.class)) {
             exp.ponTipo(tipo);
         } else {
@@ -617,7 +617,7 @@ public class Tipado extends ProcesamientoDef {
     @Override
     public void procesa(Negado exp) {
         exp.opnd0().procesa(this);
-        Tipo tipo = refenciar(exp.opnd0().tipo());
+        Tipo tipo = referenciar(exp.opnd0().tipo());
         if (claseDe(tipo, T_Bool.class)) {
             exp.ponTipo(tipo);
         } else {
@@ -633,9 +633,9 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Index exp) {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
-        Tipo t0 = refenciar(exp.opnd0().tipo()), t1 = refenciar(exp.opnd1().tipo());
+        Tipo t0 = referenciar(exp.opnd0().tipo()), t1 = referenciar(exp.opnd1().tipo());
         if (claseDe(t0, T_Array.class) && claseDe(t1, T_Int.class)) {
-            exp.ponTipo(refenciar(t0.tipo()));
+            exp.ponTipo(referenciar(t0.tipo()));
         } else {
             aviso_error(t0, t1, ErrorTipado.errorTiposIncompatiblesIndx(exp.leeFila(), exp.leeCol(),
                     (t0 == null ? "null" : t0.toString()) + " " + (t1 == null ? "null" : t1.toString())));
@@ -646,7 +646,7 @@ public class Tipado extends ProcesamientoDef {
     @Override
     public void procesa(Acceso exp) {
         exp.opnd0().procesa(this);
-        Tipo tipo = refenciar(exp.opnd0().tipo());
+        Tipo tipo = referenciar(exp.opnd0().tipo());
         if (claseDe(tipo, T_Struct.class)) {
             Tipo tCampo = busquedaCampo(exp.id(), tipo.camposS());
             if (claseDe(tCampo, T_Error.class)) {
@@ -678,7 +678,7 @@ public class Tipado extends ProcesamientoDef {
     @Override
     public void procesa(Indireccion exp) {
         exp.opnd0().procesa(this);
-        Tipo tipo = refenciar(exp.opnd0().tipo());
+        Tipo tipo = referenciar(exp.opnd0().tipo());
         if (claseDe(tipo, T_Puntero.class)) {
             exp.ponTipo(tipo.tipo());
         } else {

@@ -65,7 +65,7 @@ public class Prueba {
                 System.out.println("Pasando por aqui, " + cont);
                 return false;
             }
-            Tipo t0p = Tipado.refenciar(t0), t1p = Tipado.refenciar(t1);
+            Tipo t0p = Tipado.referenciar(t0), t1p = Tipado.referenciar(t1);
 
             if ((ProcesamientoDef.claseDe(t0p, T_Int.class) && ProcesamientoDef.claseDe(t1p, T_Int.class)) ||
                     (ProcesamientoDef.claseDe(t0p, T_Real.class) && (ProcesamientoDef.claseDe(t1p, T_Int.class)
@@ -111,7 +111,7 @@ public class Prueba {
         }
 
         private static boolean son_campos_unificables(CampoS campos0, CampoS campos1) {
-            return son_unificables(Tipado.refenciar(campos0.tipo()), Tipado.refenciar(campos1.tipo()));
+            return son_unificables(Tipado.referenciar(campos0.tipo()), Tipado.referenciar(campos1.tipo()));
         }
     }
 

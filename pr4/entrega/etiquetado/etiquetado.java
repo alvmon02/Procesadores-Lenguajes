@@ -48,24 +48,18 @@ public class Etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Si_Decs decs) {
-        decs.ponPrim(etqFinal);
         decs.ldecs().procesa(this);
-        decs.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Mas_Decs decs) {
-        decs.ponPrim(etqFinal);
         decs.ldecs().procesa(this);
         decs.dec().procesa(this);
-        decs.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Una_Dec dec) {
-        dec.ponPrim(etqFinal);
         dec.dec().procesa(this);
-        dec.ponSig(etqFinal);
     }
 
     @Override
@@ -75,43 +69,35 @@ public class Etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Si_Intrs si_Intrs) {
-        si_Intrs.ponPrim(etqFinal);
         si_Intrs.intrs().procesa(this);
-        si_Intrs.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Mas_Intrs mas_Intrs) {
-        mas_Intrs.ponPrim(etqFinal);
         mas_Intrs.intrs().procesa(this);
         mas_Intrs.intr().procesa(this);
-        mas_Intrs.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Una_Intr una_Intr) {
-        una_Intr.ponPrim(etqFinal);
         una_Intr.intr().procesa(this);
-        una_Intr.ponSig(etqFinal);
+    }
+
+    private void procesa_acc_exp(Exp exp) {
+        exp.procesa(this);
+        procesa_acc_valor(exp);
     }
 
     private void procesa_acc_valor(Exp exp) {
-        exp.procesa(this);
         if (esDesignador(exp)) {
             etqFinal++;
         }
     }
 
-    private void procesa_Intr(Intr intr) {
-        intr.ponPrim(etqFinal);
-        intr.exp().procesa(this);
-        etqFinal++;
-        intr.ponSig(etqFinal);
-    }
-    
     @Override
     public void procesa(I_Eval i_Eval) {
-        procesa_Intr(i_Eval);
+        i_Eval.exp().procesa(this);
+        etqFinal++;
     }
 
     @Override
@@ -120,7 +106,10 @@ public class Etiquetado extends ProcesamientoDef {
         procesa(i_If.exp());
         etqFinal++;
         i_If.prog().procesa(this);
-        etqFinal++;
+
+        if (claseDe(i_If.i_else(), Si_Else.class)) {
+            etqFinal++;
+        }
         i_If.ponSig(etqFinal);
         i_If.i_else().procesa(this);
         i_If.ponFin(etqFinal);
@@ -129,56 +118,47 @@ public class Etiquetado extends ProcesamientoDef {
     @Override
     public void procesa(I_While i_While) {
         i_While.ponPrim(etqFinal);
-        procesa_acc_valor(i_While.exp());
+        procesa_acc_exp(i_While.exp());
         etqFinal++;
         i_While.prog().procesa(this);
         etqFinal++;
         i_While.ponSig(etqFinal);
     }
 
-    private void procesa_Intr2(Intr intr){
-        intr.ponPrim(etqFinal);
-        intr.exp().procesa(this);
-        etqFinal += 2;
-        intr.ponSig(etqFinal);
-        
-    }
-
     @Override
     public void procesa(I_Read i_Read) {
-        procesa_Intr2(i_Read);
+        i_Read.exp().procesa(this);
+        etqFinal += 2;
     }
 
     @Override
     public void procesa(I_Write i_Write) {
-        i_Write.ponPrim(etqFinal);
-        procesa_acc_valor(i_Write.exp());
+        procesa_acc_exp(i_Write.exp());
         etqFinal++;
-        i_Write.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(I_NL i_Nl) {
-        procesa_lit(i_Nl.exp());  //Aunque no sea un literal, a efectos prácticos se aplican exactamente las mismas instrucciones
+        etqFinal++;
     }
 
     @Override
     public void procesa(I_New i_New) {
-        procesa_Intr2(i_New);
+        i_New.exp().procesa(this);
+        etqFinal += 2;
     }
 
     @Override
     public void procesa(I_Delete i_Delete) {
-        procesa_Intr2(i_Delete);
+        i_Delete.exp().procesa(this);
+        etqFinal += 2;
     }
 
     @Override
     public void procesa(I_Call i_Call) {
-        i_Call.ponPrim(etqFinal);
         etqFinal++;
         procesa_paso_param(((Dec_Proc) i_Call.vinculo()).pforms(), i_Call.preals());
         etqFinal++;
-        i_Call.ponSig(etqFinal);
     }
 
     private void procesa_paso_param(PForms pforms, PReals preals) {
@@ -197,50 +177,49 @@ public class Etiquetado extends ProcesamientoDef {
     private void procesa_paso_param(PForm pform, Exp exp) {
         etqFinal += 3;
         exp.procesa(this);
+        if (claseDe(pform.ref(), Si_Ref.class) && claseDe(referenciar(exp.tipo()), T_Int.class)
+                && claseDe(referenciar(pform.tipo()), T_Real.class)) {
+            etqFinal += 2;
+        }
         etqFinal++;
     }
 
     @Override
     public void procesa(I_Prog i_Prog) {
-        procesa_Intr(i_Prog);
+        i_Prog.prog().procesa(this);
     }
 
     @Override
     public void procesa(Si_Else si_Else) {
-        si_Else.ponPrim(etqFinal);
         si_Else.prog().procesa(this);
         si_Else.ponSig(etqFinal);
     }
 
     private void procesa_op_bin(Exp exp) {
-        exp.ponPrim(etqFinal);
-        procesa_acc_valor(exp.opnd0());
+        procesa_acc_exp(exp.opnd0());
         procesa_conversion(exp.opnd0(), exp.opnd1());
-        procesa_acc_valor(exp.opnd1());
+        procesa_acc_exp(exp.opnd1());
         procesa_conversion(exp.opnd1(), exp.opnd0());
         etqFinal++;
-        exp.ponSig(etqFinal);
     }
 
     private void procesa_conversion(Exp opnd0, Exp opnd1) {
-        if (claseDe(refenciar(opnd0.tipo()), T_Int.class) && claseDe(refenciar(opnd1.tipo()), T_Real.class)) {
+        if (claseDe(referenciar(opnd0.tipo()), T_Int.class) && claseDe(referenciar(opnd1.tipo()), T_Real.class)) {
             etqFinal++;
         }
     }
 
     @Override
     public void procesa(Asig exp) {
-        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
-        if (claseDe(refenciar(exp.opnd0().tipo()), T_Int.class)
-                && claseDe(refenciar(exp.opnd1().tipo()), T_Real.class)) {
+        exp.opnd1().procesa(this);
+        if (claseDe(referenciar(exp.opnd0().tipo()), T_Int.class)
+                && claseDe(referenciar(exp.opnd1().tipo()), T_Real.class)) {
             procesa_acc_valor(exp.opnd1());
-            etqFinal += 2;
-        } else {
-            exp.opnd1().procesa(this);
             etqFinal++;
         }
-        exp.ponSig(etqFinal);
+        etqFinal++;
+
     }
 
     @Override
@@ -309,10 +288,8 @@ public class Etiquetado extends ProcesamientoDef {
     }
 
     private void procesa_op_un(Exp exp) {
-        exp.ponPrim(etqFinal);
-        procesa_acc_valor(exp.opnd0());
+        procesa_acc_exp(exp.opnd0());
         etqFinal++;
-        exp.ponSig(etqFinal);
     }
 
     @Override
@@ -327,78 +304,73 @@ public class Etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(Index exp) {
-        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
-        procesa_acc_valor(exp.opnd1());
+        procesa_acc_exp(exp.opnd1());
         etqFinal += 3;
-        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Acceso exp) {
-        exp.ponPrim(etqFinal);
         exp.opnd0().procesa(this);
         etqFinal += 2;
-        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Indireccion exp) {
-        exp.ponPrim(etqFinal);
-        procesa_acc_valor(exp.opnd0());
+        procesa_acc_exp(exp.opnd0());
         etqFinal++;
-        exp.ponSig(etqFinal);
-    }
-
-    private void procesa_lit(Exp exp) {
-        exp.ponPrim(etqFinal);
-        etqFinal++;
-        exp.ponSig(etqFinal);
     }
 
     @Override
     public void procesa(Lit_ent exp) {
-        procesa_lit(exp);
+        etqFinal++;
     }
 
     @Override
     public void procesa(True exp) {
-        procesa_lit(exp);
+        etqFinal++;
     }
 
     @Override
     public void procesa(False exp) {
-        procesa_lit(exp);
+        etqFinal++;
     }
 
     @Override
     public void procesa(Lit_real exp) {
-        procesa_lit(exp);
+        etqFinal++;
     }
 
     @Override
     public void procesa(Cadena exp) {
-        procesa_lit(exp);
+        etqFinal++;
     }
 
     @Override
     public void procesa(Iden exp) {
         exp.ponPrim(etqFinal);
-        procesa_acc_iden((Dec_Var) exp.vinculo());
+        procesa_acc_iden(exp.vinculo());
         exp.ponSig(etqFinal);
     }
 
-    private void procesa_acc_iden(Dec_Var dec_Var) {
-        if (dec_Var.nivel() == 0) {
-            etqFinal++;
-        } else {
+    private void procesa_acc_iden(Nodo nodo) {
+        if (claseDe(nodo, Dec_Var.class)) {
+            if (nodo.nivel() == 0) {
+                etqFinal++;
+            } else {
+                etqFinal += 3;
+            }
+        } else { // Tiene que ser un parametro formal
+            if (claseDe(((PForm) nodo).ref(), Si_Ref.class)) {
+                etqFinal++;
+            }
             etqFinal += 3;
         }
     }
 
     @Override
     public void procesa(Null exp) {
-        procesa_lit(exp);
+        etqFinal++;
     }
 
 }
