@@ -220,7 +220,7 @@ public class asig_espacio extends ProcesamientoDef{
     @Override
     public void procesa(CampoS campoS){
         campoS.ponDir(dir); //todo
-        campoS.procesa(this);
+        campoS.tipo().procesa(this);
         campoS.ponTam(campoS.tipo().tam()); //todo
         dir += campoS.tam(); //todo
     }
@@ -287,7 +287,7 @@ public class asig_espacio extends ProcesamientoDef{
 
     @Override
     public void procesa(I_Call i_call) {
-        i_call.exp().procesa(this);
+        i_call.preals().procesa(this);
     }
 
     @Override
