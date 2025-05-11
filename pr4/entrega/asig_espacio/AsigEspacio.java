@@ -3,7 +3,7 @@ package asig_espacio;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
-public class asig_espacio extends ProcesamientoDef {
+public class AsigEspacio extends ProcesamientoDef {
 
     private int dir = 0;
     private int nivel = 0;
