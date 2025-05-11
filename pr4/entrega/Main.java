@@ -132,9 +132,10 @@ public class Main {
 
 		Etiquetado etiquetado = new Etiquetado();
 		prog.procesa(etiquetado);
-
-		GenCode genCode = new GenCode(new MaquinaP(input, 1000, 1000, 1000, 10));
+		MaquinaP m = new MaquinaP(input, 10000, 10000, 1000, 10);
+		GenCode genCode = new GenCode(m);
 		prog.procesa(genCode);
+		m.muestraCodigo();
 		genCode.ejecutar();
 	}
 }

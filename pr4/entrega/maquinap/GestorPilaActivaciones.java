@@ -12,8 +12,9 @@ public class GestorPilaActivaciones {
    }
 
    public int creaRegistroActivacion(int tamdatos) {
-      if ((pp + tamdatos + 1) > fin)
+      if ((pp + tamdatos + 1) > fin) {
          throw new StackOverflowError();
+      }
       int base = pp;
       pp += tamdatos + 2;
       return base;

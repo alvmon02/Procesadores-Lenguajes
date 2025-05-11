@@ -21,7 +21,6 @@ public class MaquinaP {
 
     private GestorMemoriaDinamica gestorMemoriaDinamica;
     private GestorPilaActivaciones gestorPilaActivaciones;
-    private Reader reader;
 
     private abstract class Valor {
 
@@ -485,25 +484,21 @@ public class MaquinaP {
 
     private class IRead implements Instruccion {
         public void ejecuta() {
-            String valor = "";
+            Valor valor = null;
             try {
-                try (Scanner scanner = new Scanner(reader)) {
-                    if (scanner.hasNextInt()) {
-                        valor = String.valueOf(scanner.nextInt());
-                        scanner.nextLine();
-                    } else if (scanner.hasNextFloat()) {
-                        valor = String.valueOf(scanner.nextFloat());
-                        scanner.nextLine();
-                    } else if (scanner.hasNextLine()) {
-                        String strValor = scanner.nextLine();
-                        valor = strValor;
-                    }
+                if (scanner.hasNextInt()) {
+                    valor = new ValorInt(scanner.nextInt());
+                    scanner.nextLine();
+                } else if (scanner.hasNextFloat()) {
+                    valor = new ValorReal(scanner.nextFloat());
+                    scanner.nextLine();
+                } else if (scanner.hasNextLine()) {
+                    valor = new ValorStr(scanner.nextLine());
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            pilaEvaluacion.push(new ValorStr(valor));
+            pilaEvaluacion.push(valor);
             pc++;
         }
 
@@ -642,6 +637,8 @@ public class MaquinaP {
 
     private class IApilaind implements Instruccion {
         public void ejecuta() {
+            if (pilaEvaluacion.isEmpty())
+                System.out.println("Pila vacia en pc " + pc);
             int dir = pilaEvaluacion.pop().valorInt();
             if (dir >= datos.length)
                 throw new EAccesoFueraDeRango();
@@ -725,6 +722,7 @@ public class MaquinaP {
             datos[base] = new ValorInt(dirretorno);
             datos[base + 1] = new ValorInt(gestorPilaActivaciones.display(nivel));
             pilaEvaluacion.push(new ValorInt(base + 2));
+            gestorPilaActivaciones.fijaDisplay(nivel, base + 2);
             pc++;
         }
 
@@ -776,6 +774,9 @@ public class MaquinaP {
 
     private class IDup implements Instruccion {
         public void ejecuta() {
+            if (pilaEvaluacion.isEmpty()) {
+                System.out.println("Pila vacia en pc " + pc);
+            }
             pilaEvaluacion.push(pilaEvaluacion.peek());
             pc++;
         }
@@ -999,34 +1000,24 @@ public class MaquinaP {
     private int tamdatos;
     private int tamheap;
     private int ndisplays;
+    private Scanner scanner;
 
     public MaquinaP(Reader buffer, int tamdatos, int tampila, int tamheap, int ndisplays) {
         this.tamdatos = tamdatos;
         this.tamheap = tamheap;
         this.ndisplays = ndisplays;
-        this.reader = buffer;
+        this.scanner = new Scanner(buffer);
         this.codigoP = new ArrayList<>();
         pilaEvaluacion = new Stack<>();
         datos = new Valor[tamdatos + tampila + tamheap];
         this.pc = 0;
-        ISUMA = new ISuma();
-        IAND = new IAnd();
-        IMUL = new IMul();
-        IAPILAIND = new IApilaind();
-        IDESAPILAIND = new IDesapilaind();
-        IIRIND = new IIrind();
-        IDUP = new IDup();
-        ISTOP = new IStop();
         gestorPilaActivaciones = new GestorPilaActivaciones(tamdatos, (tamdatos + tampila) - 1, ndisplays);
         gestorMemoriaDinamica = new GestorMemoriaDinamica(tamdatos + tampila, (tamdatos + tampila + tamheap) - 1);
     }
 
     public void ejecuta() {
         while (pc != codigoP.size()) {
-            if (pc >= codigoP.size())
-                System.err.println("Se ha intentado acceder a la posicion " + pc + " de " + codigoP.size());
-            else
-                codigoP.get(pc).ejecuta();
+            codigoP.get(pc).ejecuta();
         }
     }
 

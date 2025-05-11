@@ -223,9 +223,10 @@ public class GenCode extends ProcesamientoDef {
         exp.opnd0().procesa(this);
         exp.opnd1().procesa(this);
 
-        if (claseDe(exp.opnd0().vinculo(), T_Real.class) && claseDe(exp.opnd1().vinculo(), T_Int.class)) { // asignación
-                                                                                                           // de un int
-                                                                                                           // a un real
+        if (claseDe(referenciar(exp.opnd0().tipo()), T_Real.class)
+                && claseDe(referenciar(exp.opnd1().tipo()), T_Int.class)) { // asignación
+            // de un int
+            // a un real
             procesa_acc(exp.opnd1());
             m.emit(m.int2real()); // convertimos el valor de la cima a real
             m.emit(m.desapila_ind()); // guardamos el valor convertido a int en la dirección de opnd0
@@ -422,9 +423,9 @@ public class GenCode extends ProcesamientoDef {
             m.emit(m.apilad(dec.nivel()));
             m.emit(m.apila_int(dec.dir()));
             m.emit(m.suma());
-            if (claseDe(((PForm) dec).ref(), Si_Ref.class)) {
-                m.emit(m.apila_ind());
-            }
+            // if (claseDe(((PForm) dec).ref(), Si_Ref.class)) {
+            // m.emit(m.apila_ind());
+            // }
         }
     }
 

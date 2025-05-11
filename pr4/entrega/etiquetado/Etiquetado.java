@@ -103,7 +103,7 @@ public class Etiquetado extends ProcesamientoDef {
     @Override
     public void procesa(I_If i_If) {
         i_If.ponPrim(etqFinal);
-        procesa(i_If.exp());
+        procesa_acc_exp(i_If.exp());
         etqFinal++;
         i_If.prog().procesa(this);
 
@@ -159,6 +159,7 @@ public class Etiquetado extends ProcesamientoDef {
         etqFinal++;
         procesa_paso_param(((Dec_Proc) i_Call.vinculo()).pforms(), i_Call.preals());
         etqFinal++;
+        i_Call.ponSig(etqFinal);
     }
 
     private void procesa_paso_param(PForms pforms, PReals preals) {
