@@ -1,0 +1,3 @@
+Errores_tipado fila:49 col:7
+Errores_tipado fila:85 col:28
+Errores_tipado fila:91 col:28
