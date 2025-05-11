@@ -10,7 +10,6 @@ import maquinap.*;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-
 public class GenCode extends ProcesamientoDef {
 
     private boolean esDesignador(Exp exp) {
@@ -45,8 +44,7 @@ public class GenCode extends ProcesamientoDef {
     }
 
     public void procesa(Una_Dec dec) {
-
-        dec.procesa(this);
+        dec.dec().procesa(this);
     }
 
     public void procesa(Si_Intrs si_Intrs) {
@@ -198,11 +196,11 @@ public class GenCode extends ProcesamientoDef {
     }
 
     public void procesa(I_Prog i_Prog) {
-        i_Prog.procesa(this);
+        i_Prog.prog().procesa(this);
     }
 
     public void procesa(Si_Else si_Else) {
-        si_Else.procesa(this);
+        si_Else.prog().procesa(this);
     }
 
     public void procesa(Asig exp) {
@@ -227,8 +225,6 @@ public class GenCode extends ProcesamientoDef {
         }
     }
 
-
-
     private void prepararOperandos(final ExpBin exp) {
         // operando 0
         exp.opnd0().procesa(this);
@@ -237,7 +233,7 @@ public class GenCode extends ProcesamientoDef {
         }
         // conversión antes de segundo operando
         if (claseDe(exp.opnd0().vinculo(), T_Int.class)
-            && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
+                && claseDe(exp.opnd1().vinculo(), T_Real.class)) {
             m.emit(m.int2real());
         }
 
@@ -248,7 +244,7 @@ public class GenCode extends ProcesamientoDef {
         }
         // conversión tras segundo operando
         if (claseDe(exp.opnd0().vinculo(), T_Real.class)
-            && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
+                && claseDe(exp.opnd1().vinculo(), T_Int.class)) {
             m.emit(m.int2real());
         }
     }
@@ -330,7 +326,6 @@ public class GenCode extends ProcesamientoDef {
         m.emit(m.negativo()); // Negamos el valor de la cima
     }
 
-  
     public void procesa(Negado exp) {
         prepararOperando(exp);
         m.emit(m.negado()); // Negamos el valor de la cima
