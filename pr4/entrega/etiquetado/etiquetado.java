@@ -2,8 +2,6 @@ package etiquetado;
 
 import java.util.Stack;
 
-import javax.lang.model.element.VariableElement;
-
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
@@ -28,7 +26,7 @@ public class Etiquetado extends ProcesamientoDef {
         return claseDe(exp, Index.class) ||
                 claseDe(exp, Acceso.class) ||
                 claseDe(exp, Indireccion.class) ||
-                claseDe(exp, VariableElement.class);
+                claseDe(exp, Iden.class);
     }
 
     @Override

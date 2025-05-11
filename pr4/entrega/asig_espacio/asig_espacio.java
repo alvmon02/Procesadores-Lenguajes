@@ -1,13 +1,7 @@
 package asig_espacio;
 
-import java.util.Collection;
-
-import java.util.List;
-import java.util.ArrayList;
-
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
-import errores_procesamiento.*;
 
 public class asig_espacio extends ProcesamientoDef {
 
@@ -175,6 +169,7 @@ public class asig_espacio extends ProcesamientoDef {
 
     @Override
     public void procesa2(T_Array t_array) {
+        t_array.tipo().procesa2(this);
     }
 
     @Override
@@ -200,7 +195,16 @@ public class asig_espacio extends ProcesamientoDef {
 
     @Override
     public void procesa(T_Struct t_struct) {
+        int dirAnt = dir;
+        dir = 0;
         t_struct.camposS().procesa(this);
+        t_struct.ponTam(dir);
+        dir = dirAnt;
+    }
+
+    @Override
+    public void procesa2(T_Struct t_struct){
+        t_struct.camposS().procesa2(this);
     }
 
     @Override
@@ -217,7 +221,7 @@ public class asig_espacio extends ProcesamientoDef {
     @Override
     public void procesa(CampoS campoS) {
         campoS.ponDir(dir); // todo
-        campoS.procesa(this);
+        campoS.tipo().procesa(this);
         campoS.ponTam(campoS.tipo().tam()); // todo
         dir += campoS.tam(); // todo
     }
@@ -283,7 +287,7 @@ public class asig_espacio extends ProcesamientoDef {
 
     @Override
     public void procesa(I_Call i_call) {
-        i_call.exp().procesa(this);
+        i_call.preals().procesa(this);
     }
 
     @Override
