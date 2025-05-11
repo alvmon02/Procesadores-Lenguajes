@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 
-public class cod_maquina_p extends ProcesamientoDef {
+public class GenCode extends ProcesamientoDef {
 
     private boolean es_designador(SintaxisAbstractaTiny.Exp exp) {
 
